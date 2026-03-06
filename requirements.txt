@@ -1,0 +1,37 @@
+# Kannada Book AI Agent - Requirements (Windows Compatible)
+# Install: pip install -r requirements.txt
+
+# PDF & Image
+pdf2image
+Pillow
+opencv-python
+numpy
+
+# OCR
+surya-ocr
+
+# Kannada text cleaning
+indic-nlp-library
+
+# Embeddings & vector store
+sentence-transformers
+transformers
+torch
+chromadb
+
+# LangChain agent + chains
+langchain
+langchain-community
+langchain-core
+
+# API
+requests
+
+# Env vars
+python-dotenv
+
+# UI
+streamlit
+
+# Utilities
+tqdm

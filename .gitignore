@@ -1,0 +1,11 @@
+.env
+kannada-rag-env/
+data/raw_images/
+data/processed_images/
+data/cleaned_text/
+data/normalized_text/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.vscode/
