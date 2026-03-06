@@ -3,6 +3,8 @@
 An end-to-end AI-powered RAG chatbot for the Kannada novel **"ಹೇಳಿ ಹೋಗು ಕಾರಣ" (Heli Hogu Karana)** by Ravi Belagere.
 Ask questions in **Kannada or English** and get grounded answers with page citations and audio output.
 
+🚀 **[Live Demo](https://kannada-rag-agent-hqvwhfejguymb9ijrvz4hd.streamlit.app/)**
+
 ---
 
 ## 🎯 Project Highlights
@@ -179,12 +181,6 @@ streamlit run app.py
 - [ ] Re-embed with improved chunks
 - [ ] Docker deployment
 - [ ] Add more Kannada books to the corpus
-
----
-
-## 📸 Demo
-
-> *Screenshots coming soon*
 
 ---
 
