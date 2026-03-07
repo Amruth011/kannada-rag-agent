@@ -10,8 +10,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
-CHROMA_DIR     = r"chroma_db"
+CHROMA_DIR     = os.path.join(BASE_DIR, "chroma_db")
 COLLECTION     = "kannada_book"
 MODEL_NAME     = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
@@ -84,8 +85,164 @@ def is_general_question(question):
 st.set_page_config(
     page_title="ಹೇಳಿ ಹೋಗು ಕಾರಣ — AI Agent",
     page_icon="📚",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
+
+# --- ULTRA-PREMIUM CSS STYLING ---
+st.markdown("""
+<style>
+    /* Import modern Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    h1, h2, h3 {
+        font-family: 'Outfit', sans-serif;
+    }
+
+    /* Base theme: Deep rich space dark mode */
+    div[data-testid="stAppViewContainer"] {
+        background: radial-gradient(circle at 15% 50%, #130b29, #09090e 50%, #050a16 100%);
+        color: #e2e8f0;
+    }
+    
+    /* Hide Streamlit default UI elements for a SaaS feel */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+        backdrop-filter: blur(0px) !important;
+    }
+    footer {visibility: hidden;}
+    .stDeployButton {display:none;}
+    
+    /* Sleek Sidebar with blurred frost effect */
+    div[data-testid="stSidebar"] {
+        background-color: rgba(10, 10, 20, 0.4) !important;
+        backdrop-filter: blur(20px) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Container Spacing for Header */
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 5rem !important;
+    }
+
+    /* Modern Chat Messages */
+    div[data-testid="stChatMessage"] {
+        background: rgba(20, 20, 35, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        border-radius: 20px;
+        padding: 1.5rem 1.75rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        line-height: 1.6;
+        font-size: 1.05rem;
+    }
+    div[data-testid="stChatMessage"]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    /* User Chat Bubble - Sleek Neon Blue/Cyan */
+    div[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+        background: linear-gradient(145deg, rgba(8, 145, 178, 0.08) 0%, rgba(56, 189, 248, 0.03) 100%);
+        border-left: 3px solid #06b6d4;
+    }
+
+    /* Assistant Chat Bubble - Elegant Purple/Pink */
+    div[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {
+        background: linear-gradient(145deg, rgba(168, 85, 247, 0.08) 0%, rgba(236, 72, 153, 0.03) 100%);
+        border-left: 3px solid #d946ef;
+    }
+    
+    /* Floating, Glowing Input Box */
+    div[data-testid="stChatInput"] {
+        background: rgba(15, 15, 25, 0.7) !important;
+        backdrop-filter: blur(24px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 0.25rem 0.5rem;
+        box-shadow: 0 0 40px rgba(139, 92, 246, 0.15), 0 4px 6px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+    }
+    div[data-testid="stChatInput"]:focus-within {
+        border-color: rgba(139, 92, 246, 0.5);
+        box-shadow: 0 0 40px rgba(139, 92, 246, 0.3), 0 4px 6px rgba(0,0,0,0.3);
+    }
+
+    /* Styled Expander / Accordion */
+    div[data-testid="stExpander"] {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 12px;
+        transition: all 0.2s;
+    }
+    div[data-testid="stExpander"]:hover {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Elegant Dividers */
+    hr {
+        border-color: rgba(255,255,255,0.06) !important;
+        margin: 2rem 0;
+    }
+    
+    /* Premium Title Text Gradient with glow */
+    h1 {
+        background: linear-gradient(to right, #38bdf8, #c084fc, #f472b6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 3rem;
+        letter-spacing: -1px;
+        margin-bottom: 0.2rem;
+        text-shadow: 0 10px 30px rgba(192, 132, 252, 0.2);
+    }
+    
+    /* Subtle subtitle */
+    .stMarkdown p {
+        color: #94a3b8;
+    }
+
+    /* Minimalist Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        color: #fff;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .stButton > button:hover {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+        transform: translateY(-1px);
+    }
+</style>
+""", unsafe_allow_html=True)
 
 @st.cache_resource
 def load_agent():
@@ -153,7 +310,7 @@ ANSWER in English:"""
 
 ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ:"""
 
-def call_sarvam_llm(prompt):
+def call_sarvam_llm(messages):
     if not SARVAM_API_KEY:
         return "⚠️ SARVAM_API_KEY not set in .env"
     headers = {
@@ -162,7 +319,7 @@ def call_sarvam_llm(prompt):
     }
     payload = {
         "model"      : "sarvam-m",
-        "messages"   : [{"role": "user", "content": prompt}],
+        "messages"   : messages,
         "temperature": 0.1,
         "max_tokens" : 600
     }
@@ -180,25 +337,66 @@ def call_sarvam_tts(text, language="kn-IN"):
         "api-subscription-key": SARVAM_API_KEY,
         "Content-Type": "application/json"
     }
-    clean = re.sub(r'\[Page \d+\]:', '', text)[:500].strip()
-    payload = {
-        "inputs"              : [clean],
-        "target_language_code": language,
-        "speaker"             : "anushka",
-        "model"               : "bulbul:v3",
-        "pace"                : 1.0,
-        "loudness"            : 1.5
-    }
-    resp = requests.post(
-        "https://api.sarvam.ai/text-to-speech",
-        headers=headers, json=payload, timeout=30
-    )
-    resp.raise_for_status()
-    return base64.b64decode(resp.json()["audios"][0])
+
+    clean = re.sub(r'\[Page \d+\]:', '', text).strip()
+    
+    # Split text intelligently to stay under 500 characters (API limit)
+    words = clean.split(' ')
+    chunks = []
+    current_chunk = ""
+    
+    for word in words:
+        if len(current_chunk) + len(word) + 1 < 450:
+            current_chunk += (" " if current_chunk else "") + word
+        else:
+            if current_chunk:
+                chunks.append(current_chunk)
+            current_chunk = word
+    if current_chunk:
+        chunks.append(current_chunk)
+
+    audio_bytes_list = []
+    for chunk in chunks:
+        if not chunk.strip():
+            continue
+        payload = {
+            "inputs"              : [chunk.strip()],
+            "target_language_code": language,
+            "model"               : "bulbul:v3",
+            "pace"                : 1.0
+        }
+        resp = requests.post(
+            "https://api.sarvam.ai/text-to-speech",
+            headers=headers, json=payload, timeout=60
+        )
+        if resp.status_code == 200:
+            audio_bytes_list.append(base64.b64decode(resp.json()["audios"][0]))
+
+    if not audio_bytes_list:
+        return None
+
+    # Stitch WAV files together seamlessly
+    import wave
+    import io
+    
+    output_wav = io.BytesIO()
+    with wave.open(output_wav, 'wb') as wav_out:
+        for i, audio_bytes in enumerate(audio_bytes_list):
+            segment = io.BytesIO(audio_bytes)
+            try:
+                with wave.open(segment, 'rb') as wav_in:
+                    if i == 0:
+                        # Set audio properties based on the first chunk
+                        wav_out.setparams(wav_in.getparams())
+                    wav_out.writeframes(wav_in.readframes(wav_in.getnframes()))
+            except wave.Error:
+                continue
+
+    return output_wav.getvalue()
 
 # ── UI ───────────────────────────────────────────────
-st.title("📚 ಹೇಳಿ ಹೋಗು ಕಾರಣ — AI Agent")
-st.caption("Kannada Book AI Agent by Ravi Belagere — Ask in Kannada or English")
+st.markdown("<h1>📚 ಹೇಳಿ ಹೋಗು ಕಾರಣ<br><span style='font-size: 1.5rem; color: #94a3b8; font-weight: 400;'>Premium AI Knowledge Agent</span></h1>", unsafe_allow_html=True)
+st.markdown("<p style='margin-bottom: 2rem;'>Masterpiece Kannada Novel Intelligence — Powered by Sarvam & Surya OCR</p>", unsafe_allow_html=True)
 
 with st.sidebar:
     st.markdown("### ⚙️ Settings")
@@ -253,7 +451,20 @@ if question:
 
                 prompt = build_prompt(question, chunks, current_lang,
                                       use_book_context_only=general)
-                answer = call_sarvam_llm(prompt)
+                                      
+                # Build conversation history for memory
+                chat_history = []
+                # Keep last 4 messages to preserve context without blowing up token limits
+                for msg in st.session_state.messages[-5:-1]:
+                    if msg["role"] in ["user", "assistant"]:
+                        # Strip citations from history to keep it clean
+                        clean_content = re.sub(r'\[Page \d+\]:', '', msg["content"]).strip()
+                        chat_history.append({"role": msg["role"], "content": clean_content})
+                        
+                # Append the current prompt 
+                chat_history.append({"role": "user", "content": prompt})
+
+                answer = call_sarvam_llm(chat_history)
                 pages  = sorted(set(c["page"] for c in chunks)) if chunks else []
 
                 st.write(answer)

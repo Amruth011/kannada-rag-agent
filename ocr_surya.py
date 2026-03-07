@@ -1,12 +1,21 @@
 # ingest/ocr_surya.py
-# Phase 2.3 — EasyOCR (Kannada support, no compatibility issues)
+# Phase 2.3 — Surya OCR (State-of-the-art Kannada support)
 # Run: kannada-rag-env\Scripts\python.exe ocr_surya.py
 
 import os
 import json
-import easyocr
 from PIL import Image
 from tqdm import tqdm
+
+from surya.common.surya.schema import TaskNames
+from surya.detection import DetectionPredictor
+from surya.foundation import FoundationPredictor
+from surya.recognition import RecognitionPredictor
+
+# Load models/predictors once
+foundation_predictor = FoundationPredictor()
+det_predictor = DetectionPredictor()
+rec_predictor = RecognitionPredictor(foundation_predictor)
 
 # ── Config ──────────────────────────────────────────
 INPUT_DIR  = r"data\processed_images"
@@ -27,32 +36,57 @@ def run_ocr_pipeline(input_dir, output_dir):
 
     print(f"📄 Found {len(images)} images to OCR\n")
 
-    print("🔄 Loading EasyOCR model (downloading on first run ~500MB)...")
-    # kn = Kannada, en = English (handles mixed pages like copyright page)
-    reader = easyocr.Reader(['kn', 'en'], gpu=False)
-    print("✅ Model loaded\n")
+    print("✅ Models loaded\n")
 
     processed = 0
     failed    = []
 
-    for fname in tqdm(images, desc="Running OCR"):
-        txt_path = os.path.join(output_dir, fname.replace(".png", ".txt"))
+    BATCH_SIZE = 8
+    print(f"🔄 Using Batch Size: {BATCH_SIZE}\n")
 
-        # Resume — skip already done pages
-        if os.path.exists(txt_path):
-            continue
+    for i in tqdm(range(0, len(images), BATCH_SIZE), desc="Running OCR in Batches"):
+        batch_fnames = images[i:i + BATCH_SIZE]
+        batch_images = []
+        batch_img_paths = [] # Initialize batch_img_paths here
+        
+        for fname in batch_fnames:
+            img_path = os.path.join(input_dir, fname)
+            batch_images.append(Image.open(img_path))
+            batch_img_paths.append(img_path) # Store full path
 
-        img_path = os.path.join(input_dir, fname)
         try:
-            results = reader.readtext(img_path, detail=0, paragraph=True)
-            text    = "\n".join([r for r in results if r.strip()])
+            # Run recognition on the batch of 8 images using the v0.17 Predictor API
+            task_names = [TaskNames.ocr_with_boxes] * len(batch_images)
+            predictions = rec_predictor(
+                batch_images, 
+                task_names=task_names,
+                det_predictor=det_predictor,
+                recognition_batch_size=8,
+                detection_batch_size=8
+            )
+            
+            # Unpack results and save
+            for img_path, pred in zip(batch_img_paths, predictions):
+                base_name = os.path.basename(img_path)
+                
+                # Extract recognized text strings from the prediction objects
+                try:
+                    # Based on the new Surya inference output dict/object structure
+                    extracted_lines = [line.text for line in pred.text_lines]
+                    full_text = "\\n".join(extracted_lines)
+                except Exception as e:
+                    # Fallback if structure is slightly different
+                    full_text = str(pred)
 
-            with open(txt_path, "w", encoding="utf-8") as f:
-                f.write(text)
-            processed += 1
+                # Save to file, similar to original logic
+                txt_path = os.path.join(output_dir, base_name.replace(".png", ".txt").replace(".jpg", ".txt"))
+                with open(txt_path, "w", encoding="utf-8") as f:
+                    f.write(full_text)
+                processed += 1
 
         except Exception as e:
-            failed.append((fname, str(e)))
+            for fname in batch_fnames:
+                failed.append((fname, str(e)))
 
     print(f"\n✅ OCR complete!")
     print(f"   Processed : {processed}")
@@ -69,4 +103,4 @@ if __name__ == "__main__":
     if not os.path.exists(INPUT_DIR):
         print(f"❌ Not found: {INPUT_DIR} — run preprocess_images.py first")
     else:
-        run_ocr_pipeline(INPUT_DIR, OUTPUT_DIR)
+        run_ocr_pipeline(INPUT_DIR, OUTPUT_DIR)
