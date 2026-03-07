@@ -181,7 +181,10 @@ def load_agent():
     import chromadb
     embed_model = SentenceTransformer(MODEL_NAME)
     client      = chromadb.PersistentClient(path=CHROMA_DIR)
-    collection  = client.get_collection(COLLECTION)
+    try:
+        collection = client.get_collection(COLLECTION)
+    except Exception:
+        collection = client.get_or_create_collection(COLLECTION, metadata={"hnsw:space": "cosine"})
     return embed_model, collection
 
 def retrieve(query, embed_model, collection, top_k=5):
