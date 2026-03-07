@@ -4,6 +4,7 @@ An end-to-end Premium AI-powered RAG chatbot for the Kannada novel **"ಹೇಳ�
 Ask questions in **Kannada or English** and get grounded answers with page citations and flawless audio output.
 
 🚀 **Current Version: v2.0.0 (Premium Architecture Upgrade)**
+🌐 **[Live Premium Demo](https://kannada-rag-agent-hqvwhfejguymb9ijrvz4hd.streamlit.app/)**
 
 ---
 
