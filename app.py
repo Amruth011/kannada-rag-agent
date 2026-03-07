@@ -30,13 +30,6 @@ truth-telling, the relationship between humans and the divine, and moral account
 Style: Bold journalistic prose, episodic structure, multiple philosophical perspectives.
 Key themes: Human deception, divine justice, moral accountability, existential questioning, social critique.
 
-Main Characters:
-- ಹಿಮವಂತ (Himavant): The main protagonist of the novel. His character development and
-  inner conflicts form the central narrative. He struggles with moral dilemmas and the
-  tension between truth and deception. His relationship with his wife Prarthana is central.
-- ಪ್ರಾರ್ಥನಾ (Prarthana): Himavant's wife. Her relationship with Himavant is a key
-  emotional thread in the story. The tension between them reflects the novel's themes
-  of accountability and truth-telling in personal relationships.
 """
 
 GENERAL_PATTERNS = [
@@ -56,27 +49,20 @@ GENERAL_PATTERNS = [
     r'theme',
     r'title mean',
     r'ಶೀರ್ಷಿಕೆ',
-    r'himavant',
-    r'prarthana',
-    r'pratana',
-    r'prathana',
-    r'ಹಿಮವಂತ',
-    r'ಪ್ರಾರ್ಥನಾ',
-    r'main character',
-    r'protagonist',
-    r'ಮುಖ್ಯ ಪಾತ್ರ',
-    r'character',
-    r'ಪಾತ್ರ',
-    r'wife',
-    r'husband',
-    r'relationship',
-    r'ಹೆಂಡತಿ',
-    r'ಗಂಡ',
-    r'ಸಂಬಂಧ',
-    r'name of',
-    r'who are the',
-    r'tell me about',
 ]
+
+CHARACTER_PATTERNS = [
+    r'himavant', r'prarthana', r'pratana', r'prathana',
+    r'ಹಿಮವಂತ', r'ಪ್ರಾರ್ಥನಾ',
+    r'main character', r'protagonist', r'ಮುಖ್ಯ ಪಾತ್ರ',
+    r'who is', r'who are', r'character', r'ಪಾತ್ರ',
+    r'wife', r'husband', r'ಹೆಂಡತಿ', r'ಗಂಡ',
+    r'relationship', r'ಸಂಬಂಧ', r'name of', r'tell me about',
+]
+
+def is_character_question(question):
+    q = question.lower()
+    return any(re.search(p, q, re.IGNORECASE) for p in CHARACTER_PATTERNS)
 
 def is_general_question(question):
     q = question.lower()
@@ -205,6 +191,21 @@ def retrieve_by_page(page_num, collection):
     results = collection.get(where={"page": page_num}, limit=5)
     return [{"text": d, "page": m["page"], "score": 1.0}
             for d, m in zip(results["documents"], results["metadatas"])]
+
+def retrieve_character(query, embed_model, collection):
+    """Higher recall retrieval for character-specific questions."""
+    qe      = embed_model.encode([query])[0].tolist()
+    results = collection.query(query_embeddings=[qe], n_results=10)
+    chunks  = []
+    for i, doc in enumerate(results["documents"][0]):
+        score = 1 - results["distances"][0][i]
+        if score >= 0.2:
+            chunks.append({
+                "text" : doc,
+                "page" : results["metadatas"][0][i]["page"],
+                "score": round(score, 3)
+            })
+    return chunks
 
 def detect_page_query(question):
     m = re.search(r'page\s*(\d+)|ಪುಟ\s*(\d+)|(\d+)\s*(?:page|ಪುಟ)', question, re.IGNORECASE)
@@ -372,6 +373,8 @@ if question:
                     chunks = retrieve_by_page(page_num, collection)
                     if not chunks:
                         chunks = retrieve(question, embed_model, collection)
+                elif is_character_question(question):
+                    chunks = retrieve_character(question, embed_model, collection)
                 elif not general:
                     chunks = retrieve(question, embed_model, collection)
 
