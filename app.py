@@ -142,6 +142,29 @@ st.markdown("""
         margin-bottom: 0.2rem;
     }
     .stMarkdown p { color: #94a3b8; }
+
+    /* Glass effect for sidebar widgets */
+    div[data-testid="stSidebar"] .stRadio,
+    div[data-testid="stSidebar"] .stCheckbox {
+        background: rgba(255,255,255,0.04) !important;
+        border: 1px solid rgba(255,255,255,0.08) !important;
+        border-radius: 14px !important;
+        padding: 0.75rem 1rem !important;
+        margin-bottom: 0.5rem !important;
+        backdrop-filter: blur(10px) !important;
+        transition: all 0.2s ease !important;
+    }
+    div[data-testid="stSidebar"] .stRadio:hover,
+    div[data-testid="stSidebar"] .stCheckbox:hover {
+        background: rgba(255,255,255,0.07) !important;
+        border-color: rgba(139,92,246,0.4) !important;
+        box-shadow: 0 0 15px rgba(139,92,246,0.15) !important;
+    }
+    div[data-testid="stSidebar"] .stRadio label,
+    div[data-testid="stSidebar"] .stCheckbox label {
+        color: #e2e8f0 !important;
+        font-weight: 500 !important;
+    }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 6px; }
