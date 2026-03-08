@@ -30,8 +30,10 @@ truth-telling, the relationship between humans and the divine, and moral account
 Style: Bold journalistic prose, episodic structure, multiple philosophical perspectives.
 Key themes: Human deception, divine justice, moral accountability, existential questioning, social critique.
 
+Known characters in this novel: ಹಿಮವಂತ (Himavant) is the main protagonist. ಪ್ರಾರ್ಥನಾ (Prarthana) is his wife. Their relationship is central to the story.
 """
 
+# General book/author questions — answered from BOOK_CONTEXT only
 GENERAL_PATTERNS = [
     r'what is (this|the) book',
     r'about (this|the) book',
@@ -51,6 +53,7 @@ GENERAL_PATTERNS = [
     r'ಶೀರ್ಷಿಕೆ',
 ]
 
+# Character questions — answered from RAG retrieval
 CHARACTER_PATTERNS = [
     r'himavant', r'prarthana', r'pratana', r'prathana',
     r'ಹಿಮವಂತ', r'ಪ್ರಾರ್ಥನಾ',
@@ -60,13 +63,11 @@ CHARACTER_PATTERNS = [
     r'relationship', r'ಸಂಬಂಧ', r'name of', r'tell me about',
 ]
 
-def is_character_question(question):
-    q = question.lower()
-    return any(re.search(p, q, re.IGNORECASE) for p in CHARACTER_PATTERNS)
-
-def is_general_question(question):
-    q = question.lower()
+def is_general_question(q):
     return any(re.search(p, q, re.IGNORECASE) for p in GENERAL_PATTERNS)
+
+def is_character_question(q):
+    return any(re.search(p, q, re.IGNORECASE) for p in CHARACTER_PATTERNS)
 
 st.set_page_config(
     page_title="ಹೇಳಿ ಹೋಗು ಕಾರಣ — AI Agent",
@@ -99,14 +100,14 @@ st.markdown("""
         border-radius: 20px;
         padding: 1.5rem 1.75rem;
         margin-bottom: 1.5rem;
-        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5), inset 0 1px 0 0 rgba(255,255,255,0.05);
+        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         line-height: 1.6;
         font-size: 1.05rem;
     }
     div[data-testid="stChatMessage"]:hover {
         transform: translateY(-3px);
-        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6), inset 0 1px 0 0 rgba(255,255,255,0.08);
+        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
         border-color: rgba(255,255,255,0.08);
     }
     div[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
@@ -170,7 +171,9 @@ def load_agent():
     try:
         collection = client.get_collection(COLLECTION)
     except Exception:
-        collection = client.get_or_create_collection(COLLECTION, metadata={"hnsw:space": "cosine"})
+        collection = client.get_or_create_collection(
+            COLLECTION, metadata={"hnsw:space": "cosine"}
+        )
     return embed_model, collection
 
 def retrieve(query, embed_model, collection, top_k=5):
@@ -187,25 +190,25 @@ def retrieve(query, embed_model, collection, top_k=5):
             })
     return chunks
 
-def retrieve_by_page(page_num, collection):
-    results = collection.get(where={"page": page_num}, limit=5)
-    return [{"text": d, "page": m["page"], "score": 1.0}
-            for d, m in zip(results["documents"], results["metadatas"])]
-
 def retrieve_character(query, embed_model, collection):
-    """Higher recall retrieval for character-specific questions."""
+    """Higher recall retrieval for character questions — more chunks, lower threshold."""
     qe      = embed_model.encode([query])[0].tolist()
     results = collection.query(query_embeddings=[qe], n_results=10)
     chunks  = []
     for i, doc in enumerate(results["documents"][0]):
         score = 1 - results["distances"][0][i]
-        if score >= 0.2:
+        if score >= 0.20:
             chunks.append({
                 "text" : doc,
                 "page" : results["metadatas"][0][i]["page"],
                 "score": round(score, 3)
             })
     return chunks
+
+def retrieve_by_page(page_num, collection):
+    results = collection.get(where={"page": page_num}, limit=5)
+    return [{"text": d, "page": m["page"], "score": 1.0}
+            for d, m in zip(results["documents"], results["metadatas"])]
 
 def detect_page_query(question):
     m = re.search(r'page\s*(\d+)|ಪುಟ\s*(\d+)|(\d+)\s*(?:page|ಪುಟ)', question, re.IGNORECASE)
@@ -214,15 +217,14 @@ def detect_page_query(question):
     return None
 
 def build_prompt(question, chunks, language, use_book_context_only=False):
-    if use_book_context_only:
-        rag_section = ""
-    else:
-        rag_section = "\n\n".join([f"[Page {c['page']}]: {c['text']}" for c in chunks]) if chunks else "(No specific passages retrieved.)"
-
+    rag_section = "" if use_book_context_only else (
+        "\n\n".join([f"[Page {c['page']}]: {c['text']}" for c in chunks])
+        if chunks else "(No specific passages retrieved.)"
+    )
     if language == "English":
         return f"""You are an AI assistant for the Kannada novel "Heli Hogu Karana".
 
-BOOK INFORMATION (always accurate):
+BOOK INFORMATION:
 {BOOK_CONTEXT}
 
 {"" if use_book_context_only else f"RETRIEVED PASSAGES FROM BOOK:{chr(10)}{rag_section}{chr(10)}"}
@@ -248,7 +250,7 @@ ANSWER in English:"""
 def call_sarvam_llm(messages):
     if not SARVAM_API_KEY:
         return "⚠️ SARVAM_API_KEY not set in .env"
-    # ✅ FIXED: correct auth header
+    # ✅ FIXED auth header
     headers = {
         "Authorization": f"Bearer {SARVAM_API_KEY}",
         "Content-Type": "application/json"
@@ -269,33 +271,29 @@ def call_sarvam_llm(messages):
 def call_sarvam_tts(text, language="kn-IN"):
     if not SARVAM_API_KEY:
         return None
-    # ✅ FIXED: correct auth header
+    # ✅ FIXED auth header
     headers = {
         "Authorization": f"Bearer {SARVAM_API_KEY}",
         "Content-Type": "application/json"
     }
     clean = re.sub(r'\[Page \d+\]:', '', text).strip()
-    words = clean.split(' ')
-    chunks = []
-    current_chunk = ""
+    words = clean.split()
+    chunks_list, current = [], ""
     for word in words:
-        if len(current_chunk) + len(word) + 1 < 450:
-            current_chunk += (" " if current_chunk else "") + word
+        if len(current) + len(word) + 1 < 450:
+            current += (" " if current else "") + word
         else:
-            if current_chunk:
-                chunks.append(current_chunk)
-            current_chunk = word
-    if current_chunk:
-        chunks.append(current_chunk)
+            if current: chunks_list.append(current)
+            current = word
+    if current: chunks_list.append(current)
 
     audio_bytes_list = []
-    for chunk in chunks:
-        if not chunk.strip():
-            continue
+    for chunk in chunks_list:
+        if not chunk.strip(): continue
         payload = {
             "inputs"              : [chunk.strip()],
             "target_language_code": language,
-            "speaker"             : "anushka",
+            "speaker"             : "priya",
             "model"               : "bulbul:v3",
             "pace"                : 1.0
         }
@@ -312,12 +310,11 @@ def call_sarvam_tts(text, language="kn-IN"):
     import wave, io
     output_wav = io.BytesIO()
     with wave.open(output_wav, 'wb') as wav_out:
-        for i, audio_bytes in enumerate(audio_bytes_list):
-            segment = io.BytesIO(audio_bytes)
+        for i, ab in enumerate(audio_bytes_list):
+            seg = io.BytesIO(ab)
             try:
-                with wave.open(segment, 'rb') as wav_in:
-                    if i == 0:
-                        wav_out.setparams(wav_in.getparams())
+                with wave.open(seg, 'rb') as wav_in:
+                    if i == 0: wav_out.setparams(wav_in.getparams())
                     wav_out.writeframes(wav_in.readframes(wav_in.getnframes()))
             except wave.Error:
                 continue
@@ -374,12 +371,13 @@ if question:
                     if not chunks:
                         chunks = retrieve(question, embed_model, collection)
                 elif is_character_question(question):
+                    # Use RAG — no hardcoding, answer from actual book chunks
                     chunks = retrieve_character(question, embed_model, collection)
                 elif not general:
                     chunks = retrieve(question, embed_model, collection)
 
                 prompt = build_prompt(question, chunks, current_lang,
-                                      use_book_context_only=general)
+                                      use_book_context_only=(general and not chunks))
 
                 chat_history = []
                 for msg in st.session_state.messages[-5:-1]:
