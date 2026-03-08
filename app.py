@@ -350,19 +350,35 @@ st.markdown("<h1>📚 ಹೇಳಿ ಹೋಗು ಕಾರಣ<br><span style='fon
 st.markdown("<p style='margin-bottom: 2rem;'>Masterpiece Kannada Novel Intelligence — Powered by Sarvam & EasyOCR</p>", unsafe_allow_html=True)
 
 with st.sidebar:
-    st.markdown("### ⚙️ Settings")
-    language    = st.radio("Answer language", ["English", "Kannada"], key="lang")
+    st.markdown("""
+<div style='background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:1rem 1.2rem;margin-bottom:0.8rem;backdrop-filter:blur(20px);box-shadow:0 4px 20px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.06);'>
+<p style='color:#94a3b8;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem;'>⚙️ Settings</p>
+</div>
+""", unsafe_allow_html=True)
+
+    st.markdown("""<div style='background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:0.6rem 1rem;margin-bottom:0.5rem;backdrop-filter:blur(10px);'><p style='color:#c084fc;font-size:0.8rem;font-weight:600;margin:0;'>🌐 Answer Language</p></div>""", unsafe_allow_html=True)
+    language    = st.radio("", ["English", "Kannada"], key="lang", label_visibility="collapsed")
+
+    st.markdown("""<div style='background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:14px;padding:0.6rem 1rem;margin-bottom:0.5rem;margin-top:0.3rem;backdrop-filter:blur(10px);'><p style='color:#38bdf8;font-size:0.8rem;font-weight:600;margin:0;'>🔍 Display Options</p></div>""", unsafe_allow_html=True)
     show_chunks = st.checkbox("Show source chunks", value=False)
-    enable_tts  = st.checkbox("🔊 Read answer aloud (TTS)", value=False)
-    st.divider()
-    st.markdown("**📖 About**")
-    st.markdown("*ಹೇಳಿ ಹೋಗು ಕಾರಣ* by Ravi Belagere — a Kannada novel.")
-    st.divider()
-    st.markdown("**📊 Stats**")
-    st.markdown("- 346 pages processed\n- 687 chunks indexed\n- Powered by Sarvam AI")
-    st.divider()
-    st.markdown("**💡 Try asking:**")
-    st.markdown("- What is this book about?\n- Who is Himavant?\n- Who is Prarthana?\n- What is in page 50?\n- ಹಿಮವಂತ ಯಾರು?\n- ಈ ಪುಸ್ತಕದ ವಿಷಯ ಏನು?")
+
+    st.markdown("""<div style='background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);border-radius:14px;padding:0.6rem 1rem;margin-bottom:0.5rem;margin-top:0.3rem;backdrop-filter:blur(10px);'><p style='color:#f472b6;font-size:0.8rem;font-weight:600;margin:0;'>🔊 Audio</p></div>""", unsafe_allow_html=True)
+    enable_tts  = st.checkbox("Read answer aloud (TTS)", value=False)
+
+    st.markdown("""
+<div style='background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:0.8rem 1rem;margin-top:0.8rem;backdrop-filter:blur(10px);'>
+<p style='color:#94a3b8;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem;'>📖 About</p>
+<p style='color:#64748b;font-size:0.85rem;margin:0;'><em>ಹೇಳಿ ಹೋಗು ಕಾರಣ</em> by Ravi Belagere — a Kannada novel.</p>
+</div>
+<div style='background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:0.8rem 1rem;margin-top:0.5rem;backdrop-filter:blur(10px);'>
+<p style='color:#94a3b8;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem;'>📊 Stats</p>
+<p style='color:#64748b;font-size:0.85rem;margin:0;'>346 pages · 687 chunks · Sarvam AI</p>
+</div>
+<div style='background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:0.8rem 1rem;margin-top:0.5rem;backdrop-filter:blur(10px);'>
+<p style='color:#94a3b8;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem;'>💡 Try asking</p>
+<p style='color:#64748b;font-size:0.82rem;margin:0;line-height:1.7;'>Who is Himavant?<br>Who is Prarthana?<br>What is in page 50?<br>ಹಿಮವಂತ ಯಾರು?<br>ಈ ಪುಸ್ತಕದ ವಿಷಯ ಏನು?</p>
+</div>
+""", unsafe_allow_html=True)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
