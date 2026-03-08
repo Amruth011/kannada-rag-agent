@@ -1,19 +1,21 @@
 # 📚 ಹೇಳಿ ಹೋಗು ಕಾರಣ — Kannada Book AI Agent
 
-An end-to-end Premium AI-powered RAG chatbot for the Kannada novel **"ಹೇಳಿ ಹೋಗು ಕಾರಣ" (Heli Hogu Karana)** by Ravi Belagere.
-Ask questions in **Kannada or English** and get grounded answers with page citations and flawless audio output.
+An end-to-end AI-powered RAG chatbot for the Kannada novel **"ಹೇಳಿ ಹೋಗು ಕಾರಣ" (Heli Hogu Karana)** by Ravi Belagere.
+Ask questions in **Kannada or English** and get grounded answers with page citations and audio output.
 
-🚀 **Current Version: v2.0.0 (Premium Architecture Upgrade)**
-🌐 **[Live Premium Demo](https://kannada-rag-agent-hqvwhfejguymb9ijrvz4hd.streamlit.app/)**
+🚀 **[Live Demo](https://kannada-rag-agent-hqvwhfejguymb9ijrvz4hd.streamlit.app/)**
 
 ---
 
 ## 🎯 Project Highlights
 
-- **Scanned PDF → Premium AI Chatbot** pipeline built entirely from scratch
-- **Bilingual Q&A** — Kannada and English with Conversational Memory
-- **Flawless Text-to-Speech Streaming** via Sarvam AI (End-to-end stitched audio)
+- **Scanned PDF → AI Chatbot** pipeline built entirely from scratch
+- **Bilingual Q&A** — Kannada and English with conversational memory
+- **Text-to-Speech** via Sarvam AI bulbul:v3 (Kannada & English audio)
 - **346 pages** processed, **687 semantic chunks** indexed
+- **Smart query routing** — characters, pages, general questions handled differently
+- **Suggestion chips** — clickable quick-questions for easy exploration
+- **Feedback system** — public feedback with private admin viewer
 - Built as a portfolio project targeting **AI Engineer** roles
 
 ---
@@ -30,13 +32,13 @@ PDF → Images (pdf2image + Poppler)
 Image Preprocessing (OpenCV — denoise, threshold, sharpen)
       │
       ▼
-OCR (Surya OCR v0.17.1 — High Accuracy Batched Tensor Processing)
+OCR (EasyOCR — Kannada + English, CPU)
       │
       ▼
 Unicode Normalization (indic-nlp-library)
       │
       ▼
-Semantic Chunking (800 char chunks, 100 char overlap)
+Semantic Chunking (400 char chunks, 50 char overlap → 687 chunks)
       │
       ▼
 Embeddings (paraphrase-multilingual-MiniLM-L12-v2)
@@ -45,10 +47,13 @@ Embeddings (paraphrase-multilingual-MiniLM-L12-v2)
 Vector Store (ChromaDB — cosine similarity)
       │
       ▼
-RAG Agent (Sarvam-M LLM with Chat History Memory)
+Smart Query Router (page / character / general / RAG)
       │
       ▼
-Glassmorphism Premium Streamlit UI + Stitched Sarvam TTS Audio Streams
+RAG Agent (Sarvam-M LLM + conversational memory)
+      │
+      ▼
+Glassmorphism Streamlit UI + Sarvam TTS Audio
 ```
 
 ---
@@ -59,13 +64,13 @@ Glassmorphism Premium Streamlit UI + Stitched Sarvam TTS Audio Streams
 |-----------|-----------|
 | PDF Processing | pdf2image, Poppler |
 | Image Preprocessing | OpenCV |
-| OCR | **Surya OCR v0.17.1** (GPU/CPU Batched Processing) |
+| OCR | EasyOCR (Kannada + English, CPU) |
 | Text Normalization | indic-nlp-library |
 | Embeddings | sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 |
-| Vector Database | ChromaDB |
-| LLM | Sarvam-M (via Sarvam AI API) + Conversational Memory |
-| Text-to-Speech | Sarvam AI bulbul:v3 (Kannada TTS with API Chunking & Stitching) |
-| UI | **Streamlit with Custom $100k Glassmorphism CSS styling** |
+| Vector Database | ChromaDB (cosine similarity) |
+| LLM | Sarvam-M via Sarvam AI API |
+| Text-to-Speech | Sarvam AI bulbul:v3 — priya speaker, WAV stitching |
+| UI | Streamlit — custom glassmorphism CSS |
 | Language | Python 3.13 |
 
 ---
@@ -75,23 +80,23 @@ Glassmorphism Premium Streamlit UI + Stitched Sarvam TTS Audio Streams
 ```
 kannada-rag-agent/
 ├── data/
-│   ├── raw_images/          # PDF pages as PNG (346 files)
-│   ├── processed_images/    # Preprocessed images
-│   ├── cleaned_text/        # Raw OCR output
-│   ├── normalized_text/     # Unicode normalized text
+│   ├── raw_images/          # PDF pages as PNG (346 files, not in git)
+│   ├── processed_images/    # Preprocessed images (not in git)
+│   ├── cleaned_text/        # Raw OCR output (not in git)
+│   ├── normalized_text/     # Unicode normalized text (not in git)
 │   └── chunks.json          # 687 semantic chunks
-├── chroma_db/               # ChromaDB vector store
+├── chroma_db/               # ChromaDB vector store (shipped for deployment)
 ├── ingest/
 │   ├── pdf_to_images.py     # Phase 1: PDF → images
 │   ├── preprocess_images.py # Phase 2: OpenCV preprocessing
-│   ├── ocr_surya.py         # Phase 3: Surya OCR (Batched)
+│   ├── ocr_surya.py         # Phase 3: EasyOCR
 │   ├── clean_text.py        # Phase 4: Unicode normalization
 │   └── chunker.py           # Phase 5: Semantic chunking
 ├── vectorstore/
 │   └── embed_and_store.py   # Embeddings + ChromaDB
 ├── rag/
-│   └── rag_agent.py         # RAG pipeline
-├── app.py                   # Streamlit UI
+│   └── rag_agent.py         # RAG pipeline (CLI version)
+├── app.py                   # Streamlit UI (main app)
 ├── .env                     # API keys (not committed)
 ├── .gitignore
 └── requirements.txt
@@ -125,78 +130,82 @@ pip install -r requirements.txt
 Create a `.env` file:
 ```
 SARVAM_API_KEY=your_sarvam_api_key_here
+ADMIN_PASSWORD=your_admin_password_here
 ```
-Get your key at [dashboard.sarvam.ai](https://dashboard.sarvam.ai)
+Get your Sarvam key at [dashboard.sarvam.ai](https://dashboard.sarvam.ai)
 
 ### 5. Run the app
 ```bash
-streamlit run app.py
+kannada-rag-env\Scripts\python.exe -m streamlit run app.py
 ```
 
 ---
 
-## 🔄 Rebuild Pipeline (if needed)
+## 🔄 Rebuild Pipeline (optional)
 
-Run these in order:
+Only needed if you want to re-OCR or re-chunk from scratch:
+
 ```bash
-# 1. PDF to images
-python pdf_to_images.py
-
-# 2. Preprocess images
-python preprocess_images.py
-
-# 3. OCR
-python ocr_surya.py
-
-# 4. Normalize text
-python clean_text.py
-
-# 5. Chunk text
-python chunker.py
-
-# 6. Build vector store
-python embed_and_store.py
-
-# 7. Run app
-streamlit run app.py
+python pdf_to_images.py       # PDF → PNG images
+python preprocess_images.py   # OpenCV preprocessing
+python ocr_surya.py           # EasyOCR → text files
+python clean_text.py          # Unicode normalization
+python chunker.py             # Chunking → chunks.json
+python embed_and_store.py     # Embeddings → ChromaDB
+streamlit run app.py          # Launch app
 ```
 
 ---
 
 ## 💡 Features
 
-- **Conversational Memory** — The bot remembers chat history like ChatGPT for perfect follow-up questions.
-- **Flawless TTS Streaming** — Backend dynamically splices 450-char blocks and stitches wav bytes to perfectly read 100% of large outputs.
-- **Premium UI** — Dark mode glassmorphism overlays with vivid gradient response bubbles and hovering animations.
-- **Smart query routing** — general questions use book knowledge, specific questions use RAG
-- **Page-specific queries** — "what is in page 50?" fetches directly from that page
-- **Bilingual answers** — switch between Kannada and English
+- **Smart query routing** — detects page queries, character questions, general book questions and routes each differently
+- **Character retrieval** — uses high-recall RAG (top 10 chunks, threshold 0.2) for character questions
+- **Page-specific queries** — "what is in page 50?" fetches directly from ChromaDB by page number
+- **Conversational memory** — keeps last 4 messages for follow-up question context
+- **Bilingual answers** — toggle between Kannada and English
 - **Source citations** — every answer shows which pages were used
-- **Source chunks** — toggle to see raw retrieved passages
+- **TTS audio** — answers read aloud with WAV chunk stitching for long responses
+- **Suggestion chips** — 6 clickable quick-questions above the input box
+- **Progress bar** — shows live steps: Searching → Retrieving → Building → Generating
+- **Glassmorphism UI** — premium dark mode with glass cards, gradient bubbles, animations
+- **Feedback system** — public form with star rating; admin-only viewer in sidebar
+- **Source chunks toggle** — see raw retrieved passages with relevance scores
 
 ---
 
-## 🗺️ Roadmap (Completed ✅)
+## 🗺️ Roadmap
 
-- [x] Fix Sarvam TTS audio API cutoff block limit (Implemented byte streaming)
-- [x] Re-OCR with better preprocessing for cleaner text (Migrated to highly accurate Surya OCR)
-- [x] Re-chunk with 800-char chunks for better context
-- [x] Re-embed with improved chunks into ChromaDB
-- [x] Implement Conversational Memory state for fluent context logic
-- [x] Build an enterprise-grade UI using custom CSS
+- [x] PDF ingestion + OCR pipeline
+- [x] ChromaDB vector store with cosine similarity
+- [x] Sarvam-M RAG agent
+- [x] Bilingual Streamlit UI
+- [x] TTS with bulbul:v3 + WAV stitching
+- [x] Smart query routing (page / character / general)
+- [x] Conversational memory
+- [x] Glassmorphism CSS UI
+- [x] Suggestion chips + progress bar
+- [x] Feedback system with admin viewer
+- [x] Streamlit Cloud deployment
+- [ ] Re-OCR with Surya for better Kannada accuracy
+- [ ] Re-chunk with 800-char chunks for better context
+- [ ] Mobile responsive layout
+- [ ] Docker deployment
+- [ ] Multi-book support
 
 ---
 
 ## 🙏 Acknowledgements
 
 - [Sarvam AI](https://sarvam.ai) — Indic LLM + TTS
-- [Surya OCR](https://github.com/VikParuchuri/surya) — High-Accuracy ML OCR Engine
+- [EasyOCR](https://github.com/JaidedAI/EasyOCR) — Kannada OCR
 - [ChromaDB](https://www.trychroma.com/) — Vector store
 - [indic-nlp-library](https://github.com/anoopkunchukuttan/indic_nlp_library) — Kannada Unicode normalization
+- [sentence-transformers](https://www.sbert.net/) — Multilingual embeddings
 
 ---
 
 ## 👤 Author
 
-**Amruth** — AI Engineer  
+**Amruth Kumar M** — AI Engineer  
 [GitHub](https://github.com/Amruth011)
