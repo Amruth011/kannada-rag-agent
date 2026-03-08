@@ -445,7 +445,6 @@ if question:
     with st.chat_message("assistant"):
         progress = st.progress(0, text="🔍 Searching book...")
         try:
-            try:
                 embed_model, collection = load_agent()
                 progress.progress(25, text="📖 Retrieving passages...")
                 general  = is_general_question(question)
