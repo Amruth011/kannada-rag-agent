@@ -154,6 +154,8 @@ st.markdown("""
         font-weight: 600;
         transition: all 0.2s;
     }
+    .stForm { background: rgba(255,255,255,0.02) !important; border: 1px solid rgba(255,255,255,0.06) !important; border-radius: 20px !important; padding: 1.5rem !important; backdrop-filter: blur(20px) !important; }
+    .stTextInput > div > div > input, .stTextArea > div > div > textarea, .stSelectbox > div > div { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.08) !important; border-radius: 12px !important; color: #e2e8f0 !important; }
     .stButton > button:hover {
         border-color: #8b5cf6;
         box-shadow: 0 0 15px rgba(139,92,246,0.3);
@@ -426,3 +428,81 @@ if st.session_state.messages:
     if st.button("🗑️ Clear chat"):
         st.session_state.messages = []
         st.rerun()
+
+# ── FEEDBACK SECTION ─────────────────────────────────
+st.markdown("---")
+st.markdown("""
+<div style='
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    padding: 2rem 2.5rem;
+    margin-top: 1rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+'>
+<h3 style='
+    background: linear-gradient(to right, #38bdf8, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: Outfit, sans-serif;
+    font-size: 1.4rem;
+    margin-bottom: 0.3rem;
+'>💬 Share Your Feedback</h3>
+<p style='color: #64748b; font-size: 0.9rem; margin-bottom: 0;'>Help us improve — your feedback is anonymous and appreciated</p>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("<div style='height: 1rem'></div>", unsafe_allow_html=True)
+
+with st.form("feedback_form", clear_on_submit=True):
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        feedback_name = st.text_input("Your name (optional)", placeholder="Anonymous")
+    with col2:
+        feedback_rating = st.selectbox("Rating", ["⭐⭐⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐", "⭐⭐", "⭐"])
+    feedback_text = st.text_area("Your feedback", placeholder="What did you like? What can be improved?", height=100)
+    submitted = st.form_submit_button("Submit Feedback ✨")
+
+    if submitted and feedback_text.strip():
+        import json, datetime
+        feedback_file = os.path.join(BASE_DIR, "feedback.json")
+        try:
+            with open(feedback_file, "r", encoding="utf-8") as f:
+                all_feedback = json.load(f)
+        except:
+            all_feedback = []
+        all_feedback.append({
+            "name"     : feedback_name.strip() or "Anonymous",
+            "rating"   : feedback_rating,
+            "feedback" : feedback_text.strip(),
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
+        with open(feedback_file, "w", encoding="utf-8") as f:
+            json.dump(all_feedback, f, ensure_ascii=False, indent=2)
+        st.success("✅ Thank you for your feedback!")
+    elif submitted:
+        st.warning("Please write something before submitting.")
+
+# ── ADMIN FEEDBACK VIEWER (private) ──────────────────
+with st.sidebar:
+    st.divider()
+    st.markdown("**🔒 Admin**")
+    admin_pass = st.text_input("Admin password", type="password", key="admin_pass")
+    if admin_pass == os.getenv("ADMIN_PASSWORD", "amruth123"):
+        import json
+        feedback_file = os.path.join(BASE_DIR, "feedback.json")
+        try:
+            with open(feedback_file, "r", encoding="utf-8") as f:
+                all_feedback = json.load(f)
+            st.markdown(f"**{len(all_feedback)} responses**")
+            for fb in reversed(all_feedback):
+                st.markdown(f"""
+**{fb['rating']}** — *{fb['name']}*  
+{fb['feedback']}  
+<small style='color:#475569'>{fb['timestamp']}</small>
+""", unsafe_allow_html=True)
+                st.divider()
+        except:
+            st.info("No feedback yet.")
