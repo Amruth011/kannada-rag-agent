@@ -143,6 +143,26 @@ st.markdown("""
     }
     .stMarkdown p { color: #94a3b8; }
 
+    /* Suggestion chips */
+    div[data-testid="stHorizontalBlock"] .stButton > button {
+        background: rgba(255,255,255,0.04) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        border-radius: 999px !important;
+        padding: 0.3rem 0.9rem !important;
+        font-size: 0.8rem !important;
+        color: #94a3b8 !important;
+        font-weight: 400 !important;
+        transition: all 0.2s ease !important;
+        white-space: nowrap !important;
+    }
+    div[data-testid="stHorizontalBlock"] .stButton > button:hover {
+        background: rgba(139,92,246,0.15) !important;
+        border-color: rgba(139,92,246,0.4) !important;
+        color: #c084fc !important;
+        box-shadow: 0 0 12px rgba(139,92,246,0.2) !important;
+        transform: translateY(-1px) !important;
+    }
+
     /* Glass effect for sidebar widgets */
     div[data-testid="stSidebar"] .stRadio,
     div[data-testid="stSidebar"] .stCheckbox {
@@ -391,7 +411,30 @@ for msg in st.session_state.messages:
         if msg.get("audio"):
             st.audio(msg["audio"], format="audio/wav")
 
+# ── SUGGESTED QUESTION CHIPS ──────────────────────────
+CHIPS = [
+    "What is this book about?",
+    "Who is Himavant?",
+    "Who is Prarthana?",
+    "What is in page 50?",
+    "ಹಿಮವಂತ ಯಾರು?",
+    "ಕಾದಂಬರಿ ವಿಷಯ ಏನು?",
+]
+if "chip_question" not in st.session_state:
+    st.session_state.chip_question = None
+
+chip_cols = st.columns(len(CHIPS))
+for i, chip in enumerate(CHIPS):
+    with chip_cols[i]:
+        if st.button(chip, key=f"chip_{i}"):
+            st.session_state.chip_question = chip
+
 question = st.chat_input("Ask about the book... (ಪ್ರಶ್ನೆ ಕೇಳಿ...)")
+
+# Use chip question if clicked
+if st.session_state.chip_question:
+    question = st.session_state.chip_question
+    st.session_state.chip_question = None
 
 if question:
     current_lang = st.session_state.get("lang", "English")
@@ -400,9 +443,11 @@ if question:
         st.write(question)
 
     with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
+        progress = st.progress(0, text="🔍 Searching book...")
+        try:
             try:
                 embed_model, collection = load_agent()
+                progress.progress(25, text="📖 Retrieving passages...")
                 general  = is_general_question(question)
                 page_num = detect_page_query(question)
                 chunks   = []
@@ -417,6 +462,7 @@ if question:
                 elif not general:
                     chunks = retrieve(question, embed_model, collection)
 
+                progress.progress(55, text="🧠 Building prompt...")
                 prompt = build_prompt(question, chunks, current_lang,
                                       use_book_context_only=(general and not chunks))
 
@@ -427,7 +473,10 @@ if question:
                         chat_history.append({"role": msg["role"], "content": clean_content})
                 chat_history.append({"role": "user", "content": prompt})
 
+                progress.progress(75, text="✨ Generating answer...")
                 answer = call_sarvam_llm(chat_history)
+                progress.progress(100, text="Done!")
+                progress.empty()
                 pages  = sorted(set(c["page"] for c in chunks)) if chunks else []
 
                 st.write(answer)
@@ -460,8 +509,9 @@ if question:
                     "audio"  : audio_bytes
                 })
 
-            except Exception as e:
-                st.error(f"Error: {e}")
+        except Exception as e:
+            progress.empty()
+            st.error(f"Error: {e}")
 
 if st.session_state.messages:
     if st.button("🗑️ Clear chat"):
