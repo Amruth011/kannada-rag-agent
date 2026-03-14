@@ -147,7 +147,7 @@ Only needed if you want to re-OCR or re-chunk from scratch:
 
 ```bash
 python pdf_to_images.py       # PDF → PNG images
-python preprocess_images.py   # OpenCV preprocessing
+python preprocess_images.py   # OpenCV preprocessing(removing noise)
 python ocr_surya.py           # EasyOCR → text files
 python clean_text.py          # Unicode normalization
 python chunker.py             # Chunking → chunks.json
