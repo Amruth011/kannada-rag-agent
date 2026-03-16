@@ -207,5 +207,5 @@ streamlit run app.py          # Launch app
 
 ## 👤 Author
 
-**Amruth Kumar M** — AI Engineer  
+**Amruth Kumar M** - AI Engineer  
 [GitHub](https://github.com/Amruth011)
