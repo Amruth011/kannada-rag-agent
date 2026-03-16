@@ -70,7 +70,7 @@ Glassmorphism Streamlit UI + Sarvam TTS Audio
 | Vector Database | ChromaDB (cosine similarity) |
 | LLM | Sarvam-M via Sarvam AI API |
 | Text-to-Speech | Sarvam AI bulbul:v3 — priya speaker, WAV stitching |
-| UI | Streamlit — custom glassmorphism CSS |
+| UI | Streamlit - custom glassmorphism CSS |
 | Language | Python 3.13 |
 
 ---
