@@ -1,10 +1,8 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=28&pause=1000&color=58A6FF&center=true&vCenter=true&width=700&lines=ಹೇಳಿ+ಹೋಗು+ಕಾರಣ;Kannada+Book+AI+Agent" alt="Title"/>
+![Banner](https://raw.githubusercontent.com/Amruth011/kannada-rag-agent/main/banner.svg)
 
 <br/>
-
-<p><strong>Ask questions about a 346-page Kannada novel — in Kannada or English — with audio answers</strong></p>
 
 <p>
 <a href="https://kannada-rag-agent-hqvwhfejguymb9ijrvz4hd.streamlit.app/">
@@ -33,29 +31,73 @@
 
 ## 🎬 Demo
 
-<!-- ═══════════════════════════════════════════════════════════════
-  YOUR GIF IS AT: D:\personal files\Projects\Heli_Hogo_Karana.gif
-  
-  STEPS TO ADD IT (file is large so use GitHub Issue trick):
-  ───────────────────────────────────────────────────────────────
-  1. Go to → github.com/Amruth011/kannada-rag-agent/issues/new
-  2. DO NOT submit — just drag & drop Heli_Hogo_Karana.gif
-     into the text box and wait for upload
-  3. GitHub gives you a URL like:
-     https://github.com/user-attachments/assets/xxxxxx.gif
-  4. Copy that URL
-  5. Replace YOUR-URL-HERE below and remove the comment tags
-═══════════════════════════════════════════════════════════════ -->
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║   YOUR GIF → D:\personal files\Projects\Heli_Hogo_Karana.gif   ║
+║                                                                  ║
+║   TO ADD IT:                                                     ║
+║   1. Go to → github.com/Amruth011/kannada-rag-agent/issues/new  ║
+║   2. Type any title → drag & drop your GIF into the text box    ║
+║   3. Wait for upload → copy the URL that appears                 ║
+║   4. Paste URL below, remove the  and  tags            ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
 
-<!-- ![Kannada RAG Agent Demo](YOUR-URL-HERE) -->
+<!-- ![Kannada RAG Agent Demo](YOUR-GIF-URL-HERE) -->
 
 <div align="center">
 
-> 🎥 **Demo shows:** English Q&A with citations · Kannada Q&A · Kannada TTS audio playback
+> 🎥 **Demo shows:** English Q&A · Kannada Q&A · Kannada TTS audio playback
 >
 > **[▶ Try it live right now →](https://kannada-rag-agent-hqvwhfejguymb9ijrvz4hd.streamlit.app/)**
 
 </div>
+
+---
+
+## 💜 Why Kannada?
+
+India has **22 official languages** and over **500 million** Kannada speakers — yet almost all AI tools are built for English first.
+
+When I searched for any AI tool that could interact with Kannada literature, I found nothing. No chatbot. No search. No voice. Just silence.
+
+*ಹೇಳಿ ಹೋಗು ಕಾರಣ* (Heli Hogu Karana) by Ravi Belagere is a celebrated Kannada novel — but like most regional-language books, it exists outside the reach of modern AI.
+
+**I built this to change that.**
+
+This project is my answer to a simple question: *what if AI could speak your mother tongue?*
+
+> *"Technology should cross language barriers, not create them."*
+
+This is the first of many — my long-term mission is to make Indic-language literature, knowledge, and culture accessible through AI. 🇮🇳
+
+---
+
+## 🤔 How It Works
+
+> *No technical background needed — here's the simple version*
+
+**Step 1 — 📄 Read the book**
+The AI scans all 346 pages of the Kannada novel using OCR (like a camera that reads text) and stores everything in its memory.
+
+**Step 2 — 🧠 Understand the text**
+Every paragraph is converted into numbers (called embeddings) that capture meaning — so the AI understands that "Himavant" and "the protagonist" mean the same thing.
+
+**Step 3 — 🗄️ Build a smart library**
+All 687 text chunks are stored in a vector database — think of it as a super-smart search index that finds meaning, not just keywords.
+
+**Step 4 — 🔀 Route your question**
+When you ask something, the AI figures out what kind of question it is:
+- *"What's in page 50?"* → goes directly to page 50
+- *"Who is Himavant?"* → searches for character mentions
+- *"What is this book about?"* → uses general book knowledge
+- *"What did he do next?"* → searches the full story
+
+**Step 5 — 🤖 Generate your answer**
+The relevant passages are sent to Sarvam-M (an Indian AI model) which reads them and writes a clear answer — in English or Kannada, your choice.
+
+**Step 6 — 🔊 Speak the answer**
+If you turn on TTS, the answer is converted to audio in natural Kannada or English voice and played back to you.
 
 ---
 
@@ -72,10 +114,10 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 | | Typical RAG Demo | This Project |
 |:--|:--|:--|
 | Language | English only | **Kannada + English** |
-| Input | Clean text PDF | **Scanned Kannada novel (OCR pipeline)** |
+| Input | Clean text PDF | **Scanned Kannada novel (full OCR pipeline)** |
 | Retrieval | One strategy | **4 smart strategies** |
 | Output | Text only | **Text + TTS audio** |
-| Deployment | Local | **Live on Streamlit Cloud** |
+| Deployment | Local only | **Live on Streamlit Cloud** |
 
 ---
 
@@ -209,6 +251,7 @@ kannada-rag-agent/
 │   └── rag_agent.py          # CLI RAG pipeline
 │
 ├── app.py                    # ✅ Main Streamlit app
+├── banner.svg                # ✅ Banner image
 ├── architecture.svg          # ✅ Architecture diagram
 ├── .env                      # API keys (not committed)
 ├── .gitignore
@@ -240,7 +283,7 @@ kannada-rag-env\Scripts\activate        # Windows
 # 3. Install
 pip install -r requirements.txt
 
-# 4. Create .env file with your keys
+# 4. Create .env file
 SARVAM_API_KEY=your_key_here
 ADMIN_PASSWORD=your_admin_password
 
