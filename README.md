@@ -47,10 +47,7 @@
 ║  5. Uncomment the line below and paste your URL                 ║
 ╚══════════════════════════════════════════════════════════════════╝
 
-STEP: uncomment the line below after you get your URL ↓
--->
 
-<!-- ![Demo](https://github.com/user-attachments/assets/YOUR-ASSET-ID-HERE.gif) -->
 
 <div align="center">
 
