@@ -29,6 +29,25 @@
 
 ---
 
+## 📌 Table of Contents
+
+- [Demo](#-demo)
+- [Why Kannada?](#-why-kannada)
+- [How It Works](#-how-it-works)
+- [What Makes This Different](#-what-makes-this-different)
+- [Skills Demonstrated](#-skills-demonstrated)
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Quick Start](#-quick-start)
+- [Example Questions](#-example-questions)
+- [What I Built](#-what-i-built)
+- [Acknowledgements](#-acknowledgements)
+- [Author](#-author)
+
+---
+
 ## 🎬 Demo
 
 <!--
@@ -39,7 +58,7 @@
 ║   1. Go to → github.com/Amruth011/kannada-rag-agent/issues/new  ║
 ║   2. Type any title → drag & drop your GIF into the text box    ║
 ║   3. Wait for upload → copy the URL that appears                 ║
-║   4. Paste URL below, remove the  and  tags            ║
+║   4. Paste URL below, remove the comment tags                    ║
 ╚══════════════════════════════════════════════════════════════════╝
 -->
 
@@ -118,6 +137,25 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 | Retrieval | One strategy | **4 smart strategies** |
 | Output | Text only | **Text + TTS audio** |
 | Deployment | Local only | **Live on Streamlit Cloud** |
+
+---
+
+## 🧰 Skills Demonstrated
+
+<div align="center">
+
+![RAG](https://img.shields.io/badge/RAG_Pipelines-000000?style=for-the-badge)
+![LLM](https://img.shields.io/badge/LLM_Integration-7c3aed?style=for-the-badge)
+![OCR](https://img.shields.io/badge/OCR_Pipeline-0891b2?style=for-the-badge)
+![NLP](https://img.shields.io/badge/Indic_NLP-10b981?style=for-the-badge)
+![ChromaDB](https://img.shields.io/badge/Vector_DB-7c3aed?style=for-the-badge)
+![Streamlit](https://img.shields.io/badge/Streamlit_UI-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![TTS](https://img.shields.io/badge/Text_to_Speech-db2777?style=for-the-badge)
+![Deployment](https://img.shields.io/badge/Cloud_Deployment-16a34a?style=for-the-badge)
+![API](https://img.shields.io/badge/REST_API_Integration-f59e0b?style=for-the-badge)
+
+</div>
 
 ---
 
@@ -297,7 +335,10 @@ Open **[http://localhost:8501](http://localhost:8501)** 🎉
 
 ## 🔄 Rebuild Pipeline from Scratch
 
-> Only needed if you want to re-process the original PDF
+<details>
+<summary><b>Only needed if you want to re-process the original PDF — click to expand</b></summary>
+
+<br/>
 
 ```bash
 python pdf_to_images.py        # Phase 1 — PDF → 346 PNGs     (~5 min)
@@ -308,6 +349,8 @@ python chunker.py              # Phase 5 — 687 chunks          (~1 min)
 python embed_and_store.py      # Phase 6 — Embed → ChromaDB   (~40 min)
 streamlit run app.py           # Phase 7 — Launch
 ```
+
+</details>
 
 ---
 
@@ -345,24 +388,19 @@ between Himavant and Prarthana?
 
 ---
 
-## 🗺️ Roadmap
+## 🏅 What I Built
 
-- [x] PDF ingestion + EasyOCR pipeline
-- [x] ChromaDB vector store (cosine similarity)
-- [x] Sarvam-M RAG agent
-- [x] Bilingual Streamlit UI (EN + KN)
-- [x] TTS with bulbul:v3 + WAV stitching
-- [x] Smart query routing — 4 strategies
-- [x] Conversational memory — last 4 messages
-- [x] Glassmorphism CSS UI + glass sidebar cards
-- [x] Suggestion chips + live progress bar
-- [x] Feedback system with star rating + admin viewer
-- [x] Streamlit Cloud deployment
-- [ ] Re-OCR with Surya for higher Kannada accuracy
-- [ ] Re-chunk with 800-char chunks for better context
-- [ ] Mobile responsive layout
-- [ ] Docker deployment
-- [ ] Multi-book support
+A complete, production-deployed AI system — built from scratch with no starter templates:
+
+| | Deliverable | Detail |
+|:--|:------------|:-------|
+| ✅ | Full OCR pipeline | Scanned PDF → clean Kannada + English text |
+| ✅ | Vector search engine | 687 chunks · ChromaDB · cosine similarity |
+| ✅ | Smart RAG agent | 4-strategy router · Sarvam-M LLM · memory |
+| ✅ | Bilingual TTS | WAV stitching · kn-IN + en-IN · bulbul:v3 |
+| ✅ | Production UI | Glassmorphism · chips · progress bar · feedback |
+| ✅ | Live deployment | Public URL · Streamlit Cloud · secrets managed |
+| ✅ | Admin system | Password-protected feedback viewer |
 
 ---
 
