@@ -33,21 +33,21 @@
 
 ## 🎬 Demo
 
-<!--
-╔══════════════════════════════════════════════════════════════════╗
-║                    HOW TO ADD YOUR GIF                          ║
-╠══════════════════════════════════════════════════════════════════╣
-║  Your GIF is large (>10MB)? Use the GitHub Issue trick:         ║
-║                                                                  ║
-║  1. Go to → github.com/Amruth011/kannada-rag-agent/issues/new  ║
-║  2. DON'T submit — just drag & drop your GIF into text box      ║
-║  3. GitHub uploads it and gives a URL like:                      ║
-║     https://github.com/user-attachments/assets/xxxxx.gif        ║
-║  4. Copy that URL                                               ║
-║  5. Uncomment the line below and paste your URL                 ║
-╚══════════════════════════════════════════════════════════════════╝
+<!-- ═══════════════════════════════════════════════════════════════
+  YOUR GIF IS AT: D:\personal files\Projects\Heli_Hogo_Karana.gif
+  
+  STEPS TO ADD IT (file is large so use GitHub Issue trick):
+  ───────────────────────────────────────────────────────────────
+  1. Go to → github.com/Amruth011/kannada-rag-agent/issues/new
+  2. DO NOT submit — just drag & drop Heli_Hogo_Karana.gif
+     into the text box and wait for upload
+  3. GitHub gives you a URL like:
+     https://github.com/user-attachments/assets/xxxxxx.gif
+  4. Copy that URL
+  5. Replace YOUR-URL-HERE below and remove the comment tags
+═══════════════════════════════════════════════════════════════ -->
 
-
+<!-- ![Kannada RAG Agent Demo](YOUR-URL-HERE) -->
 
 <div align="center">
 
@@ -128,61 +128,33 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    INGESTION PIPELINE                        │
-│                                                             │
-│  Scanned PDF ──► pdf2image ──► OpenCV ──► EasyOCR          │
-│  (357MB)         (200 DPI)    (Denoise)   (kn + en)         │
-│                                    │                         │
-│                             indic-nlp                        │
-│                          (Unicode Norm)                      │
-│                                    │                         │
-│                               Chunker                        │
-│                         (400ch · 50 overlap)                 │
-│                          → 687 chunks                        │
-└────────────────────────────┬────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────┐
-│                    EMBEDDING & STORAGE                       │
-│                                                             │
-│    sentence-transformers                                     │
-│    paraphrase-multilingual-MiniLM-L12-v2                    │
-│                    │                                         │
-│             ChromaDB (cosine)                                │
-│            687 chunks indexed                               │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────────┐
-│                    SMART QUERY ROUTER                        │
-│                                                             │
-│   ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
-│   │ Page Lookup │  │  Char. RAG  │  │Standard RAG │        │
-│   │ exact page  │  │  top-10     │  │  top-5      │        │
-│   │  number     │  │  θ = 0.20   │  │  θ = 0.25   │        │
-│   └─────────────┘  └─────────────┘  └─────────────┘        │
-│                    ┌─────────────┐                          │
-│                    │BOOK_CONTEXT │  (general questions)     │
-│                    └─────────────┘                          │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────────┐
-│                    GENERATION                                │
-│                                                             │
-│         Sarvam-M LLM + Conversational Memory                │
-│                    │                                         │
-│         ┌──────────┴──────────┐                            │
-│         │                     │                             │
-│    Text Answer           bulbul:v3 TTS                      │
-│   + Page Citations       kn-IN / en-IN                      │
-│                          WAV stitching                       │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────────┐
-│           Streamlit UI · Streamlit Cloud                     │
-│   Glass UI · Chips · Progress Bar · Feedback · Admin        │
-└─────────────────────────────────────────────────────────────┘
-```
+<div align="center">
+
+![Architecture](https://raw.githubusercontent.com/Amruth011/kannada-rag-agent/main/architecture.svg)
+
+</div>
+
+<details>
+<summary><b>📐 Pipeline walkthrough — click to expand</b></summary>
+
+<br/>
+
+| Phase | Component | Detail |
+|:------|:----------|:-------|
+| **1 · Ingestion** | pdf2image + Poppler | 346 PDF pages → PNG at 200 DPI |
+| **2 · Preprocessing** | OpenCV | Denoise · adaptive threshold · sharpen |
+| **3 · OCR** | EasyOCR | Kannada + English dual-language, CPU |
+| **4 · Normalization** | indic-nlp-library | Unicode normalization for Kannada script |
+| **5 · Chunking** | Custom chunker | 400 char chunks, 50 char overlap → 687 chunks |
+| **6 · Embeddings** | sentence-transformers | `paraphrase-multilingual-MiniLM-L12-v2` |
+| **7 · Vector Store** | ChromaDB | Persistent · cosine similarity |
+| **8 · Routing** | Smart router | Page lookup · Char RAG · Standard RAG · Book context |
+| **9 · LLM** | Sarvam-M | Conversational memory · last 4 messages |
+| **10 · TTS** | Sarvam bulbul:v3 | kn-IN / en-IN · chunked + WAV stitching |
+| **11 · UI** | Streamlit | Glassmorphism · chips · progress bar · feedback |
+| **12 · Deploy** | Streamlit Cloud | Live public URL |
+
+</details>
 
 ---
 
@@ -237,6 +209,7 @@ kannada-rag-agent/
 │   └── rag_agent.py          # CLI RAG pipeline
 │
 ├── app.py                    # ✅ Main Streamlit app
+├── architecture.svg          # ✅ Architecture diagram
 ├── .env                      # API keys (not committed)
 ├── .gitignore
 ├── requirements.txt
@@ -267,9 +240,9 @@ kannada-rag-env\Scripts\activate        # Windows
 # 3. Install
 pip install -r requirements.txt
 
-# 4. Environment variables — create .env file
+# 4. Create .env file with your keys
 SARVAM_API_KEY=your_key_here
-ADMIN_PASSWORD=your_admin_password_here
+ADMIN_PASSWORD=your_admin_password
 
 # 5. Run
 kannada-rag-env\Scripts\python.exe -m streamlit run app.py
@@ -284,12 +257,12 @@ Open **[http://localhost:8501](http://localhost:8501)** 🎉
 > Only needed if you want to re-process the original PDF
 
 ```bash
-python pdf_to_images.py        # Phase 1 — PDF → 346 PNGs     ~5 min
-python preprocess_images.py    # Phase 2 — OpenCV denoise      ~3 min
-python ocr_surya.py            # Phase 3 — EasyOCR             ~3 hrs on CPU
-python clean_text.py           # Phase 4 — Unicode normalize   ~1 min
-python chunker.py              # Phase 5 — 687 chunks          ~1 min
-python embed_and_store.py      # Phase 6 — Embed → ChromaDB   ~40 min
+python pdf_to_images.py        # Phase 1 — PDF → 346 PNGs     (~5 min)
+python preprocess_images.py    # Phase 2 — OpenCV denoise      (~3 min)
+python ocr_surya.py            # Phase 3 — EasyOCR             (~3 hrs CPU)
+python clean_text.py           # Phase 4 — Unicode normalize   (~1 min)
+python chunker.py              # Phase 5 — 687 chunks          (~1 min)
+python embed_and_store.py      # Phase 6 — Embed → ChromaDB   (~40 min)
 streamlit run app.py           # Phase 7 — Launch
 ```
 
@@ -320,8 +293,7 @@ between Himavant and Prarthana?
 ಪ್ರಾರ್ಥನಾ ಯಾರು?
 ಈ ಕಾದಂಬರಿ ಬಗ್ಗೆ ಹೇಳಿ
 50ನೇ ಪುಟದಲ್ಲಿ ಏನಿದೆ?
-ಹಿಮವಂತ ಮತ್ತು ಪ್ರಾರ್ಥನಾ
-ಸಂಬಂಧ ಏನು?
+ಹಿಮವಂತ ಮತ್ತು ಪ್ರಾರ್ಥನಾ ಸಂಬಂಧ?
 ```
 
 </td>
