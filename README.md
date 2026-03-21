@@ -15,6 +15,7 @@
   <img src="https://img.shields.io/badge/Powered by-Sarvam AI-f59e0b?style=for-the-badge"/>
 </a>
 <img src="https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+<img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge"/>
 </p>
 
 <p>
@@ -31,42 +32,31 @@
 
 ## 📌 Table of Contents
 
-- [Demo](#-demo)
-- [Why Kannada?](#-why-kannada)
-- [How It Works](#-how-it-works)
-- [What Makes This Different](#-what-makes-this-different)
-- [Skills Demonstrated](#-skills-demonstrated)
-- [Features](#-features)
-- [Architecture](#-architecture)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Quick Start](#-quick-start)
-- [Example Questions](#-example-questions)
-- [What I Built](#-what-i-built)
-- [Acknowledgements](#-acknowledgements)
-- [Author](#-author)
+| | Section |
+|:--|:--------|
+| 🎬 | [Demo](#-demo) |
+| 💜 | [Why Kannada?](#-why-kannada) |
+| 🤔 | [How It Works](#-how-it-works) |
+| ✨ | [What Makes This Different](#-what-makes-this-different) |
+| 🧰 | [Skills Demonstrated](#-skills-demonstrated) |
+| 🎯 | [Features](#-features) |
+| 🏗️ | [Architecture](#%EF%B8%8F-architecture) |
+| 🧠 | [Tech Stack](#-tech-stack) |
+| 📁 | [Project Structure](#-project-structure) |
+| 🚀 | [Quick Start](#-quick-start) |
+| 💬 | [Example Questions](#-example-questions) |
+| 🏅 | [What I Built](#-what-i-built) |
+| 🙏 | [Acknowledgements](#-acknowledgements) |
+| 📄 | [License](#-license) |
+| 👤 | [Author](#-author) |
 
 ---
 
 ## 🎬 Demo
 
-<!--
-╔══════════════════════════════════════════════════════════════════╗
-║   YOUR GIF → D:\personal files\Projects\Heli_Hogo_Karana.gif   ║
-║                                                                  ║
-║   TO ADD IT:                                                     ║
-║   1. Go to → github.com/Amruth011/kannada-rag-agent/issues/new  ║
-║   2. Type any title → drag & drop your GIF into the text box    ║
-║   3. Wait for upload → copy the URL that appears                 ║
-║   4. Paste URL below, remove the comment tags                    ║
-╚══════════════════════════════════════════════════════════════════╝
--->
-
-<!-- ![Kannada RAG Agent Demo](YOUR-GIF-URL-HERE) -->
-
 <div align="center">
 
-> 🎥 **Demo shows:** English Q&A · Kannada Q&A · Kannada TTS audio playback
+> 🎥 **Demo shows:** English Q&A with citations · Kannada Q&A · Kannada TTS audio playback
 >
 > **[▶ Try it live right now →](https://kannada-rag-agent-hqvwhfejguymb9ijrvz4hd.streamlit.app/)**
 
@@ -291,6 +281,7 @@ kannada-rag-agent/
 ├── app.py                    # ✅ Main Streamlit app
 ├── banner.svg                # ✅ Banner image
 ├── architecture.svg          # ✅ Architecture diagram
+├── LICENSE                   # ✅ MIT License
 ├── .env                      # API keys (not committed)
 ├── .gitignore
 ├── requirements.txt
@@ -414,6 +405,16 @@ A complete, production-deployed AI system — built from scratch with no starter
 | 🔤 | [indic-nlp-library](https://github.com/anoopkunchukuttan/indic_nlp_library) | Kannada Unicode normalization |
 | 🧠 | [sentence-transformers](https://www.sbert.net/) | Multilingual embeddings |
 | 📚 | Ravi Belagere | Author of *ಹೇಳಿ ಹೋಗು ಕಾರಣ* |
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+```
+MIT License — free to use, modify and distribute with attribution.
+```
 
 ---
 
