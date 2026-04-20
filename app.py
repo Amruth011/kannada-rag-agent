@@ -555,7 +555,7 @@ with st.expander("💬 Share Feedback", expanded=False):
 # ── ADMIN FEEDBACK VIEWER (private) ──────────────────
 with st.sidebar:
     st.divider()
-    st.markdown("**🔒 Admin**")
+    st.markdown("**🔐 Admin**")
     admin_pass = st.text_input("Admin password", type="password", key="admin_pass")
     if admin_pass == os.getenv("ADMIN_PASSWORD", "amruth123"):
         import json
