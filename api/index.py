@@ -1,4 +1,4 @@
-# api/index.py - FastAPI version for Vercel deployment
+# api/index.py - FastAPI version for Vercel deployment with NumPy Search
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, StreamingResponse
 from pydantic import BaseModel
@@ -9,6 +9,7 @@ import requests
 import json
 import io
 import wave
+import numpy as np
 from typing import List, Optional
 from dotenv import load_dotenv
 
@@ -17,13 +18,12 @@ load_dotenv()
 # Configuration
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
-CHROMA_DIR = os.path.join(BASE_DIR, "chroma_db")
 # Use local model cache for Vercel bundling
 MODEL_CACHE_DIR = os.path.join(BASE_DIR, "model_cache")
 os.environ["FASTEMBED_CACHE_PATH"] = MODEL_CACHE_DIR
 
-COLLECTION = "kannada_book"
-MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+VECTORS_FILE = os.path.join(BASE_DIR, "vectors.npz")
+MODEL_NAME = "intfloat/multilingual-e5-small"
 
 BOOK_CONTEXT = """
 Book Title  : ಹೇಳಿ ಹೋಗು ಕಾರಣ (Heli Hogu Karana — meaning "Tell the reason before you go")
@@ -62,7 +62,7 @@ app = FastAPI(title="Kannada Book AI Agent")
 
 # Global variables for caching
 embed_model = None
-collection = None
+vector_store = None
 
 class ChatRequest(BaseModel):
     question: str
@@ -83,64 +83,69 @@ def is_character_question(q):
     return any(re.search(p, q, re.IGNORECASE) for p in CHARACTER_PATTERNS)
 
 def load_agent():
-    global embed_model, collection
-    if embed_model is None or collection is None:
+    global embed_model, vector_store
+    if embed_model is None or vector_store is None:
         from fastembed import TextEmbedding
-        import chromadb
         
         # Initialize FastEmbed with bundled model
         embed_model = TextEmbedding(model_name=MODEL_NAME)
         
-        # Initialize ChromaDB in read-only mode if possible, or just handle errors
-        client = chromadb.PersistentClient(path=CHROMA_DIR)
-        try:
-            collection = client.get_collection(COLLECTION)
-        except Exception:
-            # On Vercel, this might happen if CHROMA_DIR is missing or read-only issues occur
-            # We assume it exists in the repo
-            collection = client.get_or_create_collection(COLLECTION)
+        # Initialize NumPy Vector Store
+        if os.path.exists(VECTORS_FILE):
+            data = np.load(VECTORS_FILE, allow_pickle=True)
+            vector_store = {
+                "embeddings": data["embeddings"],
+                "documents": data["documents"],
+                "pages": data["pages"]
+            }
+        else:
+            # Fallback for empty or dev state
+            vector_store = {"embeddings": np.array([]), "documents": np.array([]), "pages": np.array([])}
             
-    return embed_model, collection
+    return embed_model, vector_store
 
-def retrieve(query, embed_model, collection, top_k=5):
-    # FastEmbed returns an iterator of embeddings
-    qe = list(embed_model.embed([query]))[0].tolist()
-    results = collection.query(query_embeddings=[qe], n_results=top_k)
+def cosine_similarity(v1, v2_matrix):
+    v1 = v1 / np.linalg.norm(v1)
+    v2_matrix = v2_matrix / np.linalg.norm(v2_matrix, axis=1, keepdims=True)
+    return np.dot(v2_matrix, v1)
+
+def retrieve(query, embed_model, vector_store, top_k=5):
+    if vector_store["embeddings"].size == 0:
+        return []
+    
+    # Get query embedding
+    qe = list(embed_model.embed([query]))[0]
+    
+    # Compute similarities
+    scores = cosine_similarity(qe, vector_store["embeddings"])
+    
+    # Get top_k indices
+    top_indices = np.argsort(scores)[::-1][:top_k]
+    
     chunks = []
-    for i, doc in enumerate(results["documents"][0]):
-        score = 1 - results["distances"][0][i]
+    for idx in top_indices:
+        score = scores[idx]
         if score >= 0.25:
             chunks.append({
-                "text": doc,
-                "page": results["metadatas"][0][i]["page"],
-                "score": round(score, 3)
+                "text": str(vector_store["documents"][idx]),
+                "page": int(vector_store["pages"][idx]),
+                "score": round(float(score), 3)
             })
     return chunks
-
-def retrieve_character(query, embed_model, collection):
-    qe = list(embed_model.embed([query]))[0].tolist()
-    results = collection.query(query_embeddings=[qe], n_results=10)
-    chunks = []
-    for i, doc in enumerate(results["documents"][0]):
-        score = 1 - results["distances"][0][i]
-        if score >= 0.20:
-            chunks.append({
-                "text": doc,
-                "page": results["metadatas"][0][i]["page"],
-                "score": round(score, 3)
-            })
-    return chunks
-
-def retrieve_by_page(page_num, collection):
-    results = collection.get(where={"page": page_num}, limit=5)
-    return [{"text": d, "page": m["page"], "score": 1.0}
-            for d, m in zip(results["documents"], results["metadatas"])]
 
 def detect_page_query(question):
     m = re.search(r'page\s*(\d+)|ಪುಟ\s*(\d+)|(\d+)\s*(?:page|ಪುಟ)', question, re.IGNORECASE)
     if m:
         return int(next(g for g in m.groups() if g))
     return None
+
+def retrieve_by_page(page_num, vector_store):
+    indices = np.where(vector_store["pages"] == page_num)[0]
+    return [{
+        "text": str(vector_store["documents"][idx]),
+        "page": int(vector_store["pages"][idx]),
+        "score": 1.0
+    } for idx in indices[:5]]
 
 def build_prompt(question, chunks, language, use_book_context_only=False):
     rag_section = "" if use_book_context_only else (
@@ -539,19 +544,19 @@ async def root():
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     try:
-        embed_model, collection = load_agent()
+        embed_model, vector_store = load_agent()
         
         general = is_general_question(request.question)
         page_num = detect_page_query(request.question)
         chunks = []
 
         if page_num:
-            chunks = retrieve_by_page(page_num, collection)
-            if not chunks: chunks = retrieve(request.question, embed_model, collection)
+            chunks = retrieve_by_page(page_num, vector_store)
+            if not chunks: chunks = retrieve(request.question, embed_model, vector_store)
         elif is_character_question(request.question):
-            chunks = retrieve_character(request.question, embed_model, collection)
+            chunks = retrieve(request.question, embed_model, vector_store, top_k=10) # Full retrieval for characters
         elif not general:
-            chunks = retrieve(request.question, embed_model, collection)
+            chunks = retrieve(request.question, embed_model, vector_store)
 
         prompt = build_prompt(request.question, chunks, request.language,
                              use_book_context_only=(general and not chunks))
@@ -564,7 +569,6 @@ async def chat(request: ChatRequest):
         
         audio_available = False
         if request.enable_tts and answer and SARVAM_API_KEY:
-            # We don't store audio but we flag it as available for the /audio endpoint
             audio_available = True
 
         return ChatResponse(
@@ -579,8 +583,8 @@ async def chat(request: ChatRequest):
 @app.get("/audio/{question}")
 async def get_audio(question: str):
     try:
-        embed_model, collection = load_agent()
-        chunks = retrieve(question, embed_model, collection)
+        embed_model, vector_store = load_agent()
+        chunks = retrieve(question, embed_model, vector_store)
         prompt = build_prompt(question, chunks, "English", use_book_context_only=False)
         chat_history = [{"role": "user", "content": prompt}]
         answer = call_sarvam_llm(chat_history)
@@ -594,7 +598,7 @@ async def get_audio(question: str):
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "model": MODEL_NAME, "fastembed": True}
+    return {"status": "healthy", "model": MODEL_NAME, "numpy_search": True}
 
 # Vercel entrypoint
 handler = app

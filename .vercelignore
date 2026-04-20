@@ -1,0 +1,43 @@
+# Local environment
+kannada-rag-env/
+.venv/
+venv/
+env/
+
+# Data and large assets
+data/
+Heli_Hogo_Karanaaa.gif
+vectorstore/
+poppler-25.12.0/
+audio/
+ingest/
+chroma_db/69f7603f-e145-47b5-bf34-3ca65dd29348/
+chroma_db/c0ecf0ae-122a-4bf6-8c29-d49971e511ba/
+
+# Development artifacts
+.git/
+.devcontainer/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.vscode/
+
+# Build scripts that aren't needed in cloud
+download_model.py
+verify_setup.py
+preprocess_images.py
+ocr_surya.py
+chunker.py
+clean_text.py
+pdf_to_images.py
+embed_and_store.py
+rag_agent.py
+verify_setup.py
+app.py
+
+# Documentation and design
+architecture.svg
+banner.svg
+README.md
+README-VERCEL.md
+LICENSE

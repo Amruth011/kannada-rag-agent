@@ -1,29 +1,7 @@
-# Kannada Book AI Agent - Requirements (Vercel Serverless Compatible)
-# Install: pip install -r requirements.txt
-
-# Core ML & AI (Vercel Optimized)
-fastembed
-chromadb
-
-# API & Web
 fastapi
 uvicorn
+pydantic
 requests
-python-dotenv
-
-# Text processing
 numpy
-
-# Audio processing
-Pillow
-
-# Optional dependencies (commented out for serverless deployment)
-# pdf2image  # Requires poppler system dependency
-# opencv-python  # Heavy for serverless
-# surya-ocr  # Heavy for serverless
-# indic-nlp-library  # Optional for text cleaning
-# langchain  # Not needed for simplified version
-# langchain-community  # Not needed for simplified version
-# langchain-core  # Not needed for simplified version
-# streamlit  # Replaced with FastAPI
-# tqdm  # Optional
+fastembed>=0.4.1
+python-dotenv
