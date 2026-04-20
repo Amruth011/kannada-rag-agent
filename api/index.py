@@ -1,7 +1,6 @@
 # api/index.py - FastAPI version for Vercel deployment
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, StreamingResponse
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import os
 import re
@@ -15,9 +14,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Configuration
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
 CHROMA_DIR = os.path.join(BASE_DIR, "chroma_db")
+# Use local model cache for Vercel bundling
+MODEL_CACHE_DIR = os.path.join(BASE_DIR, "model_cache")
+os.environ["FASTEMBED_CACHE_PATH"] = MODEL_CACHE_DIR
+
 COLLECTION = "kannada_book"
 MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
@@ -38,27 +42,13 @@ Key themes: Human deception, divine justice, moral accountability, existential q
 Known characters in this novel: ಹಿಮವಂತ (Himavant) is the main protagonist. ಪ್ರಾರ್ಥನಾ (Prarthana) is his wife. Their relationship is central to the story.
 """
 
-# General book/author questions — answered from BOOK_CONTEXT only
 GENERAL_PATTERNS = [
-    r'what is (this|the) book',
-    r'about (this|the) book',
-    r'book (about|summary|theme)',
-    r'who (is|wrote|is the author).*ravi',
-    r'ravi belagere',
-    r'author',
-    r'ಪುಸ್ತಕ(ದ|ವು|ದ ಬಗ್ಗೆ)',
-    r'ಕಾದಂಬರಿ',
-    r'ರವಿ ಬೆಳಗೆರೆ',
-    r'ವಿಷಯ ಏನು',
-    r'ಯಾರು ಬರೆದ',
-    r'ಮುಖ್ಯ ವಿಷಯ',
-    r'summary',
-    r'theme',
-    r'title mean',
-    r'ಶೀರ್ಷಿಕೆ',
+    r'what is (this|the) book', r'about (this|the) book', r'book (about|summary|theme)',
+    r'who (is|wrote|is the author).*ravi', r'ravi belagere', r'author',
+    r'ಪುಸ್ತಕ(ದ|ವು|ದ ಬಗ್ಗೆ)', r'ಕಾದಂಬರಿ', r'ರವಿ ಬೆಳಗೆರೆ', r'ವಿಷಯ ಏನು',
+    r'ಯಾರು ಬರೆದ', r'ಮುಖ್ಯ ವಿಷಯ', r'summary', r'theme', r'title mean', r'ಶೀರ್ಷಿಕೆ',
 ]
 
-# Character questions — answered from RAG retrieval
 CHARACTER_PATTERNS = [
     r'himavant', r'prarthana', r'pratana', r'prathana',
     r'ಹಿಮವಂತ', r'ಪ್ರಾರ್ಥನಾ',
@@ -68,7 +58,7 @@ CHARACTER_PATTERNS = [
     r'relationship', r'ಸಂಬಂಧ', r'name of', r'tell me about',
 ]
 
-app = FastAPI(title="Kannada Book AI Agent", description="AI Agent for Kannada Novel")
+app = FastAPI(title="Kannada Book AI Agent")
 
 # Global variables for caching
 embed_model = None
@@ -95,20 +85,26 @@ def is_character_question(q):
 def load_agent():
     global embed_model, collection
     if embed_model is None or collection is None:
-        from sentence_transformers import SentenceTransformer
+        from fastembed import TextEmbedding
         import chromadb
-        embed_model = SentenceTransformer(MODEL_NAME)
+        
+        # Initialize FastEmbed with bundled model
+        embed_model = TextEmbedding(model_name=MODEL_NAME)
+        
+        # Initialize ChromaDB in read-only mode if possible, or just handle errors
         client = chromadb.PersistentClient(path=CHROMA_DIR)
         try:
             collection = client.get_collection(COLLECTION)
         except Exception:
-            collection = client.get_or_create_collection(
-                COLLECTION, metadata={"hnsw:space": "cosine"}
-            )
+            # On Vercel, this might happen if CHROMA_DIR is missing or read-only issues occur
+            # We assume it exists in the repo
+            collection = client.get_or_create_collection(COLLECTION)
+            
     return embed_model, collection
 
 def retrieve(query, embed_model, collection, top_k=5):
-    qe = embed_model.encode([query])[0].tolist()
+    # FastEmbed returns an iterator of embeddings
+    qe = list(embed_model.embed([query]))[0].tolist()
     results = collection.query(query_embeddings=[qe], n_results=top_k)
     chunks = []
     for i, doc in enumerate(results["documents"][0]):
@@ -122,8 +118,7 @@ def retrieve(query, embed_model, collection, top_k=5):
     return chunks
 
 def retrieve_character(query, embed_model, collection):
-    """Higher recall retrieval for character questions — more chunks, lower threshold."""
-    qe = embed_model.encode([query])[0].tolist()
+    qe = list(embed_model.embed([query]))[0].tolist()
     results = collection.query(query_embeddings=[qe], n_results=10)
     chunks = []
     for i, doc in enumerate(results["documents"][0]):
@@ -180,7 +175,7 @@ ANSWER in English:"""
 
 def call_sarvam_llm(messages):
     if not SARVAM_API_KEY:
-        return "⚠️ SARVAM_API_KEY not set in .env"
+        return "⚠️ SARVAM_API_KEY not set in Environment Variables"
     headers = {
         "Authorization": f"Bearer {SARVAM_API_KEY}",
         "Content-Type": "application/json"
@@ -244,131 +239,233 @@ def call_sarvam_tts(text, language="kn-IN"):
                 with wave.open(seg, 'rb') as wav_in:
                     if i == 0: wav_out.setparams(wav_in.getparams())
                     wav_out.writeframes(wav_in.readframes(wav_in.getnframes()))
-            except wave.Error:
-                continue
+            except wave.Error: continue
     return output_wav.getvalue()
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
     return """
     <!DOCTYPE html>
-    <html>
+    <html lang="kn">
     <head>
-        <title>ಹೇಳಿ ಹೋಗು ಕಾರಣ — AI Agent</title>
+        <title>ಹೇಳಿ ಹೋಗು ಕಾರಣ — AI Intelligence</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+Kannada:wght@400;700&display=swap" rel="stylesheet">
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-            * { font-family: 'Plus Jakarta Sans', sans-serif; }
-            body {
-                background: radial-gradient(circle at 15% 50%, #130b29, #09090e 50%, #050a16 100%);
-                color: #e2e8f0;
-                margin: 0;
-                padding: 2rem;
-                min-height: 100vh;
+            :root {
+                --primary: #8b5cf6;
+                --secondary: #ec4899;
+                --bg: #05050a;
+                --surface: rgba(255, 255, 255, 0.03);
+                --border: rgba(255, 255, 255, 0.08);
+                --text: #f8fafc;
+                --text-dim: #94a3b8;
             }
-            .container { max-width: 800px; margin: 0 auto; }
+            * { box-sizing: border-box; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+            body {
+                background: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #05050a 50%, #020617 100%);
+                color: var(--text);
+                font-family: 'Outfit', 'Noto Sans Kannada', sans-serif;
+                margin: 0;
+                padding: 0;
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                overflow-x: hidden;
+            }
+            .container { width: 100%; max-width: 900px; padding: 3rem 1.5rem; }
+            .header { text-align: center; margin-bottom: 4rem; }
+            .badge {
+                display: inline-block;
+                padding: 0.5rem 1rem;
+                background: rgba(139, 92, 246, 0.1);
+                border: 1px solid rgba(139, 92, 246, 0.2);
+                border-radius: 999px;
+                color: var(--primary);
+                font-size: 0.8rem;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                margin-bottom: 1rem;
+                text-transform: uppercase;
+            }
             h1 {
-                background: linear-gradient(to right, #38bdf8, #c084fc, #f472b6);
+                font-size: clamp(2.5rem, 8vw, 4rem);
+                font-weight: 800;
+                margin: 0;
+                background: linear-gradient(to bottom right, #fff 30%, #94a3b8);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
-                font-weight: 800;
-                font-size: 3rem;
-                margin-bottom: 1rem;
+                line-height: 1.1;
             }
-            .form-container {
-                background: rgba(255,255,255,0.02);
-                border: 1px solid rgba(255,255,255,0.06);
+            .subtitle { color: var(--text-dim); font-size: 1.2rem; margin-top: 1rem; }
+            
+            .main-card {
+                background: var(--surface);
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
+                border: 1px solid var(--border);
+                border-radius: 24px;
+                padding: 2.5rem;
+                box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+                position: relative;
+                overflow: hidden;
+            }
+            .main-card::before {
+                content: '';
+                position: absolute;
+                top: 0; left: 0; right: 0; height: 1px;
+                background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            }
+            
+            .search-box { position: relative; margin-bottom: 2rem; }
+            input {
+                width: 100%;
+                background: rgba(0,0,0,0.2);
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                padding: 1.2rem 1.5rem;
+                color: white;
+                font-size: 1.1rem;
+                outline: none;
+            }
+            input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1); }
+            
+            .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
+            select {
+                background: rgba(0,0,0,0.2);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 0.8rem;
+                color: white;
+                cursor: pointer;
+            }
+            
+            .checkbox-group { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+            .checkbox-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-dim); cursor: pointer; }
+            .checkbox-item:hover { color: white; }
+            
+            button {
+                width: 100%;
+                background: linear-gradient(135deg, var(--primary) 0%, #6d28d9 100%);
+                color: white;
+                border: none;
+                border-radius: 16px;
+                padding: 1.2rem;
+                font-size: 1.1rem;
+                font-weight: 700;
+                cursor: pointer;
+                margin-top: 1rem;
+                box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.4);
+            }
+            button:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(139, 92, 246, 0.6); }
+            button:active { transform: translateY(0); }
+            
+            .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; }
+            .chip {
+                background: rgba(255,255,255,0.05);
+                border: 1px solid var(--border);
+                border-radius: 99px;
+                padding: 0.4rem 1rem;
+                font-size: 0.85rem;
+                cursor: pointer;
+                color: var(--text-dim);
+            }
+            .chip:hover { background: rgba(139, 92, 246, 0.2); color: white; border-color: var(--primary); }
+            
+            #response-container { margin-top: 3rem; display: none; }
+            .result-card {
+                background: rgba(139, 92, 246, 0.05);
+                border: 1px solid rgba(139, 92, 246, 0.2);
                 border-radius: 20px;
                 padding: 2rem;
-                backdrop-filter: blur(20px);
+                line-height: 1.7;
+                font-size: 1.1rem;
             }
-            input, select, button {
-                width: 100%;
-                padding: 1rem;
-                margin: 0.5rem 0;
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 12px;
-                background: rgba(255,255,255,0.04);
-                color: #e2e8f0;
-                font-size: 1rem;
+            .sources { 
+                margin-top: 1.5rem;
+                padding-top: 1rem;
+                border-top: 1px solid var(--border);
+                color: var(--text-dim);
+                font-size: 0.9rem;
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
             }
-            button {
-                background: linear-gradient(135deg, rgba(139,92,246,0.2) 0%, rgba(236,72,153,0.1) 100%);
-                border: 1px solid rgba(139,92,246,0.3);
-                cursor: pointer;
-                font-weight: 600;
-                transition: all 0.2s;
+            .source-tag {
+                background: rgba(255,255,255,0.03);
+                padding: 0.2rem 0.6rem;
+                border-radius: 6px;
+                border: 1px solid var(--border);
             }
-            button:hover {
-                border-color: #8b5cf6;
-                box-shadow: 0 0 15px rgba(139,92,246,0.3);
-                transform: translateY(-1px);
+            
+            .loader {
+                width: 24px; height: 24px;
+                border: 3px solid rgba(139, 92, 246, 0.3);
+                border-top-color: var(--primary);
+                border-radius: 50%;
+                animation: spin 1s infinite linear;
+                margin: 2rem auto;
             }
-            .response {
-                background: rgba(20,20,35,0.4);
-                border: 1px solid rgba(255,255,255,0.03);
-                border-radius: 20px;
-                padding: 1.5rem;
-                margin: 1rem 0;
-                line-height: 1.6;
-            }
-            .sources { color: #94a3b8; font-size: 0.9rem; margin-top: 0.5rem; }
-            .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
-            .chip {
-                background: rgba(255,255,255,0.04);
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 999px;
-                padding: 0.3rem 0.9rem;
-                font-size: 0.8rem;
-                cursor: pointer;
-                transition: all 0.2s;
-            }
-            .chip:hover {
-                background: rgba(139,92,246,0.15);
-                border-color: rgba(139,92,246,0.4);
-                color: #c084fc;
-            }
+            @keyframes spin { to { transform: rotate(360deg); } }
+            
+            audio { width: 100%; margin-top: 1.5rem; filter: invert(0.9) hue-rotate(180deg); opacity: 0.7; }
+            audio:hover { opacity: 1; }
         </style>
     </head>
     <body>
         <div class="container">
-            <h1>📚 ಹೇಳಿ ಹೋಗು ಕಾರಣ</h1>
-            <p>Premium AI Knowledge Agent</p>
+            <div class="header">
+                <span class="badge">RAG Powered Agent</span>
+                <h1>ಹೇಳಿ ಹೋಗು ಕಾರಣ</h1>
+                <p class="subtitle">Intelligent Conversational Guide to Ravi Belagere's Masterpiece</p>
+            </div>
             
-            <div class="form-container">
+            <div class="main-card">
                 <div class="chips">
-                    <div class="chip" onclick="setQuestion('What is this book about?')">What is this book about?</div>
-                    <div class="chip" onclick="setQuestion('Who is Himavant?')">Who is Himavant?</div>
-                    <div class="chip" onclick="setQuestion('Who is Prarthana?')">Who is Prarthana?</div>
-                    <div class="chip" onclick="setQuestion('What is in page 50?')">What is in page 50?</div>
-                    <div class="chip" onclick="setQuestion('ಹಿಮವಂತ ಯಾರು?')">ಹಿಮವಂತ ಯಾರು?</div>
-                    <div class="chip" onclick="setQuestion('ಕಾದಂಬರಿ ವಿಷಯ ಏನು?')">ಕಾದಂಬರಿ ವಿಷಯ ಏನು?</div>
+                    <div class="chip" onclick="setQ('What is this book about?')">Overview</div>
+                    <div class="chip" onclick="setQ('Who is Himavant?')">Himavant</div>
+                    <div class="chip" onclick="setQ('Who is Prarthana?')">Prarthana</div>
+                    <div class="chip" onclick="setQ('What happens in page 80?')">Page 80</div>
+                    <div class="chip" onclick="setQ('ಹಿಮವಂತನ ಪಾತ್ರದ ಬಗ್ಗೆ ತಿಳಿಸಿ')">ಹಿಮವಂತ</div>
+                    <div class="chip" onclick="setQ('ಕಾದಂಬರಿಯ ಸಾರಾಂಶ ಏನು?')">ಸಾರಾಂಶ</div>
                 </div>
                 
                 <form id="chatForm">
-                    <input type="text" id="question" placeholder="Ask about the book... (ಪ್ರಶ್ನೆ ಕೇಳಿ...)" required>
-                    <select id="language">
-                        <option value="English">English</option>
-                        <option value="Kannada">Kannada</option>
-                    </select>
-                    <label style="display: block; margin: 0.5rem 0;">
-                        <input type="checkbox" id="showChunks"> Show source chunks
-                    </label>
-                    <label style="display: block; margin: 0.5rem 0;">
-                        <input type="checkbox" id="enableTts"> Read answer aloud (TTS)
-                    </label>
-                    <button type="submit">Ask Question</button>
+                    <div class="search-box">
+                        <input type="text" id="question" placeholder="Ask anything about the book..." required autocomplete="off">
+                    </div>
+                    
+                    <div class="controls">
+                        <select id="language">
+                            <option value="English">Respond in English</option>
+                            <option value="Kannada">Respond in Kannada</option>
+                        </select>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="showChunks"> Show Passages
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="enableTts"> Voice (TTS)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="submitBtn">Analyze & Answer</button>
                 </form>
                 
-                <div id="response"></div>
+                <div id="loading" style="display:none"><div class="loader"></div></div>
+                
+                <div id="response-container">
+                    <div id="answer" class="result-card"></div>
+                    <div id="sources" class="sources"></div>
+                    <div id="audio-container"></div>
+                </div>
             </div>
         </div>
-        
+
         <script>
-            function setQuestion(q) {
-                document.getElementById('question').value = q;
-            }
+            function setQ(q) { document.getElementById('question').value = q; }
             
             document.getElementById('chatForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -377,48 +474,61 @@ async def root():
                 const showChunks = document.getElementById('showChunks').checked;
                 const enableTts = document.getElementById('enableTts').checked;
                 
-                const responseDiv = document.getElementById('response');
-                responseDiv.innerHTML = '<div class="response">🔍 Searching book...</div>';
+                const btn = document.getElementById('submitBtn');
+                const loading = document.getElementById('loading');
+                const container = document.getElementById('response-container');
+                const answerDiv = document.getElementById('answer');
+                const sourcesDiv = document.getElementById('sources');
+                const audioDiv = document.getElementById('audio-container');
+                
+                btn.disabled = true;
+                loading.style.display = 'block';
+                container.style.display = 'none';
                 
                 try {
                     const response = await fetch('/chat', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            question,
-                            language,
-                            show_chunks: showChunks,
-                            enable_tts: enableTts
-                        })
+                        body: JSON.stringify({ question, language, show_chunks: showChunks, enable_tts: enableTts })
                     });
                     
                     const data = await response.json();
                     
-                    let html = `<div class="response">${data.answer}`;
+                    answerDiv.innerHTML = data.answer.replace(/\\n/g, '<br>');
+                    
+                    sourcesDiv.innerHTML = '';
                     if (data.sources && data.sources.length > 0) {
-                        html += `<div class="sources">📄 Sources: Pages ${data.sources.join(', ')}</div>`;
-                    }
-                    if (data.chunks && data.chunks.length > 0 && showChunks) {
-                        html += '<div style="margin-top: 1rem;"><strong>Source chunks:</strong>';
-                        data.chunks.forEach(chunk => {
-                            html += `<div style="margin: 0.5rem 0; padding: 0.5rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
-                                <strong>Page ${chunk.page}</strong> (score: ${chunk.score})<br>
-                                ${chunk.text.substring(0, 300)}...
-                            </div>`;
+                        data.sources.forEach(s => {
+                            sourcesDiv.innerHTML += `<span class="source-tag">Page ${s}</span>`;
                         });
-                        html += '</div>';
                     }
+                    
+                    audioDiv.innerHTML = '';
                     if (data.audio_available) {
-                        html += `<div style="margin-top: 1rem;">
-                            <audio controls>
+                        audioDiv.innerHTML = `
+                            <audio controls autoplay>
                                 <source src="/audio/${encodeURIComponent(question)}" type="audio/wav">
                             </audio>
-                        </div>`;
+                        `;
                     }
-                    html += '</div>';
-                    responseDiv.innerHTML = html;
-                } catch (error) {
-                    responseDiv.innerHTML = `<div class="response">Error: ${error.message}</div>`;
+                    
+                    if (data.chunks && data.chunks.length > 0 && showChunks) {
+                        let chunksHtml = '<div style="margin-top:2rem; font-size:0.9rem; color:var(--text-dim)"><strong>Retrieved Passages:</strong>';
+                        data.chunks.forEach(c => {
+                            chunksHtml += `<div style="margin-top:1rem; padding:1rem; background:rgba(0,0,0,0.2); border-radius:12px; border-left:4px solid var(--primary)">
+                                <strong>Page ${c.page}</strong> (match: ${c.score})<br>${c.text}
+                            </div>`;
+                        });
+                        answerDiv.innerHTML += chunksHtml + '</div>';
+                    }
+                    
+                    container.style.display = 'block';
+                } catch (err) {
+                    answerDiv.innerHTML = `Error: ${err.message}`;
+                    container.style.display = 'block';
+                } finally {
+                    btn.disabled = false;
+                    loading.style.display = 'none';
                 }
             });
         </script>
@@ -437,8 +547,7 @@ async def chat(request: ChatRequest):
 
         if page_num:
             chunks = retrieve_by_page(page_num, collection)
-            if not chunks:
-                chunks = retrieve(request.question, embed_model, collection)
+            if not chunks: chunks = retrieve(request.question, embed_model, collection)
         elif is_character_question(request.question):
             chunks = retrieve_character(request.question, embed_model, collection)
         elif not general:
@@ -453,17 +562,10 @@ async def chat(request: ChatRequest):
         pages = sorted(set(c["page"] for c in chunks)) if chunks else []
         sources = [str(p) for p in pages]
         
-        # Generate audio if requested
         audio_available = False
         if request.enable_tts and answer and SARVAM_API_KEY:
-            tts_lang = "kn-IN" if request.language == "Kannada" else "en-IN"
-            try:
-                audio_bytes = call_sarvam_tts(answer, tts_lang)
-                if audio_bytes:
-                    # Store audio in memory or temporary storage
-                    audio_available = True
-            except Exception:
-                pass
+            # We don't store audio but we flag it as available for the /audio endpoint
+            audio_available = True
 
         return ChatResponse(
             answer=answer,
@@ -471,13 +573,11 @@ async def chat(request: ChatRequest):
             chunks=chunks if request.show_chunks else [],
             audio_available=audio_available
         )
-        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/audio/{question}")
 async def get_audio(question: str):
-    # This is a simplified version - in production, you'd want to cache audio
     try:
         embed_model, collection = load_agent()
         chunks = retrieve(question, embed_model, collection)
@@ -485,17 +585,16 @@ async def get_audio(question: str):
         chat_history = [{"role": "user", "content": prompt}]
         answer = call_sarvam_llm(chat_history)
         
-        audio_bytes = call_sarvam_tts(answer, "en-IN")
+        audio_bytes = call_sarvam_tts(answer, "kn-IN" if any(ord(c) > 128 for c in answer) else "en-IN")
         if audio_bytes:
             return StreamingResponse(io.BytesIO(audio_bytes), media_type="audio/wav")
-        else:
-            raise HTTPException(status_code=404, detail="Audio not available")
+        raise HTTPException(status_code=404, detail="Audio generation failed")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    return {"status": "healthy", "model": MODEL_NAME, "fastembed": True}
 
-# For Vercel serverless deployment
+# Vercel entrypoint
 handler = app

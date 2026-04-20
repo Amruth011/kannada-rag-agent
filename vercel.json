@@ -3,19 +3,18 @@
   "name": "kannada-rag-agent",
   "builds": [
     {
-      "src": "api/app.py",
+      "src": "api/index.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/app.py"
+      "dest": "api/index.py"
     }
   ],
   "env": {
-    "PYTHON_VERSION": "3.9"
-  },
-  "installCommand": "pip install -r requirements.txt",
-  "framework": null
+    "PYTHON_VERSION": "3.9",
+    "FASTEMBED_CACHE_PATH": "model_cache"
+  }
 }
