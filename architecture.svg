@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="680" viewBox="0 0 980 680">
+<defs>
+<marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+  <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280"/>
+</marker>
+<filter id="sh">
+  <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.4"/>
+</filter>
+</defs>
+<rect width="980" height="680" fill="#0d1117"/>
+<line x1="0" y1="0" x2="0" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="60" y1="0" x2="60" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="120" y1="0" x2="120" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="180" y1="0" x2="180" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="240" y1="0" x2="240" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="300" y1="0" x2="300" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="360" y1="0" x2="360" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="420" y1="0" x2="420" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="480" y1="0" x2="480" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="540" y1="0" x2="540" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="600" y1="0" x2="600" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="660" y1="0" x2="660" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="720" y1="0" x2="720" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="780" y1="0" x2="780" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="840" y1="0" x2="840" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="900" y1="0" x2="900" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="960" y1="0" x2="960" y2="680" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="0" y1="0" x2="980" y2="0" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="0" y1="60" x2="980" y2="60" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="0" y1="120" x2="980" y2="120" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="0" y1="180" x2="980" y2="180" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="0" y1="240" x2="980" y2="240" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="0" y1="300" x2="980" y2="300" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="0" y1="360" x2="980" y2="360" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="0" y1="420" x2="980" y2="420" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="0" y1="480" x2="980" y2="480" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="0" y1="540" x2="980" y2="540" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="0" y1="600" x2="980" y2="600" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<line x1="0" y1="660" x2="980" y2="660" stroke="#ffffff" stroke-width="0.3" opacity="0.03"/>
+<rect x="0" y="0" width="980" height="54" fill="#161b22"/>
+<line x1="0" y1="54" x2="980" y2="54" stroke="#30363d" stroke-width="1"/>
+<text x="490" y="22" text-anchor="middle" font-size="16" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">ಹೇಳಿ ಹೋಗು ಕಾರಣ  —  Kannada Book AI Agent</text>
+<text x="490" y="42" text-anchor="middle" font-size="10" fill="#8b949e" font-family="Arial,sans-serif">End-to-End RAG Pipeline  ·  EasyOCR  ·  ChromaDB  ·  Sarvam-M  ·  bulbul:v3 TTS  ·  Streamlit Cloud</text>
+<rect x="8" y="59" width="78" height="16" rx="4" fill="#161b22" stroke="#30363d" stroke-width="0.8"/>
+<text x="47" y="69" text-anchor="middle" dominant-baseline="middle" font-size="7.5" fill="#58a6ff" font-family="Arial,sans-serif" font-weight="bold" letter-spacing="0.8">INGESTION</text>
+<rect x="8" y="176" width="78" height="16" rx="4" fill="#161b22" stroke="#30363d" stroke-width="0.8"/>
+<text x="47" y="186" text-anchor="middle" dominant-baseline="middle" font-size="7.5" fill="#58a6ff" font-family="Arial,sans-serif" font-weight="bold" letter-spacing="0.8">EMBEDDING</text>
+<rect x="8" y="286" width="78" height="16" rx="4" fill="#161b22" stroke="#30363d" stroke-width="0.8"/>
+<text x="47" y="296" text-anchor="middle" dominant-baseline="middle" font-size="7.5" fill="#58a6ff" font-family="Arial,sans-serif" font-weight="bold" letter-spacing="0.8">ROUTING</text>
+<rect x="8" y="411" width="78" height="16" rx="4" fill="#161b22" stroke="#30363d" stroke-width="0.8"/>
+<text x="47" y="421" text-anchor="middle" dominant-baseline="middle" font-size="7.5" fill="#58a6ff" font-family="Arial,sans-serif" font-weight="bold" letter-spacing="0.8">RETRIEVAL</text>
+<rect x="8" y="521" width="78" height="16" rx="4" fill="#161b22" stroke="#30363d" stroke-width="0.8"/>
+<text x="47" y="531" text-anchor="middle" dominant-baseline="middle" font-size="7.5" fill="#58a6ff" font-family="Arial,sans-serif" font-weight="bold" letter-spacing="0.8">GENERATION</text>
+<rect x="8" y="616" width="78" height="16" rx="4" fill="#161b22" stroke="#30363d" stroke-width="0.8"/>
+<text x="47" y="626" text-anchor="middle" dominant-baseline="middle" font-size="7.5" fill="#58a6ff" font-family="Arial,sans-serif" font-weight="bold" letter-spacing="0.8">OUTPUT</text>
+<rect x="77" y="69" width="110" height="48" rx="10" fill="#000" opacity="0.35"/>
+<rect x="75" y="66" width="110" height="48" rx="10" fill="#1c2128" stroke="#30363d" stroke-width="1.5" filter="url(#sh)"/>
+<text x="130" y="83" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">PDF Input</text>
+<text x="130" y="99" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">346 pages</text>
+<rect x="212" y="69" width="110" height="48" rx="10" fill="#000" opacity="0.35"/>
+<rect x="210" y="66" width="110" height="48" rx="10" fill="#0d2137" stroke="#1f6feb" stroke-width="1.5" filter="url(#sh)"/>
+<text x="265" y="83" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">pdf2image</text>
+<text x="265" y="99" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">200 DPI PNG</text>
+<rect x="347" y="69" width="110" height="48" rx="10" fill="#000" opacity="0.35"/>
+<rect x="345" y="66" width="110" height="48" rx="10" fill="#0d2137" stroke="#1f6feb" stroke-width="1.5" filter="url(#sh)"/>
+<text x="400" y="83" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">OpenCV</text>
+<text x="400" y="99" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">Preprocess</text>
+<rect x="482" y="69" width="110" height="48" rx="10" fill="#000" opacity="0.35"/>
+<rect x="480" y="66" width="110" height="48" rx="10" fill="#0d2a1e" stroke="#238636" stroke-width="1.5" filter="url(#sh)"/>
+<text x="535" y="83" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">EasyOCR</text>
+<text x="535" y="99" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">kn + en CPU</text>
+<rect x="617" y="69" width="110" height="48" rx="10" fill="#000" opacity="0.35"/>
+<rect x="615" y="66" width="110" height="48" rx="10" fill="#1c2128" stroke="#30363d" stroke-width="1.5" filter="url(#sh)"/>
+<text x="670" y="83" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">indic-nlp</text>
+<text x="670" y="99" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">Unicode Norm</text>
+<rect x="752" y="69" width="110" height="48" rx="10" fill="#000" opacity="0.35"/>
+<rect x="750" y="66" width="110" height="48" rx="10" fill="#2a1a00" stroke="#d29922" stroke-width="1.5" filter="url(#sh)"/>
+<text x="805" y="83" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">Chunker</text>
+<text x="805" y="99" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">400ch·50ovlp</text>
+<line x1="185" y1="90" x2="210" y2="90" stroke="#6b7280" stroke-width="1.8" marker-end="url(#arr)"/>
+<line x1="320" y1="90" x2="345" y2="90" stroke="#6b7280" stroke-width="1.8" marker-end="url(#arr)"/>
+<line x1="455" y1="90" x2="480" y2="90" stroke="#6b7280" stroke-width="1.8" marker-end="url(#arr)"/>
+<line x1="590" y1="90" x2="615" y2="90" stroke="#6b7280" stroke-width="1.8" marker-end="url(#arr)"/>
+<line x1="725" y1="90" x2="750" y2="90" stroke="#6b7280" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="740" y="83" text-anchor="middle" font-size="8" fill="#8b949e" font-family="Arial,sans-serif">687 chunks</text>
+<rect x="265" y="164" width="175" height="48" rx="10" fill="#000" opacity="0.35"/>
+<rect x="263" y="161" width="175" height="48" rx="10" fill="#1a0f3c" stroke="#7c3aed" stroke-width="1.5" filter="url(#sh)"/>
+<text x="350" y="178" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#c4b5fd" font-family="Arial,sans-serif">sentence-transformers</text>
+<text x="350" y="194" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#a78bfa" font-family="Arial,sans-serif">MiniLM-L12-v2</text>
+<rect x="505" y="164" width="155" height="48" rx="10" fill="#000" opacity="0.35"/>
+<rect x="503" y="161" width="155" height="48" rx="10" fill="#1a0f3c" stroke="#7c3aed" stroke-width="1.5" filter="url(#sh)"/>
+<text x="580" y="178" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#c4b5fd" font-family="Arial,sans-serif">ChromaDB</text>
+<text x="580" y="194" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#a78bfa" font-family="Arial,sans-serif">cosine · 687 indexed</text>
+<path d="M 805 114 L 805 185 L 437 185" fill="none" stroke="#d29922" stroke-width="1.6" marker-end="url(#arr)"/>
+<line x1="437" y1="185" x2="503" y2="185" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#arr)"/>
+<line x1="437" y1="185" x2="503" y2="185" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#arr)"/>
+<polygon points="490,253 580,295 490,337 400,295" fill="#0a2540" stroke="#1f6feb" stroke-width="1.5" filter="url(#sh)"/>
+<text x="490" y="288" text-anchor="middle" dominant-baseline="middle" font-size="10.5" font-weight="bold" fill="#79c0ff" font-family="Arial,sans-serif">Smart Router</text>
+<text x="490" y="304" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">4 strategies</text>
+<line x1="657" y1="209" x2="545" y2="285" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#arr)"/>
+<rect x="30" y="399" width="145" height="48" rx="10" fill="#000" opacity="0.35"/>
+<rect x="28" y="396" width="145" height="48" rx="10" fill="#1c2128" stroke="#30363d" stroke-width="1.5" filter="url(#sh)"/>
+<text x="100" y="413" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">Page Lookup</text>
+<text x="100" y="429" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">exact page num</text>
+<rect x="215" y="399" width="145" height="48" rx="10" fill="#000" opacity="0.35"/>
+<rect x="213" y="396" width="145" height="48" rx="10" fill="#1a0f3c" stroke="#7c3aed" stroke-width="1.5" filter="url(#sh)"/>
+<text x="285" y="413" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">Char. RAG</text>
+<text x="285" y="429" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">top-10 · θ=0.20</text>
+<rect x="490" y="399" width="145" height="48" rx="10" fill="#000" opacity="0.35"/>
+<rect x="488" y="396" width="145" height="48" rx="10" fill="#0d2137" stroke="#1f6feb" stroke-width="1.5" filter="url(#sh)"/>
+<text x="560" y="413" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">Standard RAG</text>
+<text x="560" y="429" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">top-5 · θ=0.25</text>
+<rect x="680" y="399" width="145" height="48" rx="10" fill="#000" opacity="0.35"/>
+<rect x="678" y="396" width="145" height="48" rx="10" fill="#1c2128" stroke="#30363d" stroke-width="1.5" filter="url(#sh)"/>
+<text x="750" y="413" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">BOOK_CONTEXT</text>
+<text x="750" y="429" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">general queries</text>
+<path d="M 490 337 L 490 390 L 100 390 L 100 396" fill="none" stroke="#4b5563" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M 490 337 L 490 390 L 285 390 L 285 396" fill="none" stroke="#4b5563" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M 490 337 L 490 390 L 560 390 L 560 396" fill="none" stroke="#4b5563" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M 490 337 L 490 390 L 750 390 L 750 396" fill="none" stroke="#4b5563" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="230" y="508" width="185" height="50" rx="10" fill="#000" opacity="0.35"/>
+<rect x="228" y="505" width="185" height="50" rx="10" fill="#2a1a00" stroke="#d29922" stroke-width="1.5" filter="url(#sh)"/>
+<text x="320" y="523" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#fde68a" font-family="Arial,sans-serif">Sarvam-M LLM</text>
+<text x="320" y="539" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#fbbf24" font-family="Arial,sans-serif">conv. memory · 4 msgs</text>
+<rect x="500" y="508" width="165" height="50" rx="10" fill="#000" opacity="0.35"/>
+<rect x="498" y="505" width="165" height="50" rx="10" fill="#2a0020" stroke="#db2777" stroke-width="1.5" filter="url(#sh)"/>
+<text x="580" y="523" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#fbcfe8" font-family="Arial,sans-serif">bulbul:v3 TTS</text>
+<text x="580" y="539" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#f472b6" font-family="Arial,sans-serif">kn-IN / en-IN · WAV</text>
+<path d="M 100 444 L 100 515 L 320 515 L 320 505" fill="none" stroke="#4b5563" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M 285 444 L 285 515 L 320 515 L 320 505" fill="none" stroke="#4b5563" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M 560 444 L 560 515 L 320 515 L 320 505" fill="none" stroke="#4b5563" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M 750 444 L 750 515 L 320 515 L 320 505" fill="none" stroke="#4b5563" stroke-width="1.6" marker-end="url(#arr)"/>
+<line x1="412" y1="530" x2="498" y2="530" stroke="#d29922" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="490" y="555" text-anchor="middle" font-size="8.5" fill="#8b949e" font-family="Arial,sans-serif">if TTS enabled</text>
+<rect x="202" y="612" width="580" height="42" rx="12" fill="#000" opacity="0.35"/>
+<rect x="200" y="609" width="580" height="42" rx="12" fill="#0d2a1e" stroke="#238636" stroke-width="1.5" filter="url(#sh)"/>
+<text x="490" y="623" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#56d364" font-family="Arial,sans-serif">Streamlit UI  ·  Deployed on Streamlit Cloud</text>
+<text x="490" y="639" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#3fb950" font-family="Arial,sans-serif">Glass UI · Suggestion Chips · Progress Bar · Feedback · Admin Viewer</text>
+<line x1="320" y1="555" x2="420" y2="609" stroke="#d29922" stroke-width="1.8" marker-end="url(#arr)"/>
+<line x1="580" y1="555" x2="560" y2="609" stroke="#db2777" stroke-width="1.8" marker-end="url(#arr)"/>
+<rect x="820" y="362" width="148" height="138" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+<text x="830" y="376" font-size="8.5" fill="#58a6ff" font-family="Arial,sans-serif" font-weight="bold" letter-spacing="0.8">LEGEND</text>
+<rect x="830" y="387" width="11" height="11" rx="2" fill="#30363d"/>
+<text x="846" y="395" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">Ingestion / Storage</text>
+<rect x="830" y="405" width="11" height="11" rx="2" fill="#1f6feb"/>
+<text x="846" y="413" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">Image · OCR</text>
+<rect x="830" y="423" width="11" height="11" rx="2" fill="#7c3aed"/>
+<text x="846" y="431" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">Embeddings · VectorDB</text>
+<rect x="830" y="441" width="11" height="11" rx="2" fill="#d29922"/>
+<text x="846" y="449" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">Chunking · LLM</text>
+<rect x="830" y="459" width="11" height="11" rx="2" fill="#db2777"/>
+<text x="846" y="467" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">TTS · Audio</text>
+<rect x="830" y="477" width="11" height="11" rx="2" fill="#238636"/>
+<text x="846" y="485" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">Output · Deploy</text>
+</svg>

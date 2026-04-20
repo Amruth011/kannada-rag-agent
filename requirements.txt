@@ -1,37 +1,31 @@
-# Kannada Book AI Agent - Requirements (Windows Compatible)
+# Kannada Book AI Agent - Requirements (Vercel Serverless Compatible)
 # Install: pip install -r requirements.txt
 
-# PDF & Image
-pdf2image
-Pillow
-opencv-python
-numpy
-
-# OCR
-surya-ocr
-
-# Kannada text cleaning
-indic-nlp-library
-
-# Embeddings & vector store
+# Core ML & AI
 sentence-transformers
 transformers
 torch
 chromadb
 
-# LangChain agent + chains
-langchain
-langchain-community
-langchain-core
-
-# API
+# API & Web
+fastapi
+uvicorn
 requests
-
-# Env vars
 python-dotenv
 
-# UI
-streamlit
+# Text processing
+numpy
 
-# Utilities
-tqdm
+# Audio processing
+Pillow
+
+# Optional dependencies (commented out for serverless deployment)
+# pdf2image  # Requires poppler system dependency
+# opencv-python  # Heavy for serverless
+# surya-ocr  # Heavy for serverless
+# indic-nlp-library  # Optional for text cleaning
+# langchain  # Not needed for simplified version
+# langchain-community  # Not needed for simplified version
+# langchain-core  # Not needed for simplified version
+# streamlit  # Replaced with FastAPI
+# tqdm  # Optional
