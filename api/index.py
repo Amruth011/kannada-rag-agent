@@ -92,8 +92,8 @@ def search_text(query, data, top_k=5):
     results.sort(key=lambda x: x['score'], reverse=True)
     return results[:top_k]
 
-def call_groq(prompt):
-    """Fallback to Groq (Llama 3 70B) if Gemini fails."""
+def call_groq(prompt, retries=2):
+    """Fallback to Groq (Llama 3.3) with Rate Limit Armor."""
     if not GROQ_API_KEY:
         return "[ERROR]: GROQ_API_KEY is missing."
     
@@ -111,12 +111,25 @@ def call_groq(prompt):
         "temperature": 0.2,
         "max_tokens": 1024
     }
-    try:
-        resp = requests.post(url, headers=headers, json=payload, timeout=30)
-        resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"]
-    except Exception as e:
-        return f"[GROQ ERROR]: {str(e)}"
+    
+    for attempt in range(retries + 1):
+        try:
+            resp = requests.post(url, headers=headers, json=payload, timeout=30)
+            if resp.status_code == 200:
+                return resp.json()["choices"][0]["message"]["content"]
+            
+            if resp.status_code == 429: # Rate Limit
+                if attempt < retries:
+                    time.sleep(5) # Wait 5s for token bucket to refill
+                    continue
+            
+            resp.raise_for_status()
+        except Exception as e:
+            if attempt < retries:
+                time.sleep(2)
+                continue
+            return f"[GROQ ERROR]: {str(e)}"
+    return "[ERROR]: Groq rate limit exhausted."
 
 def call_gemini(prompt, retries=2):
     """Call Gemini 1.5 Flash with 'Rate Limit Armor' (Automatic Retries) + Groq Fallback."""

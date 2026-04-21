@@ -294,8 +294,8 @@ ANSWER in English:"""
 
 ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ:"""
 
-def call_groq_llm(messages):
-    """Fallback to Groq Llama 3 if Sarvam is unavailable."""
+def call_groq_llm(messages, retries=2):
+    """Fallback to Groq Llama 3 with Rate Limit Armor."""
     if not GROQ_API_KEY: return "⚠️ GROQ_API_KEY not set"
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
@@ -305,12 +305,25 @@ def call_groq_llm(messages):
         "temperature": 0.1,
         "max_tokens": 800
     }
-    try:
-        resp = requests.post(url, headers=headers, json=payload, timeout=30)
-        resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"].strip()
-    except Exception as e:
-        return f"❌ Groq Fallback Error: {e}"
+    
+    for attempt in range(retries + 1):
+        try:
+            resp = requests.post(url, headers=headers, json=payload, timeout=30)
+            if resp.status_code == 200:
+                return resp.json()["choices"][0]["message"]["content"].strip()
+            
+            if resp.status_code == 429: # Rate Limit
+                if attempt < retries:
+                    time.sleep(5)
+                    continue
+            
+            resp.raise_for_status()
+        except Exception as e:
+            if attempt < retries:
+                time.sleep(2)
+                continue
+            return f"❌ Groq Error: {e}"
+    return "❌ Groq rate limit exhausted."
 
 def call_sarvam_llm(messages):
     if not SARVAM_API_KEY:
