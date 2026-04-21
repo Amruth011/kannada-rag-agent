@@ -1,20 +1,16 @@
 {
   "version": 2,
-  "name": "kannada-rag-agent",
-  "builds": [
+  "rewrites": [
     {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
+      "source": "/chat",
+      "destination": "/api/index.py"
+    },
     {
-      "src": "/(.*)",
-      "dest": "api/index.py"
+      "source": "/(.*)",
+      "destination": "/api/index.py"
     }
   ],
   "env": {
-    "PYTHON_VERSION": "3.9",
-    "FASTEMBED_CACHE_PATH": "model_cache"
+    "PYTHON_VERSION": "3.9"
   }
 }
