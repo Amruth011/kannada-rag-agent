@@ -135,6 +135,10 @@ async def chat(request: ChatRequest):
         
         pagetext = "\n\n".join([f"[Page {c['page']}]: {c['text']}" for c in chunks]) if chunks else "No direct passages found."
         
+        # Smart Context Trimming for 413 protection
+        if len(pagetext) > 15000:
+            pagetext = pagetext[:15000] + "\n...[Content truncated for stability]..."
+
         full_prompt = f"{BOOK_CONTEXT}\n\nRETRIEVED PASSAGES:\n{pagetext}\n\nUSER QUESTION: {request.question}\n\nAnswer concisely. If text is Kannada, interpret it and answer in {request.language}."
         
         answer = call_groq(full_prompt)
