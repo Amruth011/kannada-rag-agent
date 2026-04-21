@@ -160,14 +160,13 @@ def call_gemini(prompt, retries=1):
     last_error = ""
     model_name = get_best_gemini_model()
     
-    # 1. Exhaustive Safety Settings
-    safety_settings = {
-        "HARM_CATEGORY_HARASSMENT": "BLOCK_NONE",
-        "HARM_CATEGORY_HATE_SPEECH": "BLOCK_NONE",
-        "HARM_CATEGORY_SEXUALLY_EXPLICIT": "BLOCK_NONE",
-        "HARM_CATEGORY_DANGEROUS_CONTENT": "BLOCK_NONE",
-        "HARM_CATEGORY_CIVIC_INTEGRITY": "BLOCK_NONE", # Newer category
-    }
+    # 1. Standard Safety Settings (Guaranteed compatibility)
+    safety_settings = [
+        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+    ]
     
     for attempt in range(retries + 1):
         try:

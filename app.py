@@ -318,14 +318,13 @@ def call_gemini_llm(messages, retries=1):
     if not GEMINI_API_KEY: return None
     model_name = get_best_gemini_model()
     
-    # Exhaustive Safety Settings
-    safety_settings = {
-        "HARM_CATEGORY_HARASSMENT": "BLOCK_NONE",
-        "HARM_CATEGORY_HATE_SPEECH": "BLOCK_NONE",
-        "HARM_CATEGORY_SEXUALLY_EXPLICIT": "BLOCK_NONE",
-        "HARM_CATEGORY_DANGEROUS_CONTENT": "BLOCK_NONE",
-        "HARM_CATEGORY_CIVIC_INTEGRITY": "BLOCK_NONE"
-    }
+    # Standard Safety Settings
+    safety_settings = [
+        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+    ]
     
     # Extract System Prompt for separate instruction field
     system_instr = ""
