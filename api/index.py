@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-MODEL_NAME_GROQ = "llama-3.3-70b-versatile"
+MODEL_NAME_GROQ = "llama-3.1-8b-instant"
 
 BOOK_CONTEXT = "You are a helpful assistant. Use these Kannada book passages to answer the user question in English. Be direct and cite page numbers."
 
@@ -98,10 +98,12 @@ def call_groq(prompt):
     }
     try:
         resp = requests.post(url, headers=headers, json=payload, timeout=30)
+        if resp.status_code == 429:
+            return "[RATE LIMIT]: The AI is resting. Please try again in 10 seconds."
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]["content"]
     except Exception as e:
-        return f"[GROQ API ERROR]: {str(e)}"
+        return f"[AI ERROR]: {str(e)}"
 
 def call_sarvam_tts(text):
     """Call Sarvam TTS 'Meera' voice (bulbul:v3)."""
