@@ -1,5 +1,21 @@
+# Core API (Vercel)
 fastapi
 uvicorn
 pydantic
 requests
 python-dotenv
+
+# Streamlit UI
+streamlit
+chromadb
+sentence-transformers
+numpy
+
+# PDF & OCR Pipeline
+pdf2image
+opencv-python
+easyocr
+indic-nlp-library
+
+# Audio
+wave

@@ -12,6 +12,8 @@ load_dotenv()
 
 BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GROQ_API_KEY   = os.getenv("GROQ_API_KEY", "")
 CHROMA_DIR     = os.path.join(BASE_DIR, "chroma_db")
 COLLECTION     = "kannada_book"
 MODEL_NAME     = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
@@ -292,10 +294,28 @@ ANSWER in English:"""
 
 ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ:"""
 
+def call_groq_llm(messages):
+    """Fallback to Groq Llama 3 if Sarvam is unavailable."""
+    if not GROQ_API_KEY: return "⚠️ GROQ_API_KEY not set"
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
+    payload = {
+        "model": "llama3-70b-8192",
+        "messages": messages,
+        "temperature": 0.1,
+        "max_tokens": 800
+    }
+    try:
+        resp = requests.post(url, headers=headers, json=payload, timeout=30)
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"].strip()
+    except Exception as e:
+        return f"❌ Groq Fallback Error: {e}"
+
 def call_sarvam_llm(messages):
     if not SARVAM_API_KEY:
-        return "⚠️ SARVAM_API_KEY not set in .env"
-    # ✅ FIXED auth header
+        return call_groq_llm(messages)
+    
     headers = {
         "Authorization": f"Bearer {SARVAM_API_KEY}",
         "Content-Type": "application/json"
@@ -306,12 +326,18 @@ def call_sarvam_llm(messages):
         "temperature": 0.1,
         "max_tokens" : 600
     }
-    resp = requests.post(
-        "https://api.sarvam.ai/v1/chat/completions",
-        headers=headers, json=payload, timeout=30
-    )
-    resp.raise_for_status()
-    return resp.json()["choices"][0]["message"]["content"].strip()
+    try:
+        resp = requests.post(
+            "https://api.sarvam.ai/v1/chat/completions",
+            headers=headers, json=payload, timeout=30
+        )
+        if resp.status_code == 200:
+            return resp.json()["choices"][0]["message"]["content"].strip()
+        
+        # Fallback to Groq on any failure (429, 500, etc)
+        return call_groq_llm(messages)
+    except Exception:
+        return call_groq_llm(messages)
 
 def call_sarvam_tts(text, language="kn-IN"):
     if not SARVAM_API_KEY:
@@ -459,7 +485,18 @@ if question:
                     # Use RAG — no hardcoding, answer from actual book chunks
                     chunks = retrieve_character(question, embed_model, collection)
                 elif not general:
-                    chunks = retrieve(question, embed_model, collection)
+                    chunks = retrieve(question, embed_model, collection, top_k=3) # Limit to 3 for stability
+
+                # Apply safe context length capping (7,000 characters)
+                capped_chunks = []
+                current_len = 0
+                for c in chunks:
+                    text_len = len(c['text'])
+                    if current_len + text_len > 7000:
+                        break
+                    capped_chunks.append(c)
+                    current_len += text_len
+                chunks = capped_chunks
 
                 progress.progress(55, text="🧠 Building prompt...")
                 prompt = build_prompt(question, chunks, current_lang,

@@ -2,13 +2,14 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-import os, re, requests, json, traceback, base64
+import os, re, requests, json, traceback, base64, time
 from typing import List
 from dotenv import load_dotenv
 
 load_dotenv()
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
 BOOK_CONTEXT = "You are a professional literary assistant. Use these Kannada book passages to answer the user question in English. Provide deep analysis and always cite page numbers."
 
@@ -59,6 +60,9 @@ def load_data():
                 continue
     return []
 
+# Load data once at startup to prevent Vercel timeouts
+BOOK_DATA = load_data()
+
 def search_text(query, data, top_k=5):
     """Retrieves full pages for Gemini's large context window."""
     query_words = set(query.lower().split())
@@ -88,12 +92,39 @@ def search_text(query, data, top_k=5):
     results.sort(key=lambda x: x['score'], reverse=True)
     return results[:top_k]
 
-def call_gemini(prompt, retries=2):
-    """Call Gemini 1.5 Flash with 'Rate Limit Armor' (Automatic Retries)."""
-    if not GEMINI_API_KEY: 
-        return "[ERROR]: GEMINI_API_KEY is missing."
+def call_groq(prompt):
+    """Fallback to Groq (Llama 3 70B) if Gemini fails."""
+    if not GROQ_API_KEY:
+        return "[ERROR]: GROQ_API_KEY is missing."
     
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": "llama3-70b-8192",
+        "messages": [
+            {"role": "system", "content": BOOK_CONTEXT},
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.2,
+        "max_tokens": 1024
+    }
+    try:
+        resp = requests.post(url, headers=headers, json=payload, timeout=30)
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"]
+    except Exception as e:
+        return f"[GROQ ERROR]: {str(e)}"
+
+def call_gemini(prompt, retries=2):
+    """Call Gemini 1.5 Flash with 'Rate Limit Armor' (Automatic Retries) + Groq Fallback."""
+    if not GEMINI_API_KEY: 
+        return call_groq(prompt)
+    
+    # Switch to v1 stable endpoint
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
     
     for attempt in range(retries + 1):
@@ -104,17 +135,18 @@ def call_gemini(prompt, retries=2):
             
             if resp.status_code == 429: # Rate Limit
                 if attempt < retries:
-                    time.sleep(3) # Wait and try again
+                    time.sleep(3)
                     continue
-                return "[RATE LIMIT]: Gemini is currently very busy. Please wait a few seconds and try again."
+                return call_groq(prompt)
             
             resp.raise_for_status()
         except Exception as e:
             if attempt < retries:
                 time.sleep(1)
                 continue
-            return f"[AI ERROR]: {str(e)}"
-    return "[ERROR]: Max retries reached."
+            # If all retries fail (including 404s, 500s), fall back to Groq
+            return call_groq(prompt)
+    return call_groq(prompt)
 
 def call_sarvam_tts(text):
     """Call Sarvam TTS 'Meera' voice (bulbul:v3)."""
@@ -140,11 +172,21 @@ def call_sarvam_tts(text):
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     try:
-        data = load_data()
-        chunks = search_text(request.question, data)
+        # Use globally loaded BOOK_DATA
+        chunks = search_text(request.question, BOOK_DATA, top_k=3) # Limit to Top 3 for stability
         retrieved_pages = [str(c['page']) for c in chunks]
         
-        pagetext = "\n\n".join([f"[Passage from Page {c['page']}]: {c['text']}" for c in chunks]) if chunks else "No direct passages found."
+        # Implement safe character capping (approx 7,000 chars)
+        pagetext = ""
+        current_len = 0
+        for c in chunks:
+            text_block = f"[Passage from Page {c['page']}]: {c['text']}\n\n"
+            if current_len + len(text_block) > 7000:
+                break
+            pagetext += text_block
+            current_len += len(text_block)
+            
+        if not pagetext: pagetext = "No direct passages found."
         
         full_prompt = f"{BOOK_CONTEXT}\n\nRETRIEVED BOOK DATA:\n{pagetext}\n\nUSER QUESTION: {request.question}\n\nAnswer deep English analysis based ONLY on the text above."
         
