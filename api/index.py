@@ -158,6 +158,7 @@ def call_gemini(prompt, retries=1):
                     if attempt < retries:
                         time.sleep(3)
                         continue
+                print(f"Gemini Error ({model_name}): {str(e)}") # Log for Vercel logs
                 # If any other error (404, auth, etc.), try next model
                 break 
                 
