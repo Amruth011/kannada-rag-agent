@@ -1,0 +1,15 @@
+# Heavy dependencies for local Streamlit UI and OCR pipeline
+fastapi
+uvicorn
+pydantic
+requests
+python-dotenv
+streamlit
+chromadb
+sentence-transformers
+numpy
+pdf2image
+opencv-python
+easyocr
+indic-nlp-library
+wave
