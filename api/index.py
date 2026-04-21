@@ -146,6 +146,8 @@ async def voice(request: VoiceRequest):
     audio_b64 = call_sarvam_tts(request.text)
     return {"audio": audio_b64}
 
+@app.get("/", response_class=HTMLResponse)
+async def root():
     return """
     <!DOCTYPE html>
     <html lang="kn">
