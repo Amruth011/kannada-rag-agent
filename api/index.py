@@ -153,31 +153,40 @@ def get_best_gemini_model():
         return "gemini-1.5-flash"
 
 def call_gemini(prompt, retries=1):
-    """Reliable Gemini Call with Safety Bypass."""
+    """Deepest Gemini Safety Bypass + System Prompting."""
     if not GEMINI_API_KEY: 
         return call_groq(prompt)
     
     last_error = ""
     model_name = get_best_gemini_model()
     
-    # Relax safety filters to prevent blocking literary content
-    safety_settings = [
-        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-    ]
+    # 1. Exhaustive Safety Settings
+    safety_settings = {
+        "HARM_CATEGORY_HARASSMENT": "BLOCK_NONE",
+        "HARM_CATEGORY_HATE_SPEECH": "BLOCK_NONE",
+        "HARM_CATEGORY_SEXUALLY_EXPLICIT": "BLOCK_NONE",
+        "HARM_CATEGORY_DANGEROUS_CONTENT": "BLOCK_NONE",
+        "HARM_CATEGORY_CIVIC_INTEGRITY": "BLOCK_NONE", # Newer category
+    }
     
     for attempt in range(retries + 1):
         try:
-            model = genai.GenerativeModel(model_name)
+            # 2. Use System Instruction (Makes Gemini less sensitive to content blocks)
+            model = genai.GenerativeModel(
+                model_name=model_name,
+                system_instruction=BOOK_CONTEXT
+            )
             response = model.generate_content(prompt, safety_settings=safety_settings)
             
-            # Check if we actually got a response (not blocked)
-            if response.candidates and response.candidates[0].content.parts:
-                return response.text
-            
-            last_error = "Response was blocked by safety filters."
+            # 3. Robust candidate checking
+            if response.candidates:
+                candidate = response.candidates[0]
+                if candidate.content and candidate.content.parts:
+                    return response.text
+                if candidate.finish_reason:
+                    last_error = f"Blocked (Reason: {candidate.finish_reason})"
+            else:
+                last_error = "No candidates returned (Safety Blocked)"
             break 
         except Exception as e:
             last_error = str(e)

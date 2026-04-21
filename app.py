@@ -314,33 +314,40 @@ def get_best_gemini_model():
         return "gemini-1.5-flash"
 
 def call_gemini_llm(messages, retries=1):
-    """Reliable Gemini Call with Safety Bypass."""
+    """Reliable Gemini Call with System Prompts and Safety Bypass."""
     if not GEMINI_API_KEY: return None
     model_name = get_best_gemini_model()
     
-    # Relax safety filters
-    safety_settings = [
-        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-    ]
+    # Exhaustive Safety Settings
+    safety_settings = {
+        "HARM_CATEGORY_HARASSMENT": "BLOCK_NONE",
+        "HARM_CATEGORY_HATE_SPEECH": "BLOCK_NONE",
+        "HARM_CATEGORY_SEXUALLY_EXPLICIT": "BLOCK_NONE",
+        "HARM_CATEGORY_DANGEROUS_CONTENT": "BLOCK_NONE",
+        "HARM_CATEGORY_CIVIC_INTEGRITY": "BLOCK_NONE"
+    }
     
-    # Convert OpenAI message format to SDK format
-    contents = []
+    # Extract System Prompt for separate instruction field
+    system_instr = ""
+    chat_contents = []
     for m in messages:
-        # Use proper role mapping for SDK
-        role = "user" if m["role"] in ["user", "system"] else "model"
-        contents.append({"role": role, "parts": [{"text": m["content"]}]})
+        if m["role"] == "system":
+            system_instr = m["content"]
+        else:
+            role = "user" if m["role"] == "user" else "model"
+            chat_contents.append({"role": role, "parts": [{"text": m["content"]}]})
     
     for attempt in range(retries + 1):
         try:
-            model = genai.GenerativeModel(model_name)
-            response = model.generate_content(contents, safety_settings=safety_settings)
+            model = genai.GenerativeModel(
+                model_name=model_name,
+                system_instruction=system_instr
+            )
+            response = model.generate_content(chat_contents, safety_settings=safety_settings)
             
             if response.candidates and response.candidates[0].content.parts:
                 return response.text.strip()
-            return "⚠️ Gemini blocked this response due to its built-in safety filters."
+            return f"⚠️ Blocked (Reason: {response.candidates[0].finish_reason if response.candidates else 'Unknown'})"
         except Exception as e:
             if "429" in str(e) and attempt < retries:
                 time.sleep(3)
