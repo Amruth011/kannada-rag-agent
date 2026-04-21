@@ -79,7 +79,7 @@ def search_text(query, data, top_k=8):
                 if word in para_lower:
                     score += 5
                 # Simple transliteration bridge for English queries
-                mapped = TRANSLITERATION_MAP.get(word, "")
+                mapped = TRANSLIT_MAP.get(word, "")
                 if mapped and mapped in para_lower:
                     score += 10
             
