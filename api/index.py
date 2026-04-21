@@ -103,7 +103,7 @@ def call_groq(prompt):
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "llama3-70b-8192",
+        "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": BOOK_CONTEXT},
             {"role": "user", "content": prompt}
