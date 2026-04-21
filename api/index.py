@@ -120,7 +120,7 @@ def call_groq(prompt, retries=2):
             
             if resp.status_code == 429: # Rate Limit
                 if attempt < retries:
-                    time.sleep(5) # Wait 5s for token bucket to refill
+                    time.sleep(3) # Shorter sleep to avoid Vercel 10s timeout
                     continue
             
             resp.raise_for_status()
@@ -186,15 +186,15 @@ def call_sarvam_tts(text):
 async def chat(request: ChatRequest):
     try:
         # Use globally loaded BOOK_DATA
-        chunks = search_text(request.question, BOOK_DATA, top_k=3) # Limit to Top 3 for stability
+        chunks = search_text(request.question, BOOK_DATA, top_k=2) # Reduced to 2 for Groq free-tier stability
         retrieved_pages = [str(c['page']) for c in chunks]
         
-        # Implement safe character capping (approx 7,000 chars)
+        # Implement safe character capping (approx 5,000 chars for Groq)
         pagetext = ""
         current_len = 0
         for c in chunks:
             text_block = f"[Passage from Page {c['page']}]: {c['text']}\n\n"
-            if current_len + len(text_block) > 7000:
+            if current_len + len(text_block) > 5000:
                 break
             pagetext += text_block
             current_len += len(text_block)

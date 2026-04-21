@@ -498,14 +498,14 @@ if question:
                     # Use RAG — no hardcoding, answer from actual book chunks
                     chunks = retrieve_character(question, embed_model, collection)
                 elif not general:
-                    chunks = retrieve(question, embed_model, collection, top_k=3) # Limit to 3 for stability
+                    chunks = retrieve(question, embed_model, collection, top_k=2) # Reduced for stability
 
-                # Apply safe context length capping (7,000 characters)
+                # Apply safe context length capping (5,000 characters for free tiers)
                 capped_chunks = []
                 current_len = 0
                 for c in chunks:
                     text_len = len(c['text'])
-                    if current_len + text_len > 7000:
+                    if current_len + text_len > 5000:
                         break
                     capped_chunks.append(c)
                     current_len += text_len
