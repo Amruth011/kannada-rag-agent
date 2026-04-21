@@ -120,13 +120,14 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
                   → Deployed · Feedback System · Admin Viewer
 ```
 
-| | Typical RAG Demo | This Project |
+| | Typical RAG Demo | This Project (v2.0) |
 |:--|:--|:--|
 | Language | English only | **Kannada + English** |
 | Input | Clean text PDF | **Scanned Kannada novel (full OCR pipeline)** |
-| Retrieval | One strategy | **4 smart strategies** |
+| Intelligence | Single Model | **Dual-Brain (Gemini 1.5 Flash + Groq Llama 3.3)** |
+| Stability | Basic | **Auto-Discovery + Rate Limit Armor (Retries)** |
 | Output | Text only | **Text + TTS audio** |
-| Deployment | Local only | **Live on Streamlit Cloud** |
+| Deployment | Local only | **Vercel API + Streamlit Frontend** |
 
 ---
 
@@ -207,9 +208,19 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 <details>
 <summary><b>📐 Pipeline walkthrough — click to expand</b></summary>
 
-<br/>
+### 🛡️ Stability-First Architecture (New v2.0)
 
-| Phase | Component | Detail |
+This project has been heavily optimized for production stability and handles API failures gracefully:
+
+1. **Dual-Brain Fallback**: The system defaults to **Gemini 1.5 Flash** for deep analysis. If Gemini is unavailable or rate-limited, it automatically falls back to **Groq (Llama 3.3)** within milliseconds.
+2. **Auto-Discovery**: The agent programmatically queries your API keys to find the best available model version for your specific region, preventing `404 Not Found` errors.
+3. **Rate Limit Armor**: Implements automatic retry logic with exponential backoff for `429 Too Many Requests` errors.
+4. **Vercel Optimized**: The backend is built with **FastAPI** and optimized for Vercel Serverless (under 250MB bundle size) with strict 10-second timeout management.
+5. **Smart Capping**: RAG retrieval is capped at the top 2 pages (~5,000 characters) to ensure high speed and reliability on free-tier LLMs.
+
+---
+
+### Phase | Component | Detail |
 |:------|:----------|:-------|
 | **1 · Ingestion** | pdf2image + Poppler | 346 PDF pages → PNG at 200 DPI |
 | **2 · Preprocessing** | OpenCV | Denoise · adaptive threshold · sharpen |
@@ -233,19 +244,16 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 <div align="center">
 
 | Layer | Component | Technology |
-|:------|:----------|:-----------|
+|:--|:--|:--|
 | 📄 PDF Processing | Page extraction | pdf2image + Poppler |
-| 🖼️ Image Prep | Noise removal | OpenCV (denoise · threshold · sharpen) |
-| 👁️ OCR | Text extraction | EasyOCR (Kannada + English, CPU) |
-| 🔤 Normalization | Script fixing | indic-nlp-library |
-| ✂️ Chunking | Text splitting | Custom (400ch · 50 overlap) |
-| 🧠 Embeddings | Vector encoding | sentence-transformers MiniLM-L12-v2 |
+| 👁️ OCR | Text extraction | EasyOCR (Kannada + English) |
+| 🧠 Primary Brain | Large Language Model | **Gemini 1.5 Flash (via Official Google SDK)** |
+| 🧠 Secondary Brain | Multilingual LLM | **Groq Llama 3.3 Versatile (Safety Net)** |
 | 🗄️ Vector DB | Semantic search | ChromaDB (cosine similarity) |
-| 🤖 LLM | Answer generation | Sarvam-M via Sarvam AI API |
+| 🤖 Routing | Stability Architecture | **Auto-Discovery + Rate Limit Armor** |
 | 🔊 TTS | Audio synthesis | Sarvam bulbul:v3 · priya speaker |
-| 🎨 UI | Frontend | Streamlit + glassmorphism CSS |
-| ☁️ Deployment | Hosting | Streamlit Cloud |
-| 🐍 Language | Runtime | Python 3.13 |
+| 🎨 UI & API | Product | Streamlit + FastAPI (Deployed on Vercel) |
+| ☁️ Hosting | Cloud | Vercel (API) + Streamlit Cloud (UI) |
 
 </div>
 
