@@ -314,25 +314,33 @@ def get_best_gemini_model():
         return "gemini-1.5-flash"
 
 def call_gemini_llm(messages, retries=1):
-    """Reliable Gemini Call using Auto-Discovery logic."""
+    """Reliable Gemini Call with Safety Bypass."""
     if not GEMINI_API_KEY: return None
-    
-    # Use auto-discovery to find the exact model ID for this project
     model_name = get_best_gemini_model()
+    
+    # Relax safety filters
+    safety_settings = [
+        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+    ]
     
     # Convert OpenAI message format to SDK format
     contents = []
     for m in messages:
+        # Use proper role mapping for SDK
         role = "user" if m["role"] in ["user", "system"] else "model"
         contents.append({"role": role, "parts": [{"text": m["content"]}]})
     
     for attempt in range(retries + 1):
         try:
             model = genai.GenerativeModel(model_name)
-            response = model.generate_content(contents)
-            if response and response.text:
+            response = model.generate_content(contents, safety_settings=safety_settings)
+            
+            if response.candidates and response.candidates[0].content.parts:
                 return response.text.strip()
-            break
+            return "⚠️ Gemini blocked this response due to its built-in safety filters."
         except Exception as e:
             if "429" in str(e) and attempt < retries:
                 time.sleep(3)

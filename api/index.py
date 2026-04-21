@@ -153,20 +153,31 @@ def get_best_gemini_model():
         return "gemini-1.5-flash"
 
 def call_gemini(prompt, retries=1):
-    """Reliable Gemini Call using Auto-Discovery logic."""
+    """Reliable Gemini Call with Safety Bypass."""
     if not GEMINI_API_KEY: 
         return call_groq(prompt)
     
     last_error = ""
-    # Use auto-discovery to find the exact model ID for this project
     model_name = get_best_gemini_model()
+    
+    # Relax safety filters to prevent blocking literary content
+    safety_settings = [
+        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+    ]
     
     for attempt in range(retries + 1):
         try:
             model = genai.GenerativeModel(model_name)
-            response = model.generate_content(prompt)
-            if response and response.text:
+            response = model.generate_content(prompt, safety_settings=safety_settings)
+            
+            # Check if we actually got a response (not blocked)
+            if response.candidates and response.candidates[0].content.parts:
                 return response.text
+            
+            last_error = "Response was blocked by safety filters."
             break 
         except Exception as e:
             last_error = str(e)
