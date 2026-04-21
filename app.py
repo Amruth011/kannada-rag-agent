@@ -6,6 +6,7 @@ import re
 import base64
 import requests
 import streamlit as st
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,6 +15,11 @@ BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GROQ_API_KEY   = os.getenv("GROQ_API_KEY", "")
+
+# Configure Gemini
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+
 CHROMA_DIR     = os.path.join(BASE_DIR, "chroma_db")
 COLLECTION     = "kannada_book"
 MODEL_NAME     = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
@@ -295,31 +301,27 @@ ANSWER in English:"""
 ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ:"""
 
 def call_gemini_llm(messages, retries=1):
-    """Tiered Gemini Fallback (Flash -> Flash-Latest -> Pro)."""
+    """Reliable Gemini Call using official SDK."""
     if not GEMINI_API_KEY: return None
-    models = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"]
-    payload = {"contents": [{"parts": [{"text": str(messages)}]}]} # Simplified for REST
+    models = ["gemini-1.5-flash", "gemini-1.5-pro"]
+    
+    # Convert OpenAI message format to SDK format
+    contents = []
+    for m in messages:
+        role = "user" if m["role"] in ["user", "system"] else "model"
+        contents.append({"role": role, "parts": [{"text": m["content"]}]})
     
     for model_name in models:
-        url = f"https://generativelanguage.googleapis.com/v1/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
         for attempt in range(retries + 1):
             try:
-                # Convert OpenAI messages format to Gemini format for better results
-                gemini_contents = []
-                for m in messages:
-                    role = "user" if m["role"] in ["user", "system"] else "model"
-                    gemini_contents.append({"role": role, "parts": [{"text": m["content"]}]})
-                
-                resp = requests.post(url, json={"contents": gemini_contents}, timeout=25)
-                if resp.status_code == 200:
-                    return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-                if resp.status_code == 429 and attempt < retries:
-                    time.sleep(3)
-                    continue
+                model = genai.GenerativeModel(model_name)
+                response = model.generate_content(contents)
+                if response and response.text:
+                    return response.text.strip()
                 break
-            except Exception:
-                if attempt < retries:
-                    time.sleep(1)
+            except Exception as e:
+                if "429" in str(e) and attempt < retries:
+                    time.sleep(3)
                     continue
                 break
     return None

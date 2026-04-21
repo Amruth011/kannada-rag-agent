@@ -5,11 +5,16 @@ from pydantic import BaseModel
 import os, re, requests, json, traceback, base64, time
 from typing import List
 from dotenv import load_dotenv
+import google.generativeai as genai
 
 load_dotenv()
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+
+# Configure Gemini SDK
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 BOOK_CONTEXT = "You are a professional literary assistant. Use these Kannada book passages to answer the user question in English. Provide deep analysis and always cite page numbers."
 
@@ -132,38 +137,30 @@ def call_groq(prompt, retries=2):
     return "[ERROR]: Groq rate limit exhausted."
 
 def call_gemini(prompt, retries=1):
-    """Call Gemini with tiered models: Flash -> Flash-Latest -> Pro -> Groq Fallback."""
+    """Reliable Gemini Call using official SDK."""
     if not GEMINI_API_KEY: 
         return call_groq(prompt)
     
-    models = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"]
-    payload = {"contents": [{"parts": [{"text": prompt}]}]}
+    # Try models using the SDK which handles endpoints automatically
+    models = ["gemini-1.5-flash", "gemini-1.5-pro"]
     
     for model_name in models:
-        url = f"https://generativelanguage.googleapis.com/v1/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
-        
         for attempt in range(retries + 1):
             try:
-                resp = requests.post(url, json=payload, timeout=25)
-                if resp.status_code == 200:
-                    return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
-                
-                # If rate limited, wait a bit and retry this specific model
-                if resp.status_code == 429:
+                model = genai.GenerativeModel(model_name)
+                response = model.generate_content(prompt)
+                if response and response.text:
+                    return response.text
+                break # Model returned empty, try next model
+            except Exception as e:
+                # If rate limited (429), retry
+                if "429" in str(e):
                     if attempt < retries:
                         time.sleep(3)
                         continue
-                
-                # For any other error (including 404), break to try the next model
+                # If any other error (404, auth, etc.), try next model
                 break 
                 
-            except Exception:
-                if attempt < retries:
-                    time.sleep(1)
-                    continue
-                break # Try next model
-                
-    # If all Gemini models fail, return the final fallback to Groq
     return call_groq(prompt)
 
 def call_sarvam_tts(text):
