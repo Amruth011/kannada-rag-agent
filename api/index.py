@@ -8,13 +8,16 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 
 load_dotenv()
-SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "").strip()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
 
-# Configure Gemini SDK
+# Configure Gemini SDK with strict key cleaning
 if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
+    except Exception as e:
+        print(f"SDK Config Error: {e}")
 
 BOOK_CONTEXT = "You are a professional literary assistant. Use these Kannada book passages to answer the user question in English. Provide deep analysis and always cite page numbers."
 
@@ -141,8 +144,9 @@ def call_gemini(prompt, retries=1):
     if not GEMINI_API_KEY: 
         return call_groq(prompt)
     
-    # Try models using the SDK which handles endpoints automatically
-    models = ["gemini-1.5-flash", "gemini-1.5-pro"]
+    # Try models: Flash-8b (fastest) -> Flash (standard) -> Pro
+    models = ["gemini-1.5-flash-8b", "gemini-1.5-flash", "gemini-1.5-pro"]
+    last_error = ""
     
     for model_name in models:
         for attempt in range(retries + 1):
@@ -151,18 +155,19 @@ def call_gemini(prompt, retries=1):
                 response = model.generate_content(prompt)
                 if response and response.text:
                     return response.text
-                break # Model returned empty, try next model
+                break 
             except Exception as e:
+                last_error = str(e)
                 # If rate limited (429), retry
-                if "429" in str(e):
+                if "429" in last_error:
                     if attempt < retries:
                         time.sleep(3)
                         continue
-                print(f"Gemini Error ({model_name}): {str(e)}") # Log for Vercel logs
-                # If any other error (404, auth, etc.), try next model
+                # For any other error, try next model
                 break 
                 
-    return call_groq(prompt)
+    # If all Gemini models fail, fall back to Groq but keep the error log
+    return f"[GEMINI SKIPPED: {last_error[:100]}] " + call_groq(prompt)
 
 def call_sarvam_tts(text):
     """Call Sarvam TTS 'Meera' voice (bulbul:v3)."""

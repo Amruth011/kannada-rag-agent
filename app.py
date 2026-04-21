@@ -12,9 +12,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
-SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GROQ_API_KEY   = os.getenv("GROQ_API_KEY", "")
+SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "").strip()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+GROQ_API_KEY   = os.getenv("GROQ_API_KEY", "").strip()
 
 # Configure Gemini
 if GEMINI_API_KEY:
@@ -303,13 +303,13 @@ ANSWER in English:"""
 def call_gemini_llm(messages, retries=1):
     """Reliable Gemini Call using official SDK."""
     if not GEMINI_API_KEY: return None
-    models = ["gemini-1.5-flash", "gemini-1.5-pro"]
+    models = ["gemini-1.5-flash-8b", "gemini-1.5-flash", "gemini-1.5-pro"]
     
     # Convert OpenAI message format to SDK format
     contents = []
     for m in messages:
         role = "user" if m["role"] in ["user", "system"] else "model"
-        contents.append({"role": role, "parts": [{"text": m["content"]}]})
+        contents.append({"role": m["role"], "parts": [{"text": m["content"]}]})
     
     for model_name in models:
         for attempt in range(retries + 1):
