@@ -294,6 +294,36 @@ ANSWER in English:"""
 
 ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ:"""
 
+def call_gemini_llm(messages, retries=1):
+    """Tiered Gemini Fallback (Flash -> Flash-Latest -> Pro)."""
+    if not GEMINI_API_KEY: return None
+    models = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"]
+    payload = {"contents": [{"parts": [{"text": str(messages)}]}]} # Simplified for REST
+    
+    for model_name in models:
+        url = f"https://generativelanguage.googleapis.com/v1/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
+        for attempt in range(retries + 1):
+            try:
+                # Convert OpenAI messages format to Gemini format for better results
+                gemini_contents = []
+                for m in messages:
+                    role = "user" if m["role"] in ["user", "system"] else "model"
+                    gemini_contents.append({"role": role, "parts": [{"text": m["content"]}]})
+                
+                resp = requests.post(url, json={"contents": gemini_contents}, timeout=25)
+                if resp.status_code == 200:
+                    return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+                if resp.status_code == 429 and attempt < retries:
+                    time.sleep(3)
+                    continue
+                break
+            except Exception:
+                if attempt < retries:
+                    time.sleep(1)
+                    continue
+                break
+    return None
+
 def call_groq_llm(messages, retries=2):
     """Fallback to Groq Llama 3 with Rate Limit Armor."""
     if not GROQ_API_KEY: return "⚠️ GROQ_API_KEY not set"
@@ -326,6 +356,11 @@ def call_groq_llm(messages, retries=2):
     return "❌ Groq rate limit exhausted."
 
 def call_sarvam_llm(messages):
+    # 1. Try Gemini first (Best for English Analysis)
+    gemini_resp = call_gemini_llm(messages)
+    if gemini_resp: return gemini_resp
+
+    # 2. Try Sarvam (Good for Kannada/Bilingual)
     if not SARVAM_API_KEY:
         return call_groq_llm(messages)
     
@@ -347,7 +382,7 @@ def call_sarvam_llm(messages):
         if resp.status_code == 200:
             return resp.json()["choices"][0]["message"]["content"].strip()
         
-        # Fallback to Groq on any failure (429, 500, etc)
+        # 3. Fallback to Groq (Last Resort)
         return call_groq_llm(messages)
     except Exception:
         return call_groq_llm(messages)

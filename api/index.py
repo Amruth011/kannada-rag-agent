@@ -131,34 +131,39 @@ def call_groq(prompt, retries=2):
             return f"[GROQ ERROR]: {str(e)}"
     return "[ERROR]: Groq rate limit exhausted."
 
-def call_gemini(prompt, retries=2):
-    """Call Gemini 1.5 Flash with 'Rate Limit Armor' (Automatic Retries) + Groq Fallback."""
+def call_gemini(prompt, retries=1):
+    """Call Gemini with tiered models: Flash -> Flash-Latest -> Pro -> Groq Fallback."""
     if not GEMINI_API_KEY: 
         return call_groq(prompt)
     
-    # Switch to v1 stable endpoint
-    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    models = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"]
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
     
-    for attempt in range(retries + 1):
-        try:
-            resp = requests.post(url, json=payload, timeout=30)
-            if resp.status_code == 200:
-                return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
-            
-            if resp.status_code == 429: # Rate Limit
+    for model_name in models:
+        url = f"https://generativelanguage.googleapis.com/v1/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
+        
+        for attempt in range(retries + 1):
+            try:
+                resp = requests.post(url, json=payload, timeout=25)
+                if resp.status_code == 200:
+                    return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+                
+                # If rate limited, wait a bit and retry this specific model
+                if resp.status_code == 429:
+                    if attempt < retries:
+                        time.sleep(3)
+                        continue
+                
+                # For any other error (including 404), break to try the next model
+                break 
+                
+            except Exception:
                 if attempt < retries:
-                    time.sleep(3)
+                    time.sleep(1)
                     continue
-                return call_groq(prompt)
-            
-            resp.raise_for_status()
-        except Exception as e:
-            if attempt < retries:
-                time.sleep(1)
-                continue
-            # If all retries fail (including 404s, 500s), fall back to Groq
-            return call_groq(prompt)
+                break # Try next model
+                
+    # If all Gemini models fail, return the final fallback to Groq
     return call_groq(prompt)
 
 def call_sarvam_tts(text):
