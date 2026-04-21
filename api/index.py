@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 MODEL_NAME_GROQ = "llama-3.1-8b-instant"
 
 BOOK_CONTEXT = "You are a helpful assistant. Use these Kannada book passages to answer the user question in English. Be direct and cite page numbers."
@@ -60,50 +61,71 @@ def load_data():
                 continue
     return []
 
-def search_text(query, data, top_k=3):
-    if not data: return []
-    words = re.findall(r'\w+', query.lower())
-    keywords = [w for w in words if len(w) > 2]
-    
-    # Expand Keywords (English -> Kannada Script)
-    expanded = list(keywords)
-    for k in keywords:
-        if k in TRANSLIT_MAP:
-            expanded.append(TRANSLIT_MAP[k])
-            
+def search_text(query, data, top_k=8):
+    """Refined search: Splits pages into paragraphs for high precision RAG."""
+    query_words = set(query.lower().split())
     results = []
+    
     for item in data:
-        score = 0
-        text = item.get('text', '').lower()
-        for k in expanded:
-            if k in text:
-                score += (2 if k in TRANSLIT_MAP.values() else 1)
-        if score > 0:
-            results.append({"text": item['text'], "page": item['page'], "score": score})
+        page_num = item.get('page', 0)
+        text = item.get('text', '')
+        # Split into paragraphs to reduce payload size and increase focus
+        paragraphs = [p.strip() for p in text.replace("\r", "").split("\n") if len(p.strip()) > 30]
+        
+        for p_index, para in enumerate(paragraphs):
+            para_lower = para.lower()
+            score = 0
+            for word in query_words:
+                if word in para_lower:
+                    score += 5
+                # Simple transliteration bridge for English queries
+                mapped = TRANSLITERATION_MAP.get(word, "")
+                if mapped and mapped in para_lower:
+                    score += 10
             
+            if score > 0:
+                results.append({
+                    'page': page_num,
+                    'text': para,
+                    'score': score
+                })
+                
+    # Rank by score and pick top_k paragraph fragments
     results.sort(key=lambda x: x['score'], reverse=True)
     return results[:top_k]
 
-def call_groq(prompt):
-    """Call Groq Llama 3 via REST API."""
-    if not GROQ_API_KEY:
-        return "[ERROR]: GROQ_API_KEY is missing."
-    
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-    payload = {
-        "model": MODEL_NAME_GROQ,
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.2
-    }
+def call_gemini(prompt):
+    """Call Gemini 1.5 Flash (Primary)."""
+    if not GEMINI_API_KEY: return None
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    payload = {"contents": [{"parts": [{"text": prompt}]}]}
     try:
-        resp = requests.post(url, headers=headers, json=payload, timeout=30)
-        if resp.status_code == 429:
-            return "[RATE LIMIT]: The AI is resting. Please try again in 10 seconds."
-        resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"]
+        resp = requests.post(url, json=payload, timeout=20)
+        if resp.status_code == 200:
+            return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+        return None
+    except Exception: return None
+
+def call_groq(prompt):
+    """Call Groq Llama 3 (Fallback)."""
+    if not GROQ_API_KEY: return "[ERROR]: API Key missing."
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {GROQ_API_KEY}"}
+    payload = {"model": MODEL_NAME_GROQ, "messages": [{"role": "user", "content": prompt}], "temperature": 0.2}
+    try:
+        resp = requests.post(url, headers=headers, json=payload, timeout=20)
+        if resp.status_code == 200:
+            return resp.json()["choices"][0]["message"]["content"]
+        return f"[AI ERROR]: Groq status {resp.status_code}"
     except Exception as e:
         return f"[AI ERROR]: {str(e)}"
+
+def call_ai_resilient(prompt):
+    """Dual-Brain Logic: Gemini first, Groq as fallback."""
+    answer = call_gemini(prompt)
+    if answer: return answer
+    # Fallback to Groq if Gemini fails/limits out
+    return call_groq(prompt)
 
 def call_sarvam_tts(text):
     """Call Sarvam TTS 'Meera' voice (bulbul:v3)."""
@@ -135,13 +157,9 @@ async def chat(request: ChatRequest):
         
         pagetext = "\n\n".join([f"[Page {c['page']}]: {c['text']}" for c in chunks]) if chunks else "No direct passages found."
         
-        # Smart Context Trimming for 413 protection (Aggressive 10k)
-        if len(pagetext) > 10000:
-            pagetext = pagetext[:10000] + "\n...[Content truncated for stability]..."
-
         full_prompt = f"{BOOK_CONTEXT}\n\nRETRIEVED PASSAGES:\n{pagetext}\n\nUSER QUESTION: {request.question}\n\nAnswer concisely. If text is Kannada, interpret it and answer in {request.language}."
         
-        answer = call_groq(full_prompt)
+        answer = call_ai_resilient(full_prompt)
         return ChatResponse(answer=answer, sources=retrieved_pages)
     except Exception:
         return ChatResponse(answer=f"[BACKEND ERROR]: {traceback.format_exc()[:500]}", sources=[])
