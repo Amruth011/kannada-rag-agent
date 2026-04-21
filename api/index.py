@@ -8,11 +8,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-MODEL_NAME_GROQ = "llama-3.1-8b-instant"
 
-BOOK_CONTEXT = "You are a helpful assistant. Use these Kannada book passages to answer the user question in English. Be direct and cite page numbers."
+BOOK_CONTEXT = "You are a professional literary assistant. Use these Kannada book passages to answer the user question in English. Provide deep analysis and always cite page numbers."
 
 app = FastAPI(title="Kannada Book AI Agent + Voice")
 
@@ -61,71 +59,62 @@ def load_data():
                 continue
     return []
 
-def search_text(query, data, top_k=8):
-    """Refined search: Splits pages into paragraphs for high precision RAG."""
+def search_text(query, data, top_k=5):
+    """Retrieves full pages for Gemini's large context window."""
     query_words = set(query.lower().split())
     results = []
     
     for item in data:
         page_num = item.get('page', 0)
         text = item.get('text', '')
-        # Split into paragraphs to reduce payload size and increase focus
-        paragraphs = [p.strip() for p in text.replace("\r", "").split("\n") if len(p.strip()) > 30]
+        text_lower = text.lower()
+        score = 0
+        for word in query_words:
+            if word in text_lower:
+                score += 5
+            # Simple transliteration bridge for English queries
+            mapped = TRANSLIT_MAP.get(word, "")
+            if mapped and mapped in text_lower:
+                score += 10
         
-        for p_index, para in enumerate(paragraphs):
-            para_lower = para.lower()
-            score = 0
-            for word in query_words:
-                if word in para_lower:
-                    score += 5
-                # Simple transliteration bridge for English queries
-                mapped = TRANSLIT_MAP.get(word, "")
-                if mapped and mapped in para_lower:
-                    score += 10
-            
-            if score > 0:
-                results.append({
-                    'page': page_num,
-                    'text': para,
-                    'score': score
-                })
+        if score > 0:
+            results.append({
+                'page': page_num,
+                'text': text,
+                'score': score
+            })
                 
-    # Rank by score and pick top_k paragraph fragments
+    # Rank by score and pick top_k full pages for Gemini
     results.sort(key=lambda x: x['score'], reverse=True)
     return results[:top_k]
 
-def call_gemini(prompt):
-    """Call Gemini 1.5 Flash (Primary)."""
-    if not GEMINI_API_KEY: return None
+def call_gemini(prompt, retries=2):
+    """Call Gemini 1.5 Flash with 'Rate Limit Armor' (Automatic Retries)."""
+    if not GEMINI_API_KEY: 
+        return "[ERROR]: GEMINI_API_KEY is missing."
+    
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
-    try:
-        resp = requests.post(url, json=payload, timeout=20)
-        if resp.status_code == 200:
-            return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
-        return None
-    except Exception: return None
-
-def call_groq(prompt):
-    """Call Groq Llama 3 (Fallback)."""
-    if not GROQ_API_KEY: return "[ERROR]: API Key missing."
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {GROQ_API_KEY}"}
-    payload = {"model": MODEL_NAME_GROQ, "messages": [{"role": "user", "content": prompt}], "temperature": 0.2}
-    try:
-        resp = requests.post(url, headers=headers, json=payload, timeout=20)
-        if resp.status_code == 200:
-            return resp.json()["choices"][0]["message"]["content"]
-        return f"[AI ERROR]: Groq status {resp.status_code}"
-    except Exception as e:
-        return f"[AI ERROR]: {str(e)}"
-
-def call_ai_resilient(prompt):
-    """Dual-Brain Logic: Gemini first, Groq as fallback."""
-    answer = call_gemini(prompt)
-    if answer: return answer
-    # Fallback to Groq if Gemini fails/limits out
-    return call_groq(prompt)
+    
+    for attempt in range(retries + 1):
+        try:
+            resp = requests.post(url, json=payload, timeout=30)
+            if resp.status_code == 200:
+                return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+            
+            if resp.status_code == 429: # Rate Limit
+                if attempt < retries:
+                    time.sleep(3) # Wait and try again
+                    continue
+                return "[RATE LIMIT]: Gemini is currently very busy. Please wait a few seconds and try again."
+            
+            resp.raise_for_status()
+        except Exception as e:
+            if attempt < retries:
+                time.sleep(1)
+                continue
+            return f"[AI ERROR]: {str(e)}"
+    return "[ERROR]: Max retries reached."
 
 def call_sarvam_tts(text):
     """Call Sarvam TTS 'Meera' voice (bulbul:v3)."""
@@ -155,11 +144,11 @@ async def chat(request: ChatRequest):
         chunks = search_text(request.question, data)
         retrieved_pages = [str(c['page']) for c in chunks]
         
-        pagetext = "\n\n".join([f"[Page {c['page']}]: {c['text']}" for c in chunks]) if chunks else "No direct passages found."
+        pagetext = "\n\n".join([f"[Passage from Page {c['page']}]: {c['text']}" for c in chunks]) if chunks else "No direct passages found."
         
-        full_prompt = f"{BOOK_CONTEXT}\n\nRETRIEVED PASSAGES:\n{pagetext}\n\nUSER QUESTION: {request.question}\n\nAnswer concisely. If text is Kannada, interpret it and answer in {request.language}."
+        full_prompt = f"{BOOK_CONTEXT}\n\nRETRIEVED BOOK DATA:\n{pagetext}\n\nUSER QUESTION: {request.question}\n\nAnswer deep English analysis based ONLY on the text above."
         
-        answer = call_ai_resilient(full_prompt)
+        answer = call_gemini(full_prompt)
         return ChatResponse(answer=answer, sources=retrieved_pages)
     except Exception:
         return ChatResponse(answer=f"[BACKEND ERROR]: {traceback.format_exc()[:500]}", sources=[])
