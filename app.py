@@ -300,30 +300,44 @@ ANSWER in English:"""
 
 ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ:"""
 
+def get_best_gemini_model():
+    """Helper to find the best available model for this specific API key."""
+    try:
+        models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+        # Prefer flash for speed, then pro
+        for model in models:
+            if "gemini-1.5-flash" in model: return model
+        for model in models:
+            if "gemini-1.5-pro" in model: return model
+        return models[0] if models else "gemini-1.5-flash"
+    except Exception:
+        return "gemini-1.5-flash"
+
 def call_gemini_llm(messages, retries=1):
-    """Reliable Gemini Call using official SDK."""
+    """Reliable Gemini Call using Auto-Discovery logic."""
     if not GEMINI_API_KEY: return None
-    models = ["gemini-1.5-flash-8b", "gemini-1.5-flash", "gemini-1.5-pro"]
+    
+    # Use auto-discovery to find the exact model ID for this project
+    model_name = get_best_gemini_model()
     
     # Convert OpenAI message format to SDK format
     contents = []
     for m in messages:
         role = "user" if m["role"] in ["user", "system"] else "model"
-        contents.append({"role": m["role"], "parts": [{"text": m["content"]}]})
+        contents.append({"role": role, "parts": [{"text": m["content"]}]})
     
-    for model_name in models:
-        for attempt in range(retries + 1):
-            try:
-                model = genai.GenerativeModel(model_name)
-                response = model.generate_content(contents)
-                if response and response.text:
-                    return response.text.strip()
-                break
-            except Exception as e:
-                if "429" in str(e) and attempt < retries:
-                    time.sleep(3)
-                    continue
-                break
+    for attempt in range(retries + 1):
+        try:
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(contents)
+            if response and response.text:
+                return response.text.strip()
+            break
+        except Exception as e:
+            if "429" in str(e) and attempt < retries:
+                time.sleep(3)
+                continue
+            break
     return None
 
 def call_groq_llm(messages, retries=2):

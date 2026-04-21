@@ -139,35 +139,44 @@ def call_groq(prompt, retries=2):
             return f"[GROQ ERROR]: {str(e)}"
     return "[ERROR]: Groq rate limit exhausted."
 
+def get_best_gemini_model():
+    """Helper to find the best available model for this specific API key."""
+    try:
+        models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+        # Prefer flash for speed, then pro
+        for model in models:
+            if "gemini-1.5-flash" in model: return model
+        for model in models:
+            if "gemini-1.5-pro" in model: return model
+        return models[0] if models else "gemini-1.5-flash"
+    except Exception:
+        return "gemini-1.5-flash"
+
 def call_gemini(prompt, retries=1):
-    """Reliable Gemini Call using official SDK."""
+    """Reliable Gemini Call using Auto-Discovery logic."""
     if not GEMINI_API_KEY: 
         return call_groq(prompt)
     
-    # Try models: Flash-8b (fastest) -> Flash (standard) -> Pro
-    models = ["gemini-1.5-flash-8b", "gemini-1.5-flash", "gemini-1.5-pro"]
     last_error = ""
+    # Use auto-discovery to find the exact model ID for this project
+    model_name = get_best_gemini_model()
     
-    for model_name in models:
-        for attempt in range(retries + 1):
-            try:
-                model = genai.GenerativeModel(model_name)
-                response = model.generate_content(prompt)
-                if response and response.text:
-                    return response.text
-                break 
-            except Exception as e:
-                last_error = str(e)
-                # If rate limited (429), retry
-                if "429" in last_error:
-                    if attempt < retries:
-                        time.sleep(3)
-                        continue
-                # For any other error, try next model
-                break 
+    for attempt in range(retries + 1):
+        try:
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(prompt)
+            if response and response.text:
+                return response.text
+            break 
+        except Exception as e:
+            last_error = str(e)
+            if "429" in last_error:
+                if attempt < retries:
+                    time.sleep(3)
+                    continue
+            break 
                 
-    # If all Gemini models fail, fall back to Groq but keep the error log
-    return f"[GEMINI SKIPPED: {last_error[:100]}] " + call_groq(prompt)
+    return f"[GEMINI FAILED ({model_name}): {last_error[:100]}] " + call_groq(prompt)
 
 def call_sarvam_tts(text):
     """Call Sarvam TTS 'Meera' voice (bulbul:v3)."""
