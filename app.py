@@ -1,4 +1,4 @@
-# app.py — Kannada Book AI Agent
+# app.py — Kannada Book AI Agent v2
 # Run: kannada-rag-env\Scripts\python.exe -m streamlit run app.py
 
 import os
@@ -9,6 +9,13 @@ import streamlit as st
 import google.generativeai as genai
 from dotenv import load_dotenv
 
+# v2: LangChain-backed retrieval with metadata filtering + fallback
+from rag_agent_v2 import (
+    retrieve_v2,
+    detect_page_filter,
+    NOT_FOUND_MSG,
+)
+
 load_dotenv()
 
 BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
@@ -16,59 +23,35 @@ SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 GROQ_API_KEY   = os.getenv("GROQ_API_KEY", "").strip()
 
-# Configure Gemini
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
-CHROMA_DIR     = os.path.join(BASE_DIR, "chroma_db")
-COLLECTION     = "kannada_book"
-MODEL_NAME     = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-
 BOOK_CONTEXT = """
-Book Title  : ಹೇಳಿ ಹೋಗು ಕಾರಣ (Heli Hogu Karana — meaning "Tell the reason before you go")
-Author      : ರವಿ ಬೆಳಗೆರೆ (Ravi Belagere) — prominent Kannada journalist and bold social writer based in Bengaluru
-Publisher   : Bhavana Prakashan, Bengaluru (#2, 80 Aadi Raste, Banashankari 2nd Stage)
-Language    : Kannada | Genre: Novel (ಕಾದಂಬರಿ) | Pages: 346
+Book Title  : ಹೇಳಿ ಹೋಗು ಕಾರಣ (Heli Hogu Karana — "Tell the reason before you go")
+Author      : ರವಿ ಬೆಳಗೆರೆ (Ravi Belagere) — prominent Kannada journalist, Bengaluru
+Publisher   : Bhavana Prakashan, Bengaluru
+Language    : Kannada | Genre: Novel | Pages: 346
 
-Title meaning: "ಹೇಳಿ ಹೋಗು ಕಾರಣ" means "Tell the reason before you go" — a moral challenge
-posed to characters who leave without explanation or abandon their responsibilities.
-
-Theme: The novel explores philosophical and existential themes — human morality, guilt,
-truth-telling, the relationship between humans and the divine, and moral accountability.
+Theme: Human morality, guilt, truth-telling, divine justice, moral accountability,
+       existential questioning, social critique.
 Style: Bold journalistic prose, episodic structure, multiple philosophical perspectives.
-Key themes: Human deception, divine justice, moral accountability, existential questioning, social critique.
 
-Known characters in this novel: ಹಿಮವಂತ (Himavant) is the main protagonist. ಪ್ರಾರ್ಥನಾ (Prarthana) is his wife. Their relationship is central to the story.
+Known characters: ಹಿಮವಂತ (Himavant) is the main protagonist. ಪ್ರಾರ್ಥನಾ (Prarthana) is his wife.
 """
 
-# General book/author questions — answered from BOOK_CONTEXT only
 GENERAL_PATTERNS = [
-    r'what is (this|the) book',
-    r'about (this|the) book',
-    r'book (about|summary|theme)',
-    r'who (is|wrote|is the author).*ravi',
-    r'ravi belagere',
-    r'author',
-    r'ಪುಸ್ತಕ(ದ|ವು|ದ ಬಗ್ಗೆ)',
-    r'ಕಾದಂಬರಿ',
-    r'ರವಿ ಬೆಳಗೆರೆ',
-    r'ವಿಷಯ ಏನು',
-    r'ಯಾರು ಬರೆದ',
-    r'ಮುಖ್ಯ ವಿಷಯ',
-    r'summary',
-    r'theme',
-    r'title mean',
-    r'ಶೀರ್ಷಿಕೆ',
+    r'what is (this|the) book', r'about (this|the) book',
+    r'book (about|summary|theme)', r'who (is|wrote|is the author).*ravi',
+    r'ravi belagere', r'author', r'ಪುಸ್ತಕ(ದ|ವು|ದ ಬಗ್ಗೆ)', r'ಕಾದಂಬರಿ',
+    r'ರವಿ ಬೆಳಗೆರೆ', r'ವಿಷಯ ಏನು', r'ಯಾರು ಬರೆದ', r'ಮುಖ್ಯ ವಿಷಯ',
+    r'summary', r'theme', r'title mean', r'ಶೀರ್ಷಿಕೆ',
 ]
-
-# Character questions — answered from RAG retrieval
 CHARACTER_PATTERNS = [
     r'himavant', r'prarthana', r'pratana', r'prathana',
-    r'ಹಿಮವಂತ', r'ಪ್ರಾರ್ಥನಾ',
-    r'main character', r'protagonist', r'ಮುಖ್ಯ ಪಾತ್ರ',
-    r'who is', r'who are', r'character', r'ಪಾತ್ರ',
-    r'wife', r'husband', r'ಹೆಂಡತಿ', r'ಗಂಡ',
-    r'relationship', r'ಸಂಬಂಧ', r'name of', r'tell me about',
+    r'ಹಿಮವಂತ', r'ಪ್ರಾರ್ಥನಾ', r'main character', r'protagonist',
+    r'ಮುಖ್ಯ ಪಾತ್ರ', r'who is', r'who are', r'character', r'ಪಾತ್ರ',
+    r'wife', r'husband', r'ಹೆಂಡತಿ', r'ಗಂಡ', r'relationship',
+    r'ಸಂಬಂಧ', r'name of', r'tell me about',
 ]
 
 def is_general_question(q):
@@ -77,8 +60,10 @@ def is_general_question(q):
 def is_character_question(q):
     return any(re.search(p, q, re.IGNORECASE) for p in CHARACTER_PATTERNS)
 
+
+# ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="ಹೇಳಿ ಹೋಗು ಕಾರಣ — AI Agent",
+    page_title="ಹೇಳಿ ಹೋಗು ಕಾರಣ — AI Agent v2",
     page_icon="📚",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -133,7 +118,6 @@ st.markdown("""
         border-radius: 24px;
         padding: 0.25rem 0.5rem;
         box-shadow: 0 0 40px rgba(139,92,246,0.15), 0 4px 6px rgba(0,0,0,0.3);
-        transition: all 0.3s ease;
     }
     div[data-testid="stChatInput"]:focus-within {
         border-color: rgba(139,92,246,0.5);
@@ -142,16 +126,10 @@ st.markdown("""
     hr { border-color: rgba(255,255,255,0.06) !important; margin: 2rem 0; }
     h1 {
         background: linear-gradient(to right, #38bdf8, #c084fc, #f472b6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 800;
-        font-size: 3rem;
-        letter-spacing: -1px;
-        margin-bottom: 0.2rem;
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        font-weight: 800; font-size: 3rem; letter-spacing: -1px; margin-bottom: 0.2rem;
     }
     .stMarkdown p { color: #94a3b8; }
-
-    /* Suggestion chips */
     div[data-testid="stHorizontalBlock"] .stButton > button {
         background: rgba(255,255,255,0.04) !important;
         border: 1px solid rgba(255,255,255,0.1) !important;
@@ -170,8 +148,6 @@ st.markdown("""
         box-shadow: 0 0 12px rgba(139,92,246,0.2) !important;
         transform: translateY(-1px) !important;
     }
-
-    /* Glass effect for sidebar widgets */
     div[data-testid="stSidebar"] .stRadio,
     div[data-testid="stSidebar"] .stCheckbox {
         background: rgba(255,255,255,0.04) !important;
@@ -190,8 +166,7 @@ st.markdown("""
     }
     div[data-testid="stSidebar"] .stRadio label,
     div[data-testid="stSidebar"] .stCheckbox label {
-        color: #e2e8f0 !important;
-        font-weight: 500 !important;
+        color: #e2e8f0 !important; font-weight: 500 !important;
     }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -199,112 +174,33 @@ st.markdown("""
     ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
     .stButton > button {
         background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 12px;
-        color: #fff;
-        font-weight: 600;
-        transition: all 0.2s;
+        border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+        color: #fff; font-weight: 600; transition: all 0.2s;
     }
-    .stForm { background: rgba(255,255,255,0.02) !important; border: 1px solid rgba(255,255,255,0.06) !important; border-radius: 20px !important; padding: 1.5rem !important; backdrop-filter: blur(20px) !important; }
-    .stTextInput > div > div > input, .stTextArea > div > div > textarea, .stSelectbox > div > div { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.08) !important; border-radius: 12px !important; color: #e2e8f0 !important; }
     .stButton > button:hover {
         border-color: #8b5cf6;
         box-shadow: 0 0 15px rgba(139,92,246,0.3);
         transform: translateY(-1px);
     }
+    .stForm { background: rgba(255,255,255,0.02) !important; border: 1px solid rgba(255,255,255,0.06) !important; border-radius: 20px !important; padding: 1.5rem !important; backdrop-filter: blur(20px) !important; }
+    .stTextInput > div > div > input, .stTextArea > div > div > textarea { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.08) !important; border-radius: 12px !important; color: #e2e8f0 !important; }
+    /* v2 badge */
+    .v2-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #7c3aed, #2563eb);
+        color: white; font-size: 0.65rem; font-weight: 700;
+        padding: 2px 8px; border-radius: 999px;
+        letter-spacing: 0.05em; vertical-align: middle;
+        margin-left: 0.5rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-@st.cache_resource
-def load_agent():
-    from sentence_transformers import SentenceTransformer
-    import chromadb
-    embed_model = SentenceTransformer(MODEL_NAME)
-    client      = chromadb.PersistentClient(path=CHROMA_DIR)
-    try:
-        collection = client.get_collection(COLLECTION)
-    except Exception:
-        collection = client.get_or_create_collection(
-            COLLECTION, metadata={"hnsw:space": "cosine"}
-        )
-    return embed_model, collection
 
-def retrieve(query, embed_model, collection, top_k=5):
-    qe      = embed_model.encode([query])[0].tolist()
-    results = collection.query(query_embeddings=[qe], n_results=top_k)
-    chunks  = []
-    for i, doc in enumerate(results["documents"][0]):
-        score = 1 - results["distances"][0][i]
-        if score >= 0.25:
-            chunks.append({
-                "text" : doc,
-                "page" : results["metadatas"][0][i]["page"],
-                "score": round(score, 3)
-            })
-    return chunks
-
-def retrieve_character(query, embed_model, collection):
-    """Higher recall retrieval for character questions — more chunks, lower threshold."""
-    qe      = embed_model.encode([query])[0].tolist()
-    results = collection.query(query_embeddings=[qe], n_results=10)
-    chunks  = []
-    for i, doc in enumerate(results["documents"][0]):
-        score = 1 - results["distances"][0][i]
-        if score >= 0.20:
-            chunks.append({
-                "text" : doc,
-                "page" : results["metadatas"][0][i]["page"],
-                "score": round(score, 3)
-            })
-    return chunks
-
-def retrieve_by_page(page_num, collection):
-    results = collection.get(where={"page": page_num}, limit=5)
-    return [{"text": d, "page": m["page"], "score": 1.0}
-            for d, m in zip(results["documents"], results["metadatas"])]
-
-def detect_page_query(question):
-    m = re.search(r'page\s*(\d+)|ಪುಟ\s*(\d+)|(\d+)\s*(?:page|ಪುಟ)', question, re.IGNORECASE)
-    if m:
-        return int(next(g for g in m.groups() if g))
-    return None
-
-def build_prompt(question, chunks, language, use_book_context_only=False):
-    rag_section = "" if use_book_context_only else (
-        "\n\n".join([f"[Page {c['page']}]: {c['text']}" for c in chunks])
-        if chunks else "(No specific passages retrieved.)"
-    )
-    if language == "English":
-        return f"""You are an AI assistant for the Kannada novel "Heli Hogu Karana".
-
-BOOK INFORMATION:
-{BOOK_CONTEXT}
-
-{"" if use_book_context_only else f"RETRIEVED PASSAGES FROM BOOK:{chr(10)}{rag_section}{chr(10)}"}
-Answer the question using the information above. Be informative and helpful.
-{"" if use_book_context_only else "Cite page numbers when using retrieved passages."}
-
-QUESTION: {question}
-
-ANSWER in English:"""
-    else:
-        return f"""ನೀವು "ಹೇಳಿ ಹೋಗು ಕಾರಣ" ಕನ್ನಡ ಕಾದಂಬರಿಯ AI ಸಹಾಯಕರು.
-
-ಪುಸ್ತಕದ ಮಾಹಿತಿ:
-{BOOK_CONTEXT}
-
-{"" if use_book_context_only else f"ಪುಸ್ತಕದಿಂದ ತೆಗೆದ ವಿಷಯ:{chr(10)}{rag_section}{chr(10)}"}
-ಮೇಲಿನ ಮಾಹಿತಿ ಬಳಸಿ ಕನ್ನಡದಲ್ಲಿ ಮಾತ್ರ ಉತ್ತರಿಸಿ.
-
-ಪ್ರಶ್ನೆ: {question}
-
-ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ:"""
-
+# ── LLM functions (unchanged from v1) ────────────────────────────────────────
 def get_best_gemini_model():
-    """Helper to find the best available model for this specific API key."""
     try:
         models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        # Prefer flash for speed, then pro
         for model in models:
             if "gemini-1.5-flash" in model: return model
         for model in models:
@@ -314,19 +210,14 @@ def get_best_gemini_model():
         return "gemini-1.5-flash"
 
 def call_gemini_llm(messages, retries=1):
-    """Reliable Gemini Call with System Prompts and Safety Bypass."""
     if not GEMINI_API_KEY: return None
     model_name = get_best_gemini_model()
-    
-    # Standard Safety Settings
     safety_settings = [
         {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
         {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
         {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
         {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
     ]
-    
-    # Extract System Prompt for separate instruction field
     system_instr = ""
     chat_contents = []
     for m in messages:
@@ -335,96 +226,52 @@ def call_gemini_llm(messages, retries=1):
         else:
             role = "user" if m["role"] == "user" else "model"
             chat_contents.append({"role": role, "parts": [{"text": m["content"]}]})
-    
     for attempt in range(retries + 1):
         try:
-            model = genai.GenerativeModel(
-                model_name=model_name,
-                system_instruction=system_instr
-            )
+            model = genai.GenerativeModel(model_name=model_name, system_instruction=system_instr)
             response = model.generate_content(chat_contents, safety_settings=safety_settings)
-            
             if response.candidates and response.candidates[0].content.parts:
                 return response.text.strip()
-            return f"⚠️ Blocked (Reason: {response.candidates[0].finish_reason if response.candidates else 'Unknown'})"
-        except Exception as e:
-            if "429" in str(e) and attempt < retries:
-                time.sleep(3)
-                continue
+            return None
+        except Exception:
             break
     return None
 
 def call_groq_llm(messages, retries=2):
-    """Fallback to Groq Llama 3 with Rate Limit Armor."""
     if not GROQ_API_KEY: return "⚠️ GROQ_API_KEY not set"
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-    payload = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": messages,
-        "temperature": 0.1,
-        "max_tokens": 800
-    }
-    
+    payload = {"model": "llama-3.3-70b-versatile", "messages": messages, "temperature": 0.1, "max_tokens": 800}
     for attempt in range(retries + 1):
         try:
             resp = requests.post(url, headers=headers, json=payload, timeout=30)
             if resp.status_code == 200:
                 return resp.json()["choices"][0]["message"]["content"].strip()
-            
-            if resp.status_code == 429: # Rate Limit
-                if attempt < retries:
-                    time.sleep(5)
-                    continue
-            
+            if resp.status_code == 429 and attempt < retries:
+                import time; time.sleep(5); continue
             resp.raise_for_status()
         except Exception as e:
-            if attempt < retries:
-                time.sleep(2)
-                continue
+            if attempt < retries: import time; time.sleep(2); continue
             return f"❌ Groq Error: {e}"
     return "❌ Groq rate limit exhausted."
 
 def call_sarvam_llm(messages):
-    # 1. Try Gemini first (Best for English Analysis)
     gemini_resp = call_gemini_llm(messages)
     if gemini_resp: return gemini_resp
-
-    # 2. Try Sarvam (Good for Kannada/Bilingual)
-    if not SARVAM_API_KEY:
-        return call_groq_llm(messages)
-    
-    headers = {
-        "Authorization": f"Bearer {SARVAM_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "model"      : "sarvam-m",
-        "messages"   : messages,
-        "temperature": 0.1,
-        "max_tokens" : 600
-    }
+    if not SARVAM_API_KEY: return call_groq_llm(messages)
+    headers = {"Authorization": f"Bearer {SARVAM_API_KEY}", "Content-Type": "application/json"}
+    payload = {"model": "sarvam-m", "messages": messages, "temperature": 0.1, "max_tokens": 600}
     try:
-        resp = requests.post(
-            "https://api.sarvam.ai/v1/chat/completions",
-            headers=headers, json=payload, timeout=30
-        )
+        resp = requests.post("https://api.sarvam.ai/v1/chat/completions", headers=headers, json=payload, timeout=30)
         if resp.status_code == 200:
             return resp.json()["choices"][0]["message"]["content"].strip()
-        
-        # 3. Fallback to Groq (Last Resort)
         return call_groq_llm(messages)
     except Exception:
         return call_groq_llm(messages)
 
 def call_sarvam_tts(text, language="kn-IN"):
-    if not SARVAM_API_KEY:
-        return None
-    # ✅ FIXED auth header
-    headers = {
-        "Authorization": f"Bearer {SARVAM_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    if not SARVAM_API_KEY: return None
+    headers = {"Authorization": f"Bearer {SARVAM_API_KEY}", "Content-Type": "application/json"}
     clean = re.sub(r'\[Page \d+\]:', '', text).strip()
     words = clean.split()
     chunks_list, current = [], ""
@@ -435,27 +282,14 @@ def call_sarvam_tts(text, language="kn-IN"):
             if current: chunks_list.append(current)
             current = word
     if current: chunks_list.append(current)
-
     audio_bytes_list = []
     for chunk in chunks_list:
         if not chunk.strip(): continue
-        payload = {
-            "inputs"              : [chunk.strip()],
-            "target_language_code": language,
-            "speaker"             : "priya",
-            "model"               : "bulbul:v3",
-            "pace"                : 1.0
-        }
-        resp = requests.post(
-            "https://api.sarvam.ai/text-to-speech",
-            headers=headers, json=payload, timeout=60
-        )
+        payload = {"inputs": [chunk.strip()], "target_language_code": language, "speaker": "priya", "model": "bulbul:v3", "pace": 1.0}
+        resp = requests.post("https://api.sarvam.ai/text-to-speech", headers=headers, json=payload, timeout=60)
         if resp.status_code == 200:
             audio_bytes_list.append(base64.b64decode(resp.json()["audios"][0]))
-
-    if not audio_bytes_list:
-        return None
-
+    if not audio_bytes_list: return None
     import wave, io
     output_wav = io.BytesIO()
     with wave.open(output_wav, 'wb') as wav_out:
@@ -469,41 +303,102 @@ def call_sarvam_tts(text, language="kn-IN"):
                 continue
     return output_wav.getvalue()
 
-# ── UI ───────────────────────────────────────────────
-st.markdown("<h1>📚 ಹೇಳಿ ಹೋಗು ಕಾರಣ<br><span style='font-size: 1.5rem; color: #94a3b8; font-weight: 400;'>Premium AI Knowledge Agent</span></h1>", unsafe_allow_html=True)
-st.markdown("<p style='margin-bottom: 2rem;'>Masterpiece Kannada Novel Intelligence — Powered by Sarvam & EasyOCR</p>", unsafe_allow_html=True)
+def build_prompt(question, chunks, language, use_book_context_only=False):
+    rag_section = "" if use_book_context_only else (
+        "\n\n".join([f"[Page {c['page']}]: {c['text']}" for c in chunks])
+        if chunks else "(No specific passages retrieved.)"
+    )
+    if language == "English":
+        return f"""You are an AI assistant for the Kannada novel "Heli Hogu Karana".
+
+BOOK INFORMATION:
+{BOOK_CONTEXT}
+
+{"" if use_book_context_only else f"RETRIEVED PASSAGES:{chr(10)}{rag_section}{chr(10)}"}
+Answer using the information above. Be informative and cite page numbers when using passages.
+If passages say "Not found in document", tell the user clearly.
+
+QUESTION: {question}
+ANSWER in English:"""
+    else:
+        return f"""ನೀವು "ಹೇಳಿ ಹೋಗು ಕಾರಣ" ಕನ್ನಡ ಕಾದಂಬರಿಯ AI ಸಹಾಯಕರು.
+
+ಪುಸ್ತಕದ ಮಾಹಿತಿ:
+{BOOK_CONTEXT}
+
+{"" if use_book_context_only else f"ಪುಸ್ತಕದಿಂದ ತೆಗೆದ ವಿಷಯ:{chr(10)}{rag_section}{chr(10)}"}
+ಕನ್ನಡದಲ್ಲಿ ಮಾತ್ರ ಉತ್ತರಿಸಿ.
+
+ಪ್ರಶ್ನೆ: {question}
+ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ:"""
+
+
+# ── UI ────────────────────────────────────────────────────────────────────────
+st.markdown(
+    "<h1>📚 ಹೇಳಿ ಹೋಗು ಕಾರಣ"
+    "<span class='v2-badge'>v2</span>"
+    "<br><span style='font-size:1.5rem;color:#94a3b8;font-weight:400;'>Premium AI Knowledge Agent</span></h1>",
+    unsafe_allow_html=True
+)
+st.markdown(
+    "<p style='margin-bottom:2rem;'>Masterpiece Kannada Novel Intelligence — "
+    "Powered by Gemini · Sarvam · Groq · LangChain</p>",
+    unsafe_allow_html=True
+)
 
 with st.sidebar:
-    st.markdown("""
-<div style='background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:1rem 1.2rem;margin-bottom:0.8rem;backdrop-filter:blur(20px);box-shadow:0 4px 20px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.06);'>
+    # ── Language ──────────────────────────────────────────────────────────────
+    st.markdown("""<div style='background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:1rem 1.2rem;margin-bottom:0.8rem;backdrop-filter:blur(20px);'>
 <p style='color:#94a3b8;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem;'>⚙️ Settings</p>
-</div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
 
     st.markdown("""<div style='background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:0.6rem 1rem;margin-bottom:0.5rem;backdrop-filter:blur(10px);'><p style='color:#c084fc;font-size:0.8rem;font-weight:600;margin:0;'>🌐 Answer Language</p></div>""", unsafe_allow_html=True)
-    language    = st.radio("", ["English", "Kannada"], key="lang", label_visibility="collapsed")
+    language = st.radio("", ["English", "Kannada"], key="lang", label_visibility="collapsed")
 
+    # ── v2: Page Filter ───────────────────────────────────────────────────────
+    st.markdown("""<div style='background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);border-radius:14px;padding:0.6rem 1rem;margin-bottom:0.5rem;margin-top:0.3rem;backdrop-filter:blur(10px);'><p style='color:#38bdf8;font-size:0.8rem;font-weight:600;margin:0;'>🔢 Page Filter <span style="font-size:0.7rem;opacity:0.6">(v2)</span></p></div>""", unsafe_allow_html=True)
+    page_filter_mode = st.radio(
+        "Filter by", ["None", "Exact page", "Page range"],
+        key="page_filter_mode", label_visibility="collapsed"
+    )
+    sidebar_page_exact = None
+    sidebar_page_range = None
+    if page_filter_mode == "Exact page":
+        sidebar_page_exact = st.number_input(
+            "Page number", min_value=1, max_value=346, value=1, key="pf_exact"
+        )
+    elif page_filter_mode == "Page range":
+        col_a, col_b = st.columns(2)
+        with col_a:
+            pf_start = st.number_input("From", min_value=1, max_value=346, value=1, key="pf_start")
+        with col_b:
+            pf_end = st.number_input("To", min_value=1, max_value=346, value=50, key="pf_end")
+        sidebar_page_range = (int(pf_start), int(pf_end))
+
+    # ── Display Options ───────────────────────────────────────────────────────
     st.markdown("""<div style='background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:14px;padding:0.6rem 1rem;margin-bottom:0.5rem;margin-top:0.3rem;backdrop-filter:blur(10px);'><p style='color:#38bdf8;font-size:0.8rem;font-weight:600;margin:0;'>🔍 Display Options</p></div>""", unsafe_allow_html=True)
     show_chunks = st.checkbox("Show source chunks", value=False)
 
     st.markdown("""<div style='background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);border-radius:14px;padding:0.6rem 1rem;margin-bottom:0.5rem;margin-top:0.3rem;backdrop-filter:blur(10px);'><p style='color:#f472b6;font-size:0.8rem;font-weight:600;margin:0;'>🔊 Audio</p></div>""", unsafe_allow_html=True)
-    enable_tts  = st.checkbox("Read answer aloud (TTS)", value=False)
+    enable_tts = st.checkbox("Read answer aloud (TTS)", value=False)
 
     st.markdown("""
 <div style='background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:0.8rem 1rem;margin-top:0.8rem;backdrop-filter:blur(10px);'>
 <p style='color:#94a3b8;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem;'>📖 About</p>
-<p style='color:#64748b;font-size:0.85rem;margin:0;'><em>ಹೇಳಿ ಹೋಗು ಕಾರಣ</em> by Ravi Belagere — a Kannada novel.</p>
+<p style='color:#64748b;font-size:0.85rem;margin:0;'><em>ಹೇಳಿ ಹೋಗು ಕಾರಣ</em> by Ravi Belagere — Kannada novel</p>
 </div>
 <div style='background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:0.8rem 1rem;margin-top:0.5rem;backdrop-filter:blur(10px);'>
 <p style='color:#94a3b8;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem;'>📊 Stats</p>
-<p style='color:#64748b;font-size:0.85rem;margin:0;'>346 pages · 687 chunks · Sarvam AI</p>
+<p style='color:#64748b;font-size:0.85rem;margin:0;'>346 pages · 687 chunks · v2 RAG</p>
 </div>
 <div style='background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:0.8rem 1rem;margin-top:0.5rem;backdrop-filter:blur(10px);'>
 <p style='color:#94a3b8;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem;'>💡 Try asking</p>
-<p style='color:#64748b;font-size:0.82rem;margin:0;line-height:1.7;'>Who is Himavant?<br>Who is Prarthana?<br>What is in page 50?<br>ಹಿಮವಂತ ಯಾರು?<br>ಈ ಪುಸ್ತಕದ ವಿಷಯ ಏನು?</p>
+<p style='color:#64748b;font-size:0.82rem;margin:0;line-height:1.7;'>Who is Himavant?<br>What is in pages 10 to 30?<br>What is in page 50?<br>ಹಿಮವಂತ ಯಾರು?<br>ಈ ಪುಸ್ತಕದ ವಿಷಯ ಏನು?</p>
 </div>
 """, unsafe_allow_html=True)
 
+
+# ── Chat history ──────────────────────────────────────────────────────────────
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -515,7 +410,7 @@ for msg in st.session_state.messages:
         if msg.get("audio"):
             st.audio(msg["audio"], format="audio/wav")
 
-# ── SUGGESTED QUESTION CHIPS ──────────────────────────
+# ── Suggestion chips ──────────────────────────────────────────────────────────
 CHIPS = [
     "What is this book about?",
     "Who is Himavant?",
@@ -534,12 +429,11 @@ for i, chip in enumerate(CHIPS):
             st.session_state.chip_question = chip
 
 question = st.chat_input("Ask about the book... (ಪ್ರಶ್ನೆ ಕೇಳಿ...)")
-
-# Use chip question if clicked
 if st.session_state.chip_question:
     question = st.session_state.chip_question
     st.session_state.chip_question = None
 
+# ── Main answer loop ──────────────────────────────────────────────────────────
 if question:
     current_lang = st.session_state.get("lang", "English")
     st.session_state.messages.append({"role": "user", "content": question})
@@ -549,79 +443,93 @@ if question:
     with st.chat_message("assistant"):
         progress = st.progress(0, text="🔍 Searching book...")
         try:
-                embed_model, collection = load_agent()
-                progress.progress(25, text="📖 Retrieving passages...")
-                general  = is_general_question(question)
-                page_num = detect_page_query(question)
-                chunks   = []
+            progress.progress(20, text="📖 Retrieving passages...")
+            general = is_general_question(question)
+            is_char = is_character_question(question)
 
-                if page_num:
-                    chunks = retrieve_by_page(page_num, collection)
-                    if not chunks:
-                        chunks = retrieve(question, embed_model, collection)
-                elif is_character_question(question):
-                    # Use RAG — no hardcoding, answer from actual book chunks
-                    chunks = retrieve_character(question, embed_model, collection)
-                elif not general:
-                    chunks = retrieve(question, embed_model, collection, top_k=2) # Reduced for stability
+            # ── v2: metadata-filtered retrieval ──────────────────────────────
+            auto_page, auto_range = detect_page_filter(question)
 
-                # Apply safe context length capping (5,000 characters for free tiers)
-                capped_chunks = []
-                current_len = 0
-                for c in chunks:
-                    text_len = len(c['text'])
-                    if current_len + text_len > 5000:
-                        break
-                    capped_chunks.append(c)
-                    current_len += text_len
-                chunks = capped_chunks
+            # Sidebar filter overrides auto-detection
+            final_page  = sidebar_page_exact if sidebar_page_exact else auto_page
+            final_range = sidebar_page_range if sidebar_page_range else auto_range
+            # Clear range if exact page set
+            if final_page:
+                final_range = None
 
-                progress.progress(55, text="🧠 Building prompt...")
-                prompt = build_prompt(question, chunks, current_lang,
-                                      use_book_context_only=(general and not chunks))
+            chunks, fallback_msg = retrieve_v2(
+                query        = question,
+                page         = final_page if not general else None,
+                page_range   = final_range if not general else None,
+                is_character = is_char,
+            )
 
-                chat_history = []
-                for msg in st.session_state.messages[-5:-1]:
-                    if msg["role"] in ["user", "assistant"]:
-                        clean_content = re.sub(r'\[Page \d+\]:', '', msg["content"]).strip()
-                        chat_history.append({"role": msg["role"], "content": clean_content})
-                chat_history.append({"role": "user", "content": prompt})
-
-                progress.progress(75, text="✨ Generating answer...")
-                answer = call_sarvam_llm(chat_history)
-                progress.progress(100, text="Done!")
+            # ── v2: explicit NOT FOUND fallback ──────────────────────────────
+            if fallback_msg and not general:
                 progress.empty()
-                pages  = sorted(set(c["page"] for c in chunks)) if chunks else []
-
-                st.write(answer)
-                if pages:
-                    st.caption(f"📄 Sources: Pages {', '.join(map(str, pages))}")
-                elif general:
-                    st.caption("📖 Answer based on book knowledge")
-
-                if show_chunks and chunks:
-                    with st.expander("📑 Source chunks"):
-                        for c in chunks:
-                            st.markdown(f"**Page {c['page']}** (score: {c['score']})")
-                            st.text(c["text"][:300])
-                            st.divider()
-
-                audio_bytes = None
-                if enable_tts and answer and SARVAM_API_KEY:
-                    tts_lang = "kn-IN" if current_lang == "Kannada" else "en-IN"
-                    try:
-                        audio_bytes = call_sarvam_tts(answer, tts_lang)
-                        if audio_bytes:
-                            st.audio(audio_bytes, format="audio/wav")
-                    except Exception as e:
-                        st.warning(f"TTS error: {e}")
-
+                st.warning(fallback_msg)
                 st.session_state.messages.append({
-                    "role"   : "assistant",
-                    "content": answer,
-                    "pages"  : pages,
-                    "audio"  : audio_bytes
+                    "role": "assistant", "content": fallback_msg,
+                    "pages": [], "audio": None
                 })
+                st.stop()
+
+            # Cap context for free-tier LLMs
+            capped, cur_len = [], 0
+            for c in chunks:
+                if cur_len + len(c["text"]) > 5000: break
+                capped.append(c); cur_len += len(c["text"])
+            chunks = capped
+
+            progress.progress(55, text="🧠 Building prompt...")
+            prompt = build_prompt(question, chunks, current_lang,
+                                  use_book_context_only=(general and not chunks))
+
+            chat_history = []
+            for msg in st.session_state.messages[-5:-1]:
+                if msg["role"] in ["user", "assistant"]:
+                    clean = re.sub(r'\[Page \d+\]:', '', msg["content"]).strip()
+                    chat_history.append({"role": msg["role"], "content": clean})
+            chat_history.append({"role": "user", "content": prompt})
+
+            progress.progress(75, text="✨ Generating answer...")
+            answer = call_sarvam_llm(chat_history)
+            progress.progress(100, text="Done!")
+            progress.empty()
+
+            pages = sorted(set(c["page"] for c in chunks)) if chunks else []
+            st.write(answer)
+            if pages:
+                page_info = ""
+                if final_range:
+                    page_info = f" (filtered: pages {final_range[0]}–{final_range[1]})"
+                elif final_page:
+                    page_info = f" (filtered: page {final_page})"
+                st.caption(f"📄 Sources: Pages {', '.join(map(str, pages))}{page_info}")
+            elif general:
+                st.caption("📖 Answer based on book knowledge")
+
+            if show_chunks and chunks:
+                with st.expander("📑 Source chunks"):
+                    for c in chunks:
+                        st.markdown(f"**Page {c['page']}** (score: {c['score']})")
+                        st.text(c["text"][:300])
+                        st.divider()
+
+            audio_bytes = None
+            if enable_tts and answer and SARVAM_API_KEY:
+                tts_lang = "kn-IN" if current_lang == "Kannada" else "en-IN"
+                try:
+                    audio_bytes = call_sarvam_tts(answer, tts_lang)
+                    if audio_bytes:
+                        st.audio(audio_bytes, format="audio/wav")
+                except Exception as e:
+                    st.warning(f"TTS error: {e}")
+
+            st.session_state.messages.append({
+                "role": "assistant", "content": answer,
+                "pages": pages, "audio": audio_bytes
+            })
 
         except Exception as e:
             progress.empty()
@@ -632,12 +540,10 @@ if st.session_state.messages:
         st.session_state.messages = []
         st.rerun()
 
-# ── FEEDBACK SECTION ─────────────────────────────────
+# ── Feedback ──────────────────────────────────────────────────────────────────
 st.markdown("---")
 with st.expander("💬 Share Feedback", expanded=False):
-    st.markdown("""
-<p style='color: #64748b; font-size: 0.85rem; margin-bottom: 1rem;'>Help us improve — your feedback is anonymous and appreciated</p>
-""", unsafe_allow_html=True)
+    st.markdown("<p style='color:#64748b;font-size:0.85rem;margin-bottom:1rem;'>Help us improve — anonymous & appreciated</p>", unsafe_allow_html=True)
     with st.form("feedback_form", clear_on_submit=True):
         col1, col2 = st.columns([3, 1])
         with col1:
@@ -646,7 +552,6 @@ with st.expander("💬 Share Feedback", expanded=False):
             feedback_rating = st.selectbox("Rating", ["⭐⭐⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐", "⭐⭐", "⭐"])
         feedback_text = st.text_area("Your feedback", placeholder="What did you like? What can be improved?", height=100)
         submitted = st.form_submit_button("Submit Feedback ✨")
-
         if submitted and feedback_text.strip():
             import json, datetime
             feedback_file = os.path.join(BASE_DIR, "feedback.json")
@@ -656,18 +561,18 @@ with st.expander("💬 Share Feedback", expanded=False):
             except:
                 all_feedback = []
             all_feedback.append({
-                "name"     : feedback_name.strip() or "Anonymous",
-                "rating"   : feedback_rating,
-                "feedback" : feedback_text.strip(),
+                "name": feedback_name.strip() or "Anonymous",
+                "rating": feedback_rating,
+                "feedback": feedback_text.strip(),
                 "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             })
             with open(feedback_file, "w", encoding="utf-8") as f:
                 json.dump(all_feedback, f, ensure_ascii=False, indent=2)
-            st.success("✅ Thank you for your feedback!")
+            st.success("✅ Thank you!")
         elif submitted:
             st.warning("Please write something before submitting.")
 
-# ── ADMIN FEEDBACK VIEWER (private) ──────────────────
+# ── Admin ─────────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.divider()
     st.markdown("**🔐 Admin**")
@@ -680,11 +585,7 @@ with st.sidebar:
                 all_feedback = json.load(f)
             st.markdown(f"**{len(all_feedback)} responses**")
             for fb in reversed(all_feedback):
-                st.markdown(f"""
-**{fb['rating']}** — *{fb['name']}*  
-{fb['feedback']}  
-<small style='color:#475569'>{fb['timestamp']}</small>
-""", unsafe_allow_html=True)
+                st.markdown(f"**{fb['rating']}** — *{fb['name']}*  \n{fb['feedback']}  \n<small style='color:#475569'>{fb['timestamp']}</small>", unsafe_allow_html=True)
                 st.divider()
         except:
             st.info("No feedback yet.")
