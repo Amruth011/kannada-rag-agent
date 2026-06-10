@@ -1112,10 +1112,10 @@ async def root():
             /* TABS NAVIGATION */
             .tabs-nav {
                 display: flex;
+                flex-wrap: wrap;
                 border-bottom: 2px solid rgba(194, 65, 12, 0.08);
                 margin-bottom: 2.2rem;
-                gap: 1.2rem;
-                overflow-x: auto;
+                gap: 0.4rem;
                 padding-bottom: 0.5rem;
                 justify-content: center;
             }
@@ -1123,18 +1123,18 @@ async def root():
                 background: none;
                 border: none;
                 font-family: inherit;
-                font-size: 0.95rem;
+                font-size: 0.85rem;
                 font-weight: 700;
                 color: var(--text-muted);
                 border-bottom: 3px solid transparent;
-                padding: 0.6rem 1.2rem;
+                padding: 0.5rem 0.9rem;
                 cursor: pointer;
                 outline: none;
                 transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
                 white-space: nowrap;
                 display: inline-flex;
                 align-items: center;
-                gap: 6px;
+                gap: 5px;
                 border-radius: 8px 8px 0 0;
             }
             .tab-btn:hover {
