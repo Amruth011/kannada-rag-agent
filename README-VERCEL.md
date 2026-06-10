@@ -85,22 +85,18 @@ kannada-rag-agent/
 ```json
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "api/index.py",
-      "use": "@vercel/python"
+      "source": "/chat",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.py"
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "api/index.py"
-    }
-  ],
-  "functions": {
-    "api/index.py": {
-      "runtime": "python3.9"
-    }
+  "env": {
+    "PYTHON_VERSION": "3.9"
   }
 }
 ```
@@ -125,17 +121,23 @@ kannada-rag-agent/
   ```json
   {
     "question": "Who is Himavant?",
-    "language": "English",
-    "show_chunks": false,
-    "enable_tts": false
+    "language": "English"
   }
   ```
 
-### Audio Endpoint
-- **GET** `/audio/{question}` - Returns WAV audio for TTS
+### Voice Output Endpoint
+- **POST** `/voice`
+- **Body**:
+  ```json
+  {
+    "text": "Response text here",
+    "language": "English"
+  }
+  ```
+- **Returns**: Base64-encoded audio payload for audio playback.
 
-### Health Check
-- **GET** `/health` - Returns health status
+### Web Interface
+- **GET** `/` - Serves the Indic-styled client application interface.
 
 ## Local Development
 
