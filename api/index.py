@@ -1385,6 +1385,7 @@ async def root():
                     <button class="tab-btn" onclick="switchTab('charmap')">🗺️ Character Map</button>
                     <button class="tab-btn" onclick="switchTab('quotemaker')">🎨 Quote Creator</button>
                     <button class="tab-btn" onclick="switchTab('downloads')">📚 E-Books</button>
+                    <button class="tab-btn" onclick="switchTab('feedback')">✍️ Feedback</button>
                 </div>
 
                 <!-- SECTION 1: AI CHAT GUIDE -->
@@ -1540,33 +1541,76 @@ async def root():
                                 <button class="char-tab-btn active" id="btn-char-en" onclick="setCharLang('en')">English</button>
                                 <button class="char-tab-btn" id="btn-char-kn" onclick="setCharLang('kn')">ಕನ್ನಡ</button>
                             </div>
-                            <h3 id="char-name">Character Name <span class="badge" id="char-badge">Protagonist</span></h3>
-                            <div class="meta-title">Role / ಪಾತ್ರ</div>
-                            <div class="desc" id="char-desc">Select a character in the network map above to view details.</div>
-                            <div class="meta-title">Page Occurrences / ಕಾಣಿಸಿಕೊಳ್ಳುವ ಪುಟಗಳು</div>
-                            <div class="desc" id="char-pages" style="font-weight:700; color:var(--primary);">Pages ...</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECTION 3: INSTAGRAM QUOTE CREATOR -->
-                <div id="section-quotemaker" class="tab-section">
-                    <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.6rem; font-weight: 700;">🎨 ಇನ್‌ಸ್ಟಾಗ್ರಾಮ್ ಕೋಟ್ ಮೇಕರ್ / Quote Creator</h2>
-                    <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.8rem; line-height: 1.5;">
-                        Create beautiful, custom-styled quote cards from the novel. Download and share on your Instagram story to support the author!
-                    </p>
-                    <div class="quote-creator-box">
+                            <h3 id="char-name">Character Name <span class="badge" id="char-badge">Protagonist</span><                    <div class="quote-creator-box">
                         <canvas id="quote-canvas" width="600" height="600" style="width: 100%; max-width: 380px; border-radius: 16px; border: 1px solid rgba(194, 65, 12, 0.15); display: block; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06);"></canvas>
                         
                         <div class="creator-controls">
+                            <!-- Language Toggle -->
                             <div class="control-group">
-                                <label>1. Pick a Famous Quote / ಕೋಟ್ ಆಯ್ಕೆ ಮಾಡಿ</label>
-                                <select id="quote-presets" onchange="applyQuotePreset(this.value)">
+                                <label>1. Choose Quote Language / ಭಾಷೆ ಆಯ್ಕೆ ಮಾಡಿ</label>
+                                <div style="display: flex; gap: 8px; margin-top: 6px;">
+                                    <button id="ql-btn-kn" class="char-tab-btn active" onclick="setQuoteLang('kn')" style="flex:1;">🇮🇳 ಕನ್ನಡ</button>
+                                    <button id="ql-btn-en" class="char-tab-btn" onclick="setQuoteLang('en')" style="flex:1;">🇬🇧 English</button>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label>2. Pick a Famous Quote / ಕೋಟ್ ಆಯ್ಕೆ ಮಾಡಿ</label>
+                                <!-- Kannada Quotes -->
+                                <select id="quote-presets-kn" onchange="applyQuotePreset(this.value)">
                                     <option value="">-- Custom Quote / ನಿಮ್ಮದೇ ಆದ ವಾಕ್ಯ --</option>
-                                    <option value="ಪ್ರೀತಿ ಎಂದರೆ ಕೇವಲ ಮುಖ ನೋಡುವುದಲ್ಲ, ಪರಸ್ಪರ ಮೌನವನ್ನು ಅರ್ಥ ಮಾಡಿಕೊಳ್ಳುವುದು.">ಪ್ರೀತಿ ಎಂದರೆ ಮೌನವನ್ನು ಅರ್ಥ ಮಾಡಿಕೊಳ್ಳುವುದು (Love & Silence)</option>
-                                    <option value="ಜೀವನದಲ್ಲಿ ಕೆಲವೊಮ್ಮೆ ಉತ್ತರಗಳಿಗಿಂತ ಪ್ರಶ್ನೆಗಳೇ ಹೆಚ್ಚು ಸುಂದರವಾಗಿರುತ್ತವೆ.">ಉತ್ತರಗಳಿಗಿಂತ ಪ್ರಶ್ನೆಗಳೇ ಸುಂದರ (Beautiful Questions)</option>
-                                    <option value="ಹೇಳಿ ಹೋಗು ಕಾರಣ... ಯಾಕೆಂದರೆ ನಿನಗಾಗಿ ಕಾಯುವ ಹೃದಯ ಇಲ್ಲಿದೆ.">ಹೇಳಿ ಹೋಗು ಕಾರಣ... (Heli Hogu Karana Theme)</option>
-                                    <option value="ಮೌನಕ್ಕೂ ಒಂದು ಭಾಷೆಯಿದೆ, ಅದನ್ನ ಆಲಿಸಲು ಒಂದು ವಿಶೇಷವಾದ ಪ್ರೇಮ ಬೇಕು.">ಮೌನಕ್ಕೂ ಒಂದು ಭಾಷೆಯಿದೆ (Language of Silence)</option>
+                                    <option value="ಹೇಳಿ ಹೋಗು ಕಾರಣ... ಯಾಕೆಂದರೆ ನಿನಗಾಗಿ ಕಾಯುವ ಹೃದಯ ಇಲ್ಲಿದೆ.">ಹೇಳಿ ಹೋಗು ಕಾರಣ (ಮೂಲ ಥೀಮ್)</option>
+                                    <option value="ಪ್ರೀತಿ ಎಂದರೆ ಕೇವಲ ಮುಖ ನೋಡುವುದಲ್ಲ, ಪರಸ್ಪರ ಮೌನವನ್ನು ಅರ್ಥ ಮಾಡಿಕೊಳ್ಳುವುದು.">ಪ್ರೀತಿ ಮತ್ತು ಮೌನ</option>
+                                    <option value="ಜೀವನದಲ್ಲಿ ಕೆಲವೊಮ್ಮೆ ಉತ್ತರಗಳಿಗಿಂತ ಪ್ರಶ್ನೆಗಳೇ ಹೆಚ್ಚು ಸುಂದರವಾಗಿರುತ್ತವೆ.">ಸುಂದರ ಪ್ರಶ್ನೆಗಳು</option>
+                                    <option value="ಮೌನಕ್ಕೂ ಒಂದು ಭಾಷೆಯಿದೆ, ಅದನ್ನ ಆಲಿಸಲು ಒಂದು ವಿಶೇಷವಾದ ಪ್ರೇಮ ಬೇಕು.">ಮೌನದ ಭಾಷೆ</option>
+                                    <option value="ನಾವು ಪ್ರೀತಿಸುವವರ ಕೊರತೆಗಿಂತ, ನಮ್ಮನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವವರ ಕೊರತೆಯೇ ಹೆಚ್ಚು ನೋವು ಕೊಡುತ್ತದೆ.">ಅರ್ಥ ಮಾಡಿಕೊಳ್ಳುವಿಕೆ</option>
+                                    <option value="ನೆನಪುಗಳು ಕಳೆದುಹೋದ ನಂತರವೂ ಉಳಿಯುತ್ತವೆ, ಅದೇ ಪ್ರೇಮದ ಶಕ್ತಿ.">ನೆನಪಿನ ಶಕ್ತಿ</option>
+                                    <option value="ಕಣ್ಣೀರು ಯಾವಾಗಲೂ ದೌರ್ಬಲ್ಯದ ಗುರುತಲ್ಲ, ಕೆಲವೊಮ್ಮೆ ಅದು ಧೈರ್ಯದ ಅಭಿವ್ಯಕ್ತಿ.">ಕಣ್ಣೀರು ಮತ್ತು ಧೈರ್ಯ</option>
+                                    <option value="ದೂರವಿದ್ದರೂ ಹೃದಯ ಹತ್ತಿರದಲ್ಲಿಯೇ ಇರುತ್ತದೆ.">ದೂರ ಮತ್ತು ಹತ್ತಿರ</option>
+                                    <option value="ಬದುಕು ಒಂದು ಸಂಗೀತ; ಕೆಲವೊಮ್ಮೆ ನೋವೇ ಅದರ ಅತ್ಯಂತ ಸುಂದರ ರಾಗ.">ಬದುಕಿನ ಸಂಗೀತ</option>
+                                    <option value="ಹಿಮವಂತ ಮಾಡಿದ ತಪ್ಪುಗಳು ಅವನನ್ನು ನಾಶ ಮಾಡಲಿಲ್ಲ, ಅವನನ್ನು ರೂಪಿಸಿದವು.">ತಪ್ಪುಗಳು ರೂಪಿಸುತ್ತವೆ</option>
+                                    <option value="ಪ್ರೀತಿಯಲ್ಲಿ ಸೋಲು ಇಲ್ಲ, ಇರುವುದು ಕೇವಲ ಪಾಠಗಳು.">ಪ್ರೀತಿಯ ಪಾಠ</option>
+                                </select>
+                                <!-- English Quotes -->
+                                <select id="quote-presets-en" onchange="applyQuotePreset(this.value)" style="display:none;">
+                                    <option value="">-- Custom Quote --</option>
+                                    <option value="Tell me before you leave... because there's a heart here waiting for you.">Tell me before you leave... (Heli Hogu Karana Theme)</option>
+                                    <option value="Love is not just seeing each other's face — it is understanding each other's silence.">Love &amp; Silence</option>
+                                    <option value="Sometimes in life, questions are more beautiful than the answers.">Beautiful Questions</option>
+                                    <option value="Even silence has a language — you need a very special kind of love to hear it.">Language of Silence</option>
+                                    <option value="It hurts more to not be understood than to not be loved.">Being Understood</option>
+                                    <option value="Memories outlast their moments. That is the power of love.">Power of Memory</option>
+                                    <option value="Tears are not always a sign of weakness — sometimes they are the bravest thing you can feel.">Tears &amp; Courage</option>
+                                    <option value="Even when you are far away, the heart stays close.">Distance &amp; Closeness</option>
+                                    <option value="Life is music; sometimes pain is its most beautiful note.">Life's Music</option>
+                                    <option value="Himavant's mistakes didn't destroy him — they defined him.">Defined by Mistakes</option>
+                                    <option value="In love, there is no defeat — only lessons.">Lessons of Love</option>
+                                    <option value="The saddest goodbyes are the ones that were never said.">Unsaid Goodbyes</option>
+                                </select>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label>3. Customize Quote Text / ವಾಕ್ಯವನ್ನು ಬದಲಿಸಿ</label>
+                                <textarea id="quote-text" rows="3" oninput="drawQuoteCard()" placeholder="Type your custom quote here..."></textarea>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label>4. Select Style Theme / ಶೈಲಿ ಆಯ್ಕೆ</label>
+                                <select id="quote-style" onchange="drawQuoteCard()">
+                                    <option value="saffron">Saffron Gold / ಕೇಸರಿ ಚಿನ್ನ</option>
+                                    <option value="vintage">Terracotta Vintage / ವಿಂಟೇಜ್ ಮಣ್ಣು</option>
+                                    <option value="midnight">Midnight Shadow / ಕತ್ತಲೆಯ ನೆರಳು</option>
+                                    <option value="rose">Rose Blush / ಗುಲಾಬಿ ಬಣ್ಣ</option>
+                                    <option value="forest">Forest Night / ಅರಣ್ಯದ ರಾತ್ರಿ</option>
+                                </select>
+                            </div>
+                            
+                            <button onclick="downloadQuoteCard()" class="main-btn" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <span>📥 Save Quote Card to Device</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>    <option value="ಮೌನಕ್ಕೂ ಒಂದು ಭಾಷೆಯಿದೆ, ಅದನ್ನ ಆಲಿಸಲು ಒಂದು ವಿಶೇಷವಾದ ಪ್ರೇಮ ಬೇಕು.">ಮೌನಕ್ಕೂ ಒಂದು ಭಾಷೆಯಿದೆ (Language of Silence)</option>
                                     <option value="ನಾವು ಪ್ರೀತಿಸುವವರ ಕೊರತೆಗಿಂತ, ನಮ್ಮನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವವರ ಕೊರತೆಯೇ ಹೆಚ್ಚು ನೋವು ಕೊಡುತ್ತದೆ.">ನಮ್ಮನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವವರ ಕೊರತೆ (Being Understood)</option>
                                 </select>
                             </div>
@@ -1634,50 +1678,43 @@ async def root():
                         </div>
                     </div>
                 </div>
+
+                <!-- SECTION 5: FEEDBACK -->
+                <div id="section-feedback" class="tab-section">
+                    <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.6rem; font-weight: 700;">✍️ ನಿಮ್ಮ ಅನಿಸಿಕೆ ತಿಳಿಸಿ / Share Your Feedback</h2>
+                    <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+                        Have suggestions or feedback about this bilingual RAG assistant? Share your experience below!
+                    </p>
+
+                    <form id="feedback-form" onsubmit="submitFeedback(event)" style="max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2rem;">
+                        <div style="text-align: left;">
+                            <label for="fb-name" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Your Name / ನಿಮ್ಮ ಹೆಸರು</label>
+                            <input type="text" id="fb-name" placeholder="Enter your name" required style="width: 100%; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-family: inherit; font-size: 0.95rem; outline: none; box-sizing: border-box; background: var(--bg-secondary);">
+                        </div>
+                        
+                        <div style="text-align: left;">
+                            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px; text-align: center;">Rating / ರೇಟಿಂಗ್</label>
+                            <div class="star-rating" style="display: flex; gap: 8px; justify-content: center; font-size: 2.2rem; color: #cbd5e1; cursor: pointer;">
+                                <span class="star" onclick="setRating(1)" onmouseover="highlightStars(1)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
+                                <span class="star" onclick="setRating(2)" onmouseover="highlightStars(2)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
+                                <span class="star" onclick="setRating(3)" onmouseover="highlightStars(3)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
+                                <span class="star" onclick="setRating(4)" onmouseover="highlightStars(4)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
+                                <span class="star" onclick="setRating(5)" onmouseover="highlightStars(5)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
+                            </div>
+                            <input type="hidden" id="fb-rating" value="5">
+                        </div>
+                        
+                        <div style="text-align: left;">
+                            <label for="fb-comment" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Comment / ಅನಿಸಿಕೆ</label>
+                            <textarea id="fb-comment" placeholder="Write your feedback here..." required style="width: 100%; height: 100px; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-family: inherit; font-size: 0.95rem; outline: none; box-sizing: border-box; resize: vertical; background: var(--bg-secondary);"></textarea>
+                        </div>
+                        
+                        <button type="submit" id="fb-submit-btn" style="width: 100%; background: var(--primary); color: white; padding: 12px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s; outline: none; box-shadow: 0 4px 12px rgba(194, 65, 12, 0.25);">Submit Feedback / ಅನಿಸಿಕೆ ಕಳುಹಿಸಿ</button>
+                        <div id="fb-success-msg" style="color: #10b981; font-weight: 700; text-align: center; display: none; margin-top: 10px; font-size: 0.95rem;">✅ Thank you! Your feedback has been submitted. / ಧನ್ಯವಾದ!</div>
+                    </form>
+                </div>
             </div>
         </div>
-
-        <!-- FEEDBACK SECTION -->
-        <div class="container fade-in" style="animation-delay: 0.4s; margin-top: 2rem; margin-bottom: 4rem;">
-            <div class="card" style="padding: 2.5rem; border: 1px solid rgba(194, 65, 12, 0.1); position: relative;">
-                <!-- MEHRAB / ARCH SILHOUETTE CARD TOP OVERLAY -->
-                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 35px; z-index: 2; pointer-events: none; overflow: hidden; margin-top: -1px;">
-                    <svg viewBox="0 0 100 20" preserveAspectRatio="none" style="width: 100%; height: 100%; fill: var(--bg-secondary);">
-                        <path d="M0,0 L100,0 L100,20 C85,20 75,5 65,5 C58,5 55,2 50,0 C45,2 42,5 35,5 C25,5 15,20 0,20 Z" />
-                    </svg>
-                </div>
-                
-                <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.8rem; font-weight: 700;">✍️ ನಿಮ್ಮ ಅನಿಸಿಕೆ ತಿಳಿಸಿ / Share Your Feedback</h2>
-                <p style="text-align: center; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
-                    Have suggestions or feedback about this bilingual RAG assistant? Share your experience below!
-                </p>
-
-                <form id="feedback-form" onsubmit="submitFeedback(event)" style="max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2rem;">
-                    <div style="text-align: left;">
-                        <label for="fb-name" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Your Name / ನಿಮ್ಮ ಹೆಸರು</label>
-                        <input type="text" id="fb-name" placeholder="Enter your name" required style="width: 100%; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-family: inherit; font-size: 0.95rem; outline: none; box-sizing: border-box; background: var(--bg-secondary);">
-                    </div>
-                    
-                    <div style="text-align: left;">
-                        <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px; text-align: center;">Rating / ರೇಟಿಂಗ್</label>
-                        <div class="star-rating" style="display: flex; gap: 8px; justify-content: center; font-size: 2.2rem; color: #cbd5e1; cursor: pointer;">
-                            <span class="star" onclick="setRating(1)" onmouseover="highlightStars(1)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
-                            <span class="star" onclick="setRating(2)" onmouseover="highlightStars(2)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
-                            <span class="star" onclick="setRating(3)" onmouseover="highlightStars(3)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
-                            <span class="star" onclick="setRating(4)" onmouseover="highlightStars(4)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
-                            <span class="star" onclick="setRating(5)" onmouseover="highlightStars(5)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
-                        </div>
-                        <input type="hidden" id="fb-rating" value="5">
-                    </div>
-                    
-                    <div style="text-align: left;">
-                        <label for="fb-comment" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Comment / ಅನಿಸಿಕೆ</label>
-                        <textarea id="fb-comment" placeholder="Write your feedback here..." required style="width: 100%; height: 100px; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-family: inherit; font-size: 0.95rem; outline: none; box-sizing: border-box; resize: vertical; background: var(--bg-secondary);"></textarea>
-                    </div>
-                    
-                    <button type="submit" id="fb-submit-btn" style="width: 100%; background: var(--primary); color: white; padding: 12px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s; outline: none; box-shadow: 0 4px 12px rgba(194, 65, 12, 0.25);">Submit Feedback</button>
-                    <div id="fb-success-msg" style="color: #10b981; font-weight: 700; text-align: center; display: none; margin-top: 10px; font-size: 0.95rem;">Thank you! Your feedback has been submitted successfully.</div>
-                </form>
             </div>
         </div>
 
@@ -1854,6 +1891,19 @@ async def root():
             }
 
             // --- INSTAGRAM QUOTE CREATOR LOGIC ---
+            let activeQuoteLang = 'kn';
+
+            function setQuoteLang(lang) {
+                activeQuoteLang = lang;
+                document.getElementById('ql-btn-kn').classList.toggle('active', lang === 'kn');
+                document.getElementById('ql-btn-en').classList.toggle('active', lang === 'en');
+                document.getElementById('quote-presets-kn').style.display = lang === 'kn' ? '' : 'none';
+                document.getElementById('quote-presets-en').style.display = lang === 'en' ? '' : 'none';
+                // Reset both selects
+                document.getElementById('quote-presets-kn').value = '';
+                document.getElementById('quote-presets-en').value = '';
+            }
+
             function applyQuotePreset(quote) {
                 if (!quote) return;
                 document.getElementById('quote-text').value = quote;
@@ -1925,14 +1975,32 @@ async def root():
                     ctx.fillRect(555, 555, 10, 10);
                     
                     ctx.fillStyle = '#0f172a';
+                } else if (style === 'rose') {
+                    let grad = ctx.createLinearGradient(0, 0, 600, 600);
+                    grad.addColorStop(0, '#fce7f3');
+                    grad.addColorStop(1, '#fbcfe8');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, 600, 600);
+                    ctx.strokeStyle = '#db2777';
+                    ctx.lineWidth = 8;
+                    ctx.strokeRect(20, 20, 560, 560);
+                    ctx.fillStyle = '#831843';
+                } else if (style === 'forest') {
+                    let grad = ctx.createLinearGradient(0, 0, 0, 600);
+                    grad.addColorStop(0, '#052e16');
+                    grad.addColorStop(1, '#14532d');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, 600, 600);
+                    ctx.strokeStyle = '#4ade80';
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(20, 20, 560, 560);
+                    ctx.fillStyle = '#dcfce7';
                 } else {
                     ctx.fillStyle = '#0f172a';
                     ctx.fillRect(0, 0, 600, 600);
-                    
                     ctx.strokeStyle = '#ea580c';
                     ctx.lineWidth = 4;
                     ctx.strokeRect(25, 25, 550, 550);
-                    
                     ctx.fillStyle = '#f8fafc';
                 }
                 
