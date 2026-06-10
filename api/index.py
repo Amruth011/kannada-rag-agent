@@ -680,6 +680,48 @@ async def root():
             }
             @keyframes spin { to { transform: rotate(360deg); } }
             
+            /* LOTUS MANDALA CONCENTRIC ANIMATIONS */
+            .lotus-container {
+                display: none;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+                margin: 2rem 0;
+            }
+            .lotus-svg {
+                animation: slow-rotate 40s linear infinite;
+            }
+            .pulsing-ring {
+                transform-origin: center center;
+                animation: ring-pulse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            }
+            .ring-1 { animation-delay: 0s; }
+            .ring-2 { animation-delay: 1s; }
+            .ring-3 { animation-delay: 2s; }
+            
+            @keyframes ring-pulse {
+                0% {
+                    transform: scale(0.5);
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 0.8;
+                }
+                100% {
+                    transform: scale(1.3);
+                    opacity: 0;
+                }
+            }
+            .lotus-petals {
+                animation: gentle-beat 4s ease-in-out infinite alternate;
+                transform-origin: center center;
+            }
+            @keyframes gentle-beat {
+                from { transform: scale(0.95); }
+                to { transform: scale(1.05); }
+            }
+            
             /* ANSWERS & CITATIONS */
             #ans-container {
                 margin-top: 2.2rem;
@@ -845,7 +887,34 @@ async def root():
                 <input type="text" id="q" placeholder="What would you like to know?" required autoComplete="off">
                 <button id="btn" class="main-btn" onclick="ask()">Analyze the Book</button>
                 
-                <div id="loading" style="display:none;"><div class="loader"></div> Thinking...</div>
+                <div id="loading" class="lotus-container" style="display:none;">
+                    <svg viewBox="0 0 100 100" class="lotus-svg" style="width: 80px; height: 80px;">
+                        <circle cx="50" cy="50" r="10" fill="none" stroke="var(--primary)" stroke-width="1.2" class="pulsing-ring ring-1" />
+                        <circle cx="50" cy="50" r="25" fill="none" stroke="var(--primary)" stroke-width="0.9" class="pulsing-ring ring-2" />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--primary)" stroke-width="0.6" class="pulsing-ring ring-3" />
+                        <circle cx="50" cy="50" r="5" fill="var(--primary)" />
+                        <g class="lotus-petals" fill="var(--primary)" opacity="0.9">
+                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" />
+                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(45 50 50)" />
+                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(90 50 50)" />
+                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(135 50 50)" />
+                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(180 50 50)" />
+                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(225 50 50)" />
+                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(270 50 50)" />
+                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(315 50 50)" />
+                            
+                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(22.5 50 50)" />
+                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(67.5 50 50)" />
+                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(112.5 50 50)" />
+                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(157.5 50 50)" />
+                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(202.5 50 50)" />
+                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(247.5 50 50)" />
+                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(292.5 50 50)" />
+                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(337.5 50 50)" />
+                        </g>
+                    </svg>
+                    <div style="font-weight: 700; color: var(--primary); font-family: var(--font-serif); letter-spacing: 0.5px;">ಕಾದಂಬರಿ ವಿಶ್ಲೇಷಣೆ ಮಾಡಲಾಗುತ್ತಿದೆ...</div>
+                </div>
                 
                 <div id="ans-container">
                     <div id="ans">
