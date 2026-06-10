@@ -100,14 +100,14 @@ def translate_page_groq(page_num, text, model_name="auto"):
                     "model": model,
                     "messages": messages,
                     "temperature": 0.3,
-                    "max_tokens": 2048
+                    "max_tokens": 1000
                 }
                 resp = requests.post(url, headers=headers, json=payload, timeout=30)
                 if resp.status_code == 200:
                     return resp.json()["choices"][0]["message"]["content"].strip()
-                elif resp.status_code == 429:
+                elif resp.status_code in [429, 413] or "rate_limit_exceeded" in resp.text:
                     # Parse retry delay
-                    retry_after = 20.0 # Default delay
+                    retry_after = 30.0 # Default delay
                     try:
                         if "retry-after" in resp.headers:
                             retry_after = float(resp.headers["retry-after"])
@@ -117,12 +117,15 @@ def translate_page_groq(page_num, text, model_name="auto"):
                             match = re.search(r"retry in ([\d\.]+)s", err_msg, re.IGNORECASE)
                             if match:
                                 retry_after = float(match.group(1)) + 1.0
+                            elif "limit" in err_msg.lower():
+                                retry_after = 30.0
                     except Exception:
                         pass
-                    print(f"[RATE-LIMIT]: Groq 429 rate limit hit on {model} (Attempt {attempt+1}/4). Retrying in {retry_after:.1f} seconds...")
+                    print(f"[RATE-LIMIT]: Groq rate limit hit on {model} (Attempt {attempt+1}/4). Retrying in {retry_after:.1f} seconds...")
                     time.sleep(retry_after)
                     continue
                 else:
+                    print(f"[WARNING]: Model {model} failed (Attempt {attempt+1}/4) with HTTP {resp.status_code}: {resp.text[:200]}")
                     last_err = f"HTTP {resp.status_code}: {resp.text}"
                     break # Break retry loop to try next model or raise error
             except Exception as e:
@@ -200,8 +203,8 @@ def main():
     # Force standard output to UTF-8 on Windows
     if sys.platform == "win32":
         import io
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', line_buffering=True)
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', line_buffering=True)
 
     if not os.path.exists(INPUT_DIR):
         print(f"[ERROR]: Input directory {INPUT_DIR} does not exist. Please check your data ingestion pipeline.")
