@@ -447,32 +447,69 @@ async def save_feedback(request: FeedbackRequest):
         # Log to stdout for real-time Vercel logs
         print(f"[FEEDBACK SUBMISSION] Name: {feedback_data['name']} | Rating: {feedback_data['rating']} stars | Comment: {feedback_data['comment']}")
         
-        # Load existing feedback or create new
+        # Load existing feedback from bundled path
+        bundled_feedbacks = []
         feedback_dir = os.path.join(os.path.dirname(__file__), "data")
         if not os.path.exists(feedback_dir):
             feedback_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
             if not os.path.exists(feedback_dir):
                 feedback_dir = "data"
-                
         feedback_file = os.path.join(feedback_dir, "feedback.json")
-        os.makedirs(feedback_dir, exist_ok=True)
         
-        feedbacks = []
         if os.path.exists(feedback_file):
             try:
                 with open(feedback_file, "r", encoding="utf-8") as f:
-                    feedbacks = json.load(f)
+                    bundled_feedbacks = json.load(f)
             except Exception:
-                feedbacks = []
-                
-        feedbacks.append(feedback_data)
+                pass
+
+        # Load existing feedback from /tmp for Vercel persistence
+        tmp_feedback_file = "/tmp/feedback.json"
+        tmp_feedbacks = []
+        if os.path.exists(tmp_feedback_file):
+            try:
+                with open(tmp_feedback_file, "r", encoding="utf-8") as f:
+                    tmp_feedbacks = json.load(f)
+            except Exception:
+                pass
+
+        # Combine feedback to prevent loss of local or remote inputs
+        seen = set()
+        feedbacks = []
+        def get_fb_key(fb):
+            return (fb.get("name", ""), fb.get("rating", 0), fb.get("comment", ""), fb.get("timestamp", ""))
+
+        for fb in bundled_feedbacks + tmp_feedbacks:
+            key = get_fb_key(fb)
+            if key not in seen:
+                seen.add(key)
+                feedbacks.append(fb)
+
+        # Append new feedback
+        new_key = get_fb_key(feedback_data)
+        if new_key not in seen:
+            feedbacks.append(feedback_data)
         
+        # Try to write to bundled directory (local testing environments)
+        write_success = False
         try:
+            os.makedirs(feedback_dir, exist_ok=True)
             with open(feedback_file, "w", encoding="utf-8") as f:
                 json.dump(feedbacks, f, indent=2, ensure_ascii=False)
+            write_success = True
         except Exception as file_err:
-            print(f"[WARNING]: Could not write feedback to disk (expected in serverless): {file_err}")
+            print(f"[WARNING]: Could not write feedback to bundled data folder: {file_err}")
             
+        # Fallback to write to /tmp on serverless environments
+        if not write_success:
+            try:
+                with open(tmp_feedback_file, "w", encoding="utf-8") as f:
+                    json.dump(feedbacks, f, indent=2, ensure_ascii=False)
+                print("[INFO]: Successfully wrote feedback to /tmp/feedback.json")
+            except Exception as tmp_err:
+                print(f"[ERROR]: Could not write feedback to /tmp fallback: {tmp_err}")
+                return {"status": "error", "message": f"Could not write feedback to /tmp: {tmp_err}"}
+                
         return {"status": "success", "message": "Feedback submitted successfully!"}
     except Exception as e:
         print(f"[ERROR]: Feedback submission failed: {e}")
@@ -508,7 +545,7 @@ async def admin_feedback(password: Optional[str] = None):
             """
         )
         
-    # Read feedback from file
+    # Read feedback from bundled data
     feedback_dir = os.path.join(os.path.dirname(__file__), "data")
     if not os.path.exists(feedback_dir):
         feedback_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
@@ -517,13 +554,35 @@ async def admin_feedback(password: Optional[str] = None):
             
     feedback_file = os.path.join(feedback_dir, "feedback.json")
     
-    feedbacks = []
+    bundled_feedbacks = []
     if os.path.exists(feedback_file):
         try:
             with open(feedback_file, "r", encoding="utf-8") as f:
-                feedbacks = json.load(f)
+                bundled_feedbacks = json.load(f)
         except Exception:
             pass
+
+    # Read feedback from /tmp for Vercel persistence
+    tmp_feedback_file = "/tmp/feedback.json"
+    tmp_feedbacks = []
+    if os.path.exists(tmp_feedback_file):
+        try:
+            with open(tmp_feedback_file, "r", encoding="utf-8") as f:
+                tmp_feedbacks = json.load(f)
+        except Exception:
+            pass
+
+    # Combine feeds to avoid duplication
+    seen = set()
+    feedbacks = []
+    def get_fb_key(fb):
+        return (fb.get("name", ""), fb.get("rating", 0), fb.get("comment", ""), fb.get("timestamp", ""))
+
+    for fb in bundled_feedbacks + tmp_feedbacks:
+        key = get_fb_key(fb)
+        if key not in seen:
+            seen.add(key)
+            feedbacks.append(fb)
             
     # Sort feedbacks by timestamp descending
     try:
