@@ -64,7 +64,7 @@ def is_character_question(q):
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="ಹೇಳಿ ಹೋಗು ಕಾರಣ — AI Agent v2",
-    page_icon="📚",
+    page_icon="favicon.png",
     layout="wide",
     initial_sidebar_state="expanded"
 )

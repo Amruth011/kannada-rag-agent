@@ -142,6 +142,8 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 <div align="center">
 
 ![RAG](https://img.shields.io/badge/RAG_Pipelines-000000?style=for-the-badge)
+![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)
+![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97_Hugging_Face-FFD21E?style=for-the-badge&logoColor=black)
 ![LLM](https://img.shields.io/badge/LLM_Integration-7c3aed?style=for-the-badge)
 ![OCR](https://img.shields.io/badge/OCR_Pipeline-0891b2?style=for-the-badge)
 ![NLP](https://img.shields.io/badge/Indic_NLP-10b981?style=for-the-badge)
@@ -276,6 +278,8 @@ This project is deployed across two environments with customized retrieval mecha
 | 👁️ OCR | Text extraction | Surya OCR (Kannada + English) |
 | 🧠 Primary Brain | Large Language Model | **Gemini 1.5 Flash (via Official Google SDK)** |
 | 🧠 Secondary Brain | Multilingual LLM | **Groq Llama 3.3 Versatile (Safety Net)** |
+| 🦜 Orchestration | Agent & LCEL Chain | **LangChain (Tools, ReAct Agent, Custom Fallback Model)** |
+| 🤗 Embeddings | Multilingual Vectorization | **Hugging Face (`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`)** |
 | 🗄️ Vector DB | Semantic search | ChromaDB (cosine similarity) |
 | 🤖 Routing | Stability Architecture | **Auto-Discovery + Rate Limit Armor** |
 | 🔊 TTS | Audio synthesis | Sarvam bulbul:v3 · priya speaker |
@@ -436,6 +440,8 @@ A complete, production-deployed AI system — built from scratch with no starter
 |:--|:--------|:---------|
 | 🤖 | [Sarvam AI](https://sarvam.ai) | Indic LLM (Sarvam-M) + TTS (bulbul:v3) |
 | 👁️ | [Surya OCR](https://github.com/vikpar/surya) | Kannada + English OCR |
+| 🦜 | [LangChain](https://github.com/langchain-ai/langchain) | Agent & RAG orchestration, custom ChatModel fallback |
+| 🤗 | [Hugging Face](https://huggingface.co/) | Multilingual embeddings (`sentence-transformers` & Feature Extraction API) |
 | 🗄️ | [ChromaDB](https://www.trychroma.com/) | Vector database |
 | 🔤 | [indic-nlp-library](https://github.com/anoopkunchukuttan/indic_nlp_library) | Kannada Unicode normalization |
 | 🧠 | [sentence-transformers](https://www.sbert.net/) | Multilingual embeddings |

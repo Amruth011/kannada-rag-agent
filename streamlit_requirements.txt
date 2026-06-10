@@ -13,3 +13,9 @@ opencv-python
 surya-ocr
 indic-nlp-library
 wave
+langchain
+langchain-core
+langchain-community
+langchain-groq
+langchain-huggingface
+
