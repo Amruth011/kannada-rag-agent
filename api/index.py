@@ -313,7 +313,7 @@ def call_sarvam_tts(text, language="kn-IN"):
 async def chat(request: ChatRequest):
     try:
         # Use globally loaded BOOK_DATA
-        chunks = search_text(request.question, BOOK_DATA, top_k=1) # Reduced to 1 for Groq free-tier stability
+        chunks = search_text(request.question, BOOK_DATA, top_k=4) 
         retrieved_pages = [str(c['page']) for c in chunks]
         
         # Implement safe character capping (approx 5,000 chars for Groq)
@@ -338,8 +338,7 @@ BOOK INFORMATION:
 RETRIEVED PASSAGES:
 {pagetext}
 
-Answer using the information above. Be informative and cite page numbers when using passages.
-If passages say "Not found in document", tell the user clearly.
+Answer the question in detail using the information above. Be highly informative, provide thorough explanations, explore context from the passages, and cite page numbers when using passages. Do not give short or brief summaries.
 
 QUESTION: {request.question}
 ANSWER in English:"""
@@ -352,7 +351,7 @@ ANSWER in English:"""
 ಪುಸ್ತಕದಿಂದ ತೆಗೆದ ವಿಷಯ:
 {pagetext}
 
-ಕನ್ನಡದಲ್ಲಿ ಮಾತ್ರ ಉತ್ತರಿಸಿ.
+ಮೇಲಿನ ಮಾಹಿತಿಯನ್ನು ಬಳಸಿಕೊಂಡು ಪ್ರಶ್ನೆಗೆ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ. ಸಮಗ್ರವಾದ ಮತ್ತು ಆಳವಾದ ವಿವರಣೆಯನ್ನು ನೀಡಿ, ಕಾದಂಬರಿಯ ಸಂದರ್ಭಗಳನ್ನು ವಿವರಿಸಿ ಮತ್ತು ಸೂಕ್ತ ಪುಟಗಳ ಸಂಖ್ಯೆಯನ್ನು ಕಡ್ಡಾಯವಾಗಿ ನಮೂದಿಸಿ. ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ಸಂಕ್ಷಿಪ್ತ ಅಥವಾ ಸಣ್ಣ ಉತ್ತರಗಳನ್ನು ನೀಡಬೇಡಿ.
 
 ಪ್ರಶ್ನೆ: {request.question}
 ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ:"""
