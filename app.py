@@ -62,9 +62,18 @@ def is_character_question(q):
 
 
 # ── Page config ───────────────────────────────────────────────────────────────
+from PIL import Image
+favicon_img = "📚"
+try:
+    favicon_path = os.path.join(BASE_DIR, "favicon.png")
+    if os.path.exists(favicon_path):
+        favicon_img = Image.open(favicon_path)
+except Exception:
+    pass
+
 st.set_page_config(
     page_title="ಹೇಳಿ ಹೋಗು ಕಾರಣ — AI Agent v2",
-    page_icon="favicon.png",
+    page_icon=favicon_img,
     layout="wide",
     initial_sidebar_state="expanded"
 )
