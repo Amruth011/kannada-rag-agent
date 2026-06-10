@@ -786,19 +786,35 @@ async def root():
             }
             .nav-menu {
                 display: flex;
-                gap: 1.5rem;
+                flex-wrap: wrap;
+                gap: 0.3rem;
+                align-items: center;
             }
             .nav-item {
-                font-size: 0.8rem;
+                font-size: 0.72rem;
                 font-weight: 700;
                 color: var(--text-muted);
                 cursor: pointer;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                transition: color 0.2s;
+                letter-spacing: 0.3px;
+                transition: all 0.25s;
+                padding: 0.35rem 0.6rem;
+                border-radius: 8px;
+                border: none;
+                background: none;
+                font-family: inherit;
+                white-space: nowrap;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
             }
-            .nav-item:hover, .nav-item.active {
+            .nav-item:hover {
                 color: var(--primary);
+                background: rgba(194, 65, 12, 0.06);
+            }
+            .nav-item.active {
+                color: #fff;
+                background: var(--primary);
+                border-radius: 20px;
             }
             
             /* HERO SECTION */
@@ -1112,10 +1128,9 @@ async def root():
             /* TABS NAVIGATION */
             .tabs-nav {
                 display: flex;
-                flex-wrap: wrap;
                 border-bottom: 2px solid rgba(194, 65, 12, 0.08);
                 margin-bottom: 2.2rem;
-                gap: 0.4rem;
+                gap: 0.2rem;
                 padding-bottom: 0.5rem;
                 justify-content: center;
             }
@@ -1123,18 +1138,18 @@ async def root():
                 background: none;
                 border: none;
                 font-family: inherit;
-                font-size: 0.85rem;
+                font-size: 0.78rem;
                 font-weight: 700;
                 color: var(--text-muted);
                 border-bottom: 3px solid transparent;
-                padding: 0.5rem 0.9rem;
+                padding: 0.45rem 0.6rem;
                 cursor: pointer;
                 outline: none;
                 transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
                 white-space: nowrap;
                 display: inline-flex;
                 align-items: center;
-                gap: 5px;
+                gap: 4px;
                 border-radius: 8px 8px 0 0;
             }
             .tab-btn:hover {
@@ -1356,9 +1371,12 @@ async def root():
                 <div class="logo">
                     <span class="logo-title">ಹೇಳಿ ಹೋಗು</span><span class="logo-sub">  ಕಾರಣ</span>
                 </div>
-                <nav class="nav-menu">
-                    <span class="nav-item">ಕಾದಂಬರಿ</span>
-                    <span class="nav-item active">AI Guide</span>
+                <nav class="nav-menu" id="top-nav-menu">
+                    <button class="nav-item active" id="nav-chat" onclick="switchTab('chat')">💬 AI Guide</button>
+                    <button class="nav-item" id="nav-charmap" onclick="switchTab('charmap')">🗺️ Characters</button>
+                    <button class="nav-item" id="nav-quotemaker" onclick="switchTab('quotemaker')">🎨 Quotes</button>
+                    <button class="nav-item" id="nav-downloads" onclick="switchTab('downloads')">📚 E-Books</button>
+                    <button class="nav-item" id="nav-feedback" onclick="switchTab('feedback')">✍️ Feedback</button>
                 </nav>
             </div>
         </header>
@@ -1379,14 +1397,7 @@ async def root():
                     </svg>
                 </div>
 
-                <!-- TABS NAVIGATION -->
-                <div class="tabs-nav" style="margin-top: 10px;">
-                    <button class="tab-btn active" onclick="switchTab('chat')">💬 AI Guide</button>
-                    <button class="tab-btn" onclick="switchTab('charmap')">🗺️ Character Map</button>
-                    <button class="tab-btn" onclick="switchTab('quotemaker')">🎨 Quote Creator</button>
-                    <button class="tab-btn" onclick="switchTab('downloads')">📚 E-Books</button>
-                    <button class="tab-btn" onclick="switchTab('feedback')">✍️ Feedback</button>
-                </div>
+
 
                 <!-- SECTION 1: AI CHAT GUIDE -->
                 <div id="section-chat" class="tab-section active">
@@ -1751,14 +1762,13 @@ async def root():
 
             // --- TAB SWITCHER LOGIC ---
             function switchTab(tabId) {
-                const buttons = document.querySelectorAll('.tab-btn');
-                buttons.forEach(btn => {
-                    btn.classList.remove('active');
-                });
+                // Update top navbar active state
+                const navItems = document.querySelectorAll('#top-nav-menu .nav-item');
+                navItems.forEach(btn => btn.classList.remove('active'));
+                const activeNav = document.getElementById('nav-' + tabId);
+                if (activeNav) activeNav.classList.add('active');
                 
-                const clickedBtn = document.querySelector(`.tab-btn[onclick="switchTab('${tabId}')"]`);
-                if (clickedBtn) clickedBtn.classList.add('active');
-                
+                // Switch section visibility
                 const sections = document.querySelectorAll('.tab-section');
                 sections.forEach(sec => sec.classList.remove('active'));
                 
@@ -1766,7 +1776,6 @@ async def root():
                 if (targetSec) targetSec.classList.add('active');
                 
                 if (tabId === 'quotemaker') {
-                    // Slight delay to ensure canvas is rendered
                     setTimeout(drawQuoteCard, 20);
                 }
             }
