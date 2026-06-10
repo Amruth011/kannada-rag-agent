@@ -359,6 +359,59 @@ async def voice(request: VoiceRequest):
     audio_b64 = call_sarvam_tts(request.text, language=lang_code)
     return {"audio": audio_b64}
 
+# ── E-Book Download Routes ───────────────────────────────────────────────────
+@app.get("/api/download/{edition}/{format}")
+async def download_ebook(edition: str, format: str):
+    """
+    Download a compiled e-book file.
+    edition: 'kannada', 'english', or 'bilingual'
+    format: 'epub', 'html', or 'md'
+    """
+    edition = edition.lower()
+    format = format.lower()
+    
+    if edition not in ["kannada", "english", "bilingual"]:
+        raise HTTPException(status_code=400, detail="Invalid edition. Choose 'kannada', 'english', or 'bilingual'.")
+        
+    if format not in ["epub", "html", "md"]:
+        raise HTTPException(status_code=400, detail="Invalid format. Choose 'epub', 'html', or 'md'.")
+        
+    filename = f"heli_hogu_karana_{edition}.{format}"
+    
+    # Check possible search paths for compiled ebooks
+    search_paths = [
+        os.path.join(os.path.dirname(__file__), "data", "ebooks", filename),
+        os.path.join(os.path.dirname(__file__), "..", "data", "ebooks", filename),
+        os.path.join("data", "ebooks", filename),
+        os.path.join("/var/task/data/ebooks", filename),
+        os.path.join("/var/task/api/data/ebooks", filename),
+    ]
+    
+    file_path = None
+    for p in search_paths:
+        if os.path.exists(p):
+            file_path = p
+            break
+            
+    if not file_path:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"E-book file '{filename}' not found. Please compile it first using local administrative scripts."
+        )
+        
+    media_types = {
+        "epub": "application/epub+zip",
+        "html": "text/html",
+        "md": "text/markdown"
+    }
+    
+    # Force download (Content-Disposition attachment)
+    headers = {
+        "Content-Disposition": f"attachment; filename={filename}"
+    }
+    
+    return FileResponse(file_path, media_type=media_types[format], headers=headers)
+
 @app.get('/favicon.ico', include_in_schema=False)
 async def favicon():
     icon_b64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAC2klEQVR4nO2WzWtcVRjGf885d2YySaY6lmibSiG0xS8QUXDRnVBxVXAhSPeuXAru+y+o4MJF/wClq9KFIFTNSkHBryIUS6tFK2mCmWk+Zu4953GRyUczM0kUsih6uJzFfS/P7zznfc99j9Z7f3KYIxyq+v+A/wag2CvojDMSaDDviGEPZgU0dqHjAc7Up1EdMi6peqQ+IQLkRKxTa6AaBNynf38cYxzA1Fvc+kyLN33kOK0nac8xMUPVBai3WV/g3s/q3qF71+055s5R3n/Q4t6AVLlail+/p++vMQVF8JGTPn3eZ9/B6POL8cZVd26TMqv4+VfSsRcVAqF2EICJDTq/8c2HnmiHyUijcO5r+ZaufZDTClB8cYlHUAiE6CaeaGv+Ii+9TfsUqbfLxxDAgMilcikyOdkAKuqaTO4tYWhGZOWcJo9qfVHO5ApXILx7n4YysxGW0FbdKADO5KRQSNEBt57IbuSz73LslMoVQsQjEjAK4N0wgcFy3gimvqceTS+8lS5cZnVRS79TTOA8KsEjAUMwgTHeVhCJ1qwWfqB1wiSPF9gPAIYsDw7aJkGpdH2a7z721IxytZP8DwACFB0iikiADdkUdXVX4rcfceZc/Op9ShEamMEzNIaqaHMVRu53tJpQAqhnQiQIk2tRN+fj9XlHKKG3TG0KjXYwskwB4exn36R4jLRM5w6dX/VXh/4KFmspP97OJ07SmkUtP/Uqt78c1OhBHUis3OWZN/z06+REuUb3D//yKXIGZl/W6deYPk6tSQhWwfVPdiZpPwe5ojkjRS5fIAQABWpNcvbMc0gs/Mi9n6jWcQaUMyrcPEoqhxkadaswigDV2uYxAEWtLnDjCsCZ856cwWnTrymawI43+wC2gjtrzIQasQWQuuTyAS3ncRp7NBzjtIUCqHqUqxtuNsXHHN+DAYa3U2jr+6G/2pjxr3vy3urbBXtITX8b//BfWx5+wN+tZC4TtUtAXgAAAABJRU5ErkJggg=="

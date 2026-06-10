@@ -26,6 +26,44 @@ GROQ_API_KEY   = os.getenv("GROQ_API_KEY", "").strip()
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
+def check_and_compile_ebooks():
+    ebook_dir = os.path.join(BASE_DIR, "data", "ebooks")
+    os.makedirs(ebook_dir, exist_ok=True)
+    kn_epub = os.path.join(ebook_dir, "heli_hogu_karana_kannada.epub")
+    kn_html = os.path.join(ebook_dir, "heli_hogu_karana_kannada.html")
+    
+    # Auto-compile if Kannada version is missing
+    if not os.path.exists(kn_epub) or not os.path.exists(kn_html):
+        try:
+            import sys
+            # Append scratch directory so compile_ebook functions can be imported
+            scratch_path = os.path.join(BASE_DIR, "scratch")
+            if scratch_path not in sys.path:
+                sys.path.append(scratch_path)
+            from compile_ebook import load_pages, find_cover_image, compile_markdown, compile_html, compile_epub
+            import base64
+            
+            kn_dir = os.path.join(BASE_DIR, "data", "normalized_text")
+            en_dir = os.path.join(BASE_DIR, "data", "english_translated")
+            
+            kn_pages = load_pages(kn_dir)
+            en_pages = load_pages(en_dir)
+            
+            if kn_pages:
+                cover_path = find_cover_image()
+                cover_b64 = None
+                if cover_path:
+                    with open(cover_path, "rb") as f:
+                        cover_b64 = base64.b64encode(f.read()).decode("utf-8")
+                
+                compile_markdown(kn_pages, en_pages, cover_path, ebook_dir)
+                compile_html(kn_pages, en_pages, cover_b64, ebook_dir)
+                compile_epub(kn_pages, en_pages, cover_path, ebook_dir)
+        except Exception as e:
+            print(f"Auto-compilation error: {e}")
+
+check_and_compile_ebooks()
+
 BOOK_CONTEXT = """
 Book Title  : ಹೇಳಿ ಹೋಗು ಕಾರಣ (Heli Hogu Karana — "Tell the reason before you go")
 Author      : ರವಿ ಬೆಳಗೆರೆ (Ravi Belagere) — prominent Kannada journalist, Bengaluru
@@ -411,6 +449,117 @@ with st.sidebar:
 
     st.markdown("""<div style='background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);border-radius:14px;padding:0.6rem 1rem;margin-bottom:0.5rem;margin-top:0.3rem;backdrop-filter:blur(10px);'><p style='color:#f472b6;font-size:0.8rem;font-weight:600;margin:0;'>🔊 Audio</p></div>""", unsafe_allow_html=True)
     enable_tts = st.checkbox("Read answer aloud (TTS)", value=False)
+
+    # ── E-Book Downloads ──────────────────────────────────────────────────────
+    st.markdown("""<div style='background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);border-radius:14px;padding:0.6rem 1rem;margin-bottom:0.5rem;margin-top:0.3rem;backdrop-filter:blur(10px);'><p style='color:#a855f7;font-size:0.8rem;font-weight:600;margin:0;'>📚 Download E-Books</p></div>""", unsafe_allow_html=True)
+    
+    with st.expander("Available Editions", expanded=False):
+        ebook_dir = os.path.join(BASE_DIR, "data", "ebooks")
+        kn_dir = os.path.join(BASE_DIR, "data", "normalized_text")
+        en_dir = os.path.join(BASE_DIR, "data", "english_translated")
+        
+        # Calculate progress
+        total_pages = 346
+        translated_pages = 0
+        if os.path.exists(en_dir):
+            translated_pages = len([f for f in os.listdir(en_dir) if f.startswith("page_") and f.endswith(".txt")])
+            
+        progress_pct = int((translated_pages / total_pages) * 100) if total_pages > 0 else 0
+        
+        # Recompile button
+        if st.button("🔄 Recompile Files", use_container_width=True):
+            with st.spinner("Compiling e-books..."):
+                try:
+                    import sys
+                    scratch_path = os.path.join(BASE_DIR, "scratch")
+                    if scratch_path not in sys.path:
+                        sys.path.append(scratch_path)
+                    from compile_ebook import load_pages, find_cover_image, compile_markdown, compile_html, compile_epub
+                    import base64
+                    
+                    kn_pages = load_pages(kn_dir)
+                    en_pages = load_pages(en_dir)
+                    
+                    if kn_pages:
+                        cover_path = find_cover_image()
+                        cover_b64 = None
+                        if cover_path:
+                            with open(cover_path, "rb") as f:
+                                cover_b64 = base64.b64encode(f.read()).decode("utf-8")
+                        
+                        compile_markdown(kn_pages, en_pages, cover_path, ebook_dir)
+                        compile_html(kn_pages, en_pages, cover_b64, ebook_dir)
+                        compile_epub(kn_pages, en_pages, cover_path, ebook_dir)
+                        st.success("E-books compiled successfully!")
+                        st.rerun()
+                except Exception as e:
+                    st.error(f"Compilation error: {e}")
+        
+        st.divider()
+        
+        # 1. Kannada Edition
+        st.markdown("**📖 Kannada Edition** (Complete)")
+        kn_epub_file = os.path.join(ebook_dir, "heli_hogu_karana_kannada.epub")
+        kn_html_file = os.path.join(ebook_dir, "heli_hogu_karana_kannada.html")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if os.path.exists(kn_epub_file):
+                with open(kn_epub_file, "rb") as f:
+                    st.download_button("EPUB format", f, "heli_hogu_karana_kannada.epub", "application/epub+zip", use_container_width=True)
+            else:
+                st.button("EPUB (N/A)", disabled=True, use_container_width=True)
+        with col2:
+            if os.path.exists(kn_html_file):
+                with open(kn_html_file, "rb") as f:
+                    st.download_button("HTML format", f, "heli_hogu_karana_kannada.html", "text/html", use_container_width=True)
+            else:
+                st.button("HTML (N/A)", disabled=True, use_container_width=True)
+                
+        # 2. English & Bilingual Edition
+        st.divider()
+        st.markdown(f"**🇬🇧 English & Bilingual**")
+        st.caption(f"Translation Progress: {translated_pages}/{total_pages} pages ({progress_pct}%)")
+        if progress_pct < 100:
+            st.progress(progress_pct / 100.0)
+            
+        # English Buttons (allow download of partial translation)
+        st.markdown("*English Edition:*")
+        en_epub_file = os.path.join(ebook_dir, "heli_hogu_karana_english.epub")
+        en_html_file = os.path.join(ebook_dir, "heli_hogu_karana_english.html")
+        
+        col_en1, col_en2 = st.columns(2)
+        with col_en1:
+            if os.path.exists(en_epub_file):
+                with open(en_epub_file, "rb") as f:
+                    st.download_button("EPUB", f, "heli_hogu_karana_english.epub", "application/epub+zip", use_container_width=True, key="dl_en_epub")
+            else:
+                st.button("EPUB (N/A)", disabled=True, use_container_width=True, key="dl_en_epub_na")
+        with col_en2:
+            if os.path.exists(en_html_file):
+                with open(en_html_file, "rb") as f:
+                    st.download_button("HTML", f, "heli_hogu_karana_english.html", "text/html", use_container_width=True, key="dl_en_html")
+            else:
+                st.button("HTML (N/A)", disabled=True, use_container_width=True, key="dl_en_html_na")
+                
+        # Bilingual Buttons
+        st.markdown("*Bilingual (Side-by-Side):*")
+        bi_epub_file = os.path.join(ebook_dir, "heli_hogu_karana_bilingual.epub")
+        bi_html_file = os.path.join(ebook_dir, "heli_hogu_karana_bilingual.html")
+        
+        col_bi1, col_bi2 = st.columns(2)
+        with col_bi1:
+            if os.path.exists(bi_epub_file):
+                with open(bi_epub_file, "rb") as f:
+                    st.download_button("EPUB", f, "heli_hogu_karana_bilingual.epub", "application/epub+zip", use_container_width=True, key="dl_bi_epub")
+            else:
+                st.button("EPUB (N/A)", disabled=True, use_container_width=True, key="dl_bi_epub_na")
+        with col_bi2:
+            if os.path.exists(bi_html_file):
+                with open(bi_html_file, "rb") as f:
+                    st.download_button("HTML", f, "heli_hogu_karana_bilingual.html", "text/html", use_container_width=True, key="dl_bi_html")
+            else:
+                st.button("HTML (N/A)", disabled=True, use_container_width=True, key="dl_bi_html_na")
 
     st.markdown("""
 <div style='background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:0.8rem 1rem;margin-top:0.8rem;backdrop-filter:blur(10px);'>
