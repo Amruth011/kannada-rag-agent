@@ -363,3 +363,19 @@ As they sat there, Prarthana felt a sense of peace and contentment wash over her
 
 ---
 
+## Page 18
+
+It was a strange sight to see Himavant sitting under a tree, drinking water from a pot, without anyone bothering him. If you looked at him, you would think he was the closest person to Channarayapatna. His father, Aliandasandra, was like that. Aliandasandra's son, Orannaappa, was a man with a big name, born to a man who was known for his bravery. At that time, he was a young man, and he used to carry a panchanga and other things in his hand; he didn't know the days of the week, the stars, or the planets, but he was feared by people. They used to say that if he went to court and filed a case, he would win it, but if he faced someone who was stronger than him, he would run away. 
+
+But Himavant knew that his father was a man who had killed his mother and had hit his head with a big stone. They used to say that he would die by the third year, and that's why his stepmother, Appanna's sister, had left Aliandasandra's house and gone to Channarayapatna, crossing the Baragur river and settling in a house in the Kattegaratti village. It was said that Himavant was under the care of his stepmother, and that she had brought him up. 
+
+As for the question of who was born first, the mother or the child, it was a common saying that if the mother died, the child would also die. But Himavant's mother had died, and his stepmother had taken care of him. If she had also died, Prarthana would not have been born. The two of them would have been together, and their lives would have been happy. 
+
+But Aliandasandra's daughter, Prarthana, was not born to him, and she was born to him. She was a girl who was loved by her father, and he used to say that she was the only one who understood him. He used to say that she was the only one who could see the pain he was going through, and that she was the only one who could understand what he was feeling. 
+
+As for the question of what would happen to Prarthana, it was said that she would be married to a man who was worthy of her, and that she would live a happy life. But Aliandasandra's son, Orannaappa, was not a man who was worthy of her. He was a man who was feared by people, and he was not a man who was loved by anyone. 
+
+But Himavant knew that his stepmother had taken care of him, and that she had brought him up. He knew that she was the one who had given him life, and that she was the one who had loved him. And he knew that he would never forget her, and that he would always be grateful to her.
+
+---
+
