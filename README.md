@@ -222,22 +222,40 @@ This project has been heavily optimized for production stability and handles API
 7. **Robust Markdown Parser**: Translates raw markdown syntax (`**` and `*`) and page citations into HTML tags, rendering bold/italic fonts and citations as badge elements.
 8. **Daily Usage Counter**: Includes a client-side localStorage query limit display ("Queries Today: X / 100") to track rate limits in real-time.
 
+### 🏗️ Dual-Deployment Architecture Overview
+
+This project is deployed across two environments with customized retrieval mechanisms optimized for their runtimes:
+
+#### 1. Serverless Edge Architecture (Vercel)
+- **Frontend/Backend**: Served as a unified **FastAPI** application with a vanilla HTML5/CSS3/JavaScript user interface styled in premium Indic aesthetics.
+- **Lightweight Retrieval**: Since serverless functions on Vercel have a strict bundle size limit (250MB) and 10s execution limits, it uses an in-memory word-transliteration keyword index over pre-extracted book content (`data.json`). This bypasses the need for heavy machine learning packages (like PyTorch, Tokenizers, ChromaDB) and avoids cold start delays.
+- **LLM Engine**: Dual-Brain fallback routing. Defaults to **Gemini 1.5 Flash** (or auto-discovered Gemini 2.5/2.0) and automatically redirects queries to **Groq Llama 3.3 Versatile** if quota limit (429) occurs.
+- **Speech Engine**: Synthesizes bilingual voice outputs using **Sarvam AI (bulbul:v3)** and falls back to **Google TTS (gTTS)** if quota errors happen.
+- **Interactive Voice Player**: Native browser HTML5 controls equipped with custom seeking timeline, skip buttons, and auto-reset play triggers.
+- **Quota Armor**: Displays daily query usage status tracking limits using client-side `localStorage`.
+
+#### 2. Full Semantic RAG Architecture (Streamlit Cloud)
+- **Frontend/Backend**: Deployed on Streamlit Cloud as an interactive dashboard (`app.py`).
+- **Semantic Vectorstore Retrieval**: Utilizes a persistent **ChromaDB** database and **sentence-transformers** multilingual text embeddings (`paraphrase-multilingual-MiniLM-L12-v2`) to retrieve matches using cosine similarity.
+- **LangChain ReAct Agent Loop**: Exposes retrieval pipelines as LangChain Tools (`Tool`) and runs an autonomous AgentExecutor loop with conversational memory.
+- **Metadata Filtering**: Extracts exact pages or page ranges from user queries dynamically (e.g. *"read page 12"*) to execute page-scoped metadata lookups in ChromaDB.
+- **NOT FOUND Fallback**: Evaluates similarity match scores against strict thresholds (e.g. `score < 0.25`) to return human-friendly explicit failure responses.
+
 ---
 
-### Phase | Component | Detail |
-|:------|:----------|:-------|
-| **1 · Ingestion** | pdf2image + Poppler | 346 PDF pages → PNG at 200 DPI |
-| **2 · Preprocessing** | OpenCV | Denoise · adaptive threshold · sharpen |
-| **3 · OCR** | Surya OCR | Kannada + English dual-language, CPU |
-| **4 · Normalization** | indic-nlp-library | Unicode normalization for Kannada script |
-| **5 · Chunking** | Custom chunker | 400 char chunks, 50 char overlap → 687 chunks |
-| **6 · Embeddings** | sentence-transformers | `paraphrase-multilingual-MiniLM-L12-v2` |
-| **7 · Vector Store** | ChromaDB | Persistent · cosine similarity |
-| **8 · Routing** | Smart router | Page lookup · Char RAG · Standard RAG · Book context |
-| **9 · LLM** | Sarvam-M | Conversational memory · last 4 messages |
-| **10 · TTS** | Sarvam bulbul:v3 | kn-IN / en-IN · chunked + WAV stitching |
-| **11 · UI** | Streamlit | Glassmorphism · chips · progress bar · feedback |
-| **12 · Deploy** | Streamlit Cloud | Live public URL |
+### Pipeline Walkthrough: Streamlit vs Vercel
+| Pipeline Phase | Vercel Deployment (Serverless API) | Streamlit Deployment (Semantic App) |
+|:---|:---|:---|
+| **1 · OCR Ingestion** | Surya OCR (Kannada + English, CPU) | Surya OCR (Kannada + English, CPU) |
+| **2 · Chunking** | Page-level indexing | 400-char semantic chunks (50 overlap) |
+| **3 · Vector Indexing** | In-Memory JSON Keyword mapping | ChromaDB + Multilingual Sentence-Transformers |
+| **4 · Query Routing** | Direct transliterated search over `data.json` | LangChain ReAct Agent with Tool wrappers |
+| **5 · Metadata Filter** | Direct page number parser | LangChain Chroma metadata filters |
+| **6 · Primary Brain** | Gemini 1.5 Flash (Auto-Discovery) | Gemini 1.5 Flash |
+| **7 · Secondary Brain** | Groq Llama 3.3 Versatile (Safety Net) | Groq Llama 3.3 Versatile |
+| **8 · Speech Synthesis** | Sarvam AI bulbul:v3 + gTTS Fallback | Sarvam AI bulbul:v3 + gTTS Fallback |
+| **9 · Front-End UI** | Premium Sanskrit/Indic HTML5 + CSS3 | Glassmorphism Streamlit UI |
+| **10 · Hosting** | Vercel Serverless | Streamlit Cloud |
 
 </details>
 
