@@ -541,7 +541,7 @@ async def root():
                 background: var(--card);
                 border: 1px solid var(--border);
                 border-top: 5px solid var(--primary);
-                padding: 2.2rem;
+                padding: 3.5rem 2.2rem 2.2rem 2.2rem; /* Increased top padding for Mehrab arch dome */
                 border-radius: 28px;
                 box-shadow: var(--shadow);
                 position: relative;
@@ -815,6 +815,12 @@ async def root():
         <!-- MAIN INTERACTION CONTAINER -->
         <div class="container fade-in" style="animation-delay: 0.2s">
             <div class="card">
+                <!-- MEHRAB / ARCH SILHOUETTE CARD TOP OVERLAY -->
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 35px; z-index: 2; pointer-events: none; overflow: hidden; margin-top: -1px;">
+                    <svg viewBox="0 0 100 20" preserveAspectRatio="none" style="width: 100%; height: 100%; fill: var(--bg-secondary);">
+                        <path d="M0,0 L100,0 L100,20 C85,20 75,5 65,5 C58,5 55,2 50,0 C45,2 42,5 35,5 C25,5 15,20 0,20 Z" />
+                    </svg>
+                </div>
                 <div class="settings">
                     <label class="toggle-label">
                         <input type="checkbox" id="auto-speak"> 🔊 Auto-play Voice Output
