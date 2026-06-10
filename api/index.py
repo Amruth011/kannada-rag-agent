@@ -465,10 +465,10 @@ async def root():
                 align-items: center;
             }
             .logo {
-                font-family: 'Outfit', sans-serif;
-                font-size: 1.4rem;
+                font-family: var(--font-serif);
+                font-size: 1.5rem;
                 font-weight: 800;
-                letter-spacing: -0.5px;
+                letter-spacing: -0.2px;
                 display: flex;
                 align-items: center;
                 gap: 2px;
