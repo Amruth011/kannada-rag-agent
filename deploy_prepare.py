@@ -11,13 +11,17 @@ def prepare():
     # Copy files
     shutil.copytree("api", os.path.join(dist, "api"))
     
-    # Ensure data.json is inside api
+    # Ensure data.json and vectors.npz are inside api
     if os.path.exists("data.json"):
         shutil.copy("data.json", os.path.join(dist, "api", "data.json"))
+    if os.path.exists("vectors.npz"):
+        shutil.copy("vectors.npz", os.path.join(dist, "api", "vectors.npz"))
     
     # Requirements and Config
     shutil.copy("requirements.txt", os.path.join(dist, "requirements.txt"))
     shutil.copy("vercel.json", os.path.join(dist, "vercel.json"))
+    if os.path.exists(".vercel"):
+        shutil.copytree(".vercel", os.path.join(dist, ".vercel"))
     
     # Dummy index.html
     with open(os.path.join(dist, "public", "index.html"), "w") as f:

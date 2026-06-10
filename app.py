@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from rag_agent_v2 import (
     retrieve_v2,
     detect_page_filter,
-    NOT_FOUND_MSG,
+    get_rag_chain,
 )
 
 load_dotenv()
@@ -270,38 +270,59 @@ def call_sarvam_llm(messages):
         return call_groq_llm(messages)
 
 def call_sarvam_tts(text, language="kn-IN"):
-    if not SARVAM_API_KEY: return None
-    headers = {"Authorization": f"Bearer {SARVAM_API_KEY}", "Content-Type": "application/json"}
+    # Clear page citations from text
     clean = re.sub(r'\[Page \d+\]:', '', text).strip()
-    words = clean.split()
-    chunks_list, current = [], ""
-    for word in words:
-        if len(current) + len(word) + 1 < 450:
-            current += (" " if current else "") + word
-        else:
+    clean = re.sub(r'📄 Sources:.*', '', clean).strip()
+
+    # 1. Try Sarvam TTS first if API Key is configured
+    if SARVAM_API_KEY:
+        try:
+            headers = {"Authorization": f"Bearer {SARVAM_API_KEY}", "Content-Type": "application/json"}
+            words = clean.split()
+            chunks_list, current = [], ""
+            for word in words:
+                if len(current) + len(word) + 1 < 450:
+                    current += (" " if current else "") + word
+                else:
+                    if current: chunks_list.append(current)
+                    current = word
             if current: chunks_list.append(current)
-            current = word
-    if current: chunks_list.append(current)
-    audio_bytes_list = []
-    for chunk in chunks_list:
-        if not chunk.strip(): continue
-        payload = {"inputs": [chunk.strip()], "target_language_code": language, "speaker": "priya", "model": "bulbul:v3", "pace": 1.0}
-        resp = requests.post("https://api.sarvam.ai/text-to-speech", headers=headers, json=payload, timeout=60)
-        if resp.status_code == 200:
-            audio_bytes_list.append(base64.b64decode(resp.json()["audios"][0]))
-    if not audio_bytes_list: return None
-    import wave, io
-    output_wav = io.BytesIO()
-    with wave.open(output_wav, 'wb') as wav_out:
-        for i, ab in enumerate(audio_bytes_list):
-            seg = io.BytesIO(ab)
-            try:
-                with wave.open(seg, 'rb') as wav_in:
-                    if i == 0: wav_out.setparams(wav_in.getparams())
-                    wav_out.writeframes(wav_in.readframes(wav_in.getnframes()))
-            except wave.Error:
-                continue
-    return output_wav.getvalue()
+            audio_bytes_list = []
+            for chunk in chunks_list:
+                if not chunk.strip(): continue
+                payload = {"inputs": [chunk.strip()], "target_language_code": language, "speaker": "priya", "model": "bulbul:v3", "pace": 1.0}
+                resp = requests.post("https://api.sarvam.ai/text-to-speech", headers=headers, json=payload, timeout=60)
+                if resp.status_code == 200:
+                    audio_bytes_list.append(base64.b64decode(resp.json()["audios"][0]))
+            
+            if audio_bytes_list:
+                import wave, io
+                output_wav = io.BytesIO()
+                with wave.open(output_wav, 'wb') as wav_out:
+                    for i, ab in enumerate(audio_bytes_list):
+                        seg = io.BytesIO(ab)
+                        try:
+                            with wave.open(seg, 'rb') as wav_in:
+                                if i == 0: wav_out.setparams(wav_in.getparams())
+                                wav_out.writeframes(wav_in.readframes(wav_in.getnframes()))
+                        except:
+                            continue
+                return output_wav.getvalue()
+        except Exception as e:
+            print(f"Sarvam TTS failed: {e}. Falling back to Google TTS.")
+
+    # 2. Fallback to Google TTS (gTTS)
+    try:
+        from gtts import gTTS
+        import io
+        gtts_lang = "kn" if "kn" in language.lower() else "en"
+        tts = gTTS(text=clean, lang=gtts_lang)
+        fp = io.BytesIO()
+        tts.write_to_fp(fp)
+        return fp.getvalue()
+    except Exception as e:
+        print(f"Google TTS fallback failed: {e}")
+        return None
 
 def build_prompt(question, chunks, language, use_book_context_only=False):
     rag_section = "" if use_book_context_only else (
@@ -408,7 +429,7 @@ for msg in st.session_state.messages:
         if msg.get("pages"):
             st.caption(f"📄 Sources: Pages {', '.join(map(str, msg['pages']))}")
         if msg.get("audio"):
-            st.audio(msg["audio"], format="audio/wav")
+            st.audio(msg["audio"])
 
 # ── Suggestion chips ──────────────────────────────────────────────────────────
 CHIPS = [
@@ -462,6 +483,7 @@ if question:
                 page         = final_page if not general else None,
                 page_range   = final_range if not general else None,
                 is_character = is_char,
+                language     = current_lang,
             )
 
             # ── v2: explicit NOT FOUND fallback ──────────────────────────────
@@ -481,19 +503,30 @@ if question:
                 capped.append(c); cur_len += len(c["text"])
             chunks = capped
 
-            progress.progress(55, text="🧠 Building prompt...")
-            prompt = build_prompt(question, chunks, current_lang,
-                                  use_book_context_only=(general and not chunks))
+            progress.progress(55, text="🧠 Organizing context...")
+            rag_section = (
+                "\n\n".join([f"[Page {c['page']}]: {c['text']}" for c in chunks])
+                if chunks else "(No specific passages retrieved.)"
+            )
 
-            chat_history = []
+            # Construct history as LangChain messages
+            from langchain_core.messages import HumanMessage, AIMessage
+            history = []
             for msg in st.session_state.messages[-5:-1]:
-                if msg["role"] in ["user", "assistant"]:
+                if msg["role"] == "user":
+                    history.append(HumanMessage(content=msg["content"]))
+                elif msg["role"] == "assistant":
                     clean = re.sub(r'\[Page \d+\]:', '', msg["content"]).strip()
-                    chat_history.append({"role": msg["role"], "content": clean})
-            chat_history.append({"role": "user", "content": prompt})
+                    history.append(AIMessage(content=clean))
 
             progress.progress(75, text="✨ Generating answer...")
-            answer = call_sarvam_llm(chat_history)
+            chain = get_rag_chain(current_lang)
+            answer = chain.invoke({
+                "book_context": BOOK_CONTEXT,
+                "context": rag_section,
+                "history": history,
+                "question": question
+            })
             progress.progress(100, text="Done!")
             progress.empty()
 
@@ -517,12 +550,12 @@ if question:
                         st.divider()
 
             audio_bytes = None
-            if enable_tts and answer and SARVAM_API_KEY:
+            if enable_tts and answer:
                 tts_lang = "kn-IN" if current_lang == "Kannada" else "en-IN"
                 try:
                     audio_bytes = call_sarvam_tts(answer, tts_lang)
                     if audio_bytes:
-                        st.audio(audio_bytes, format="audio/wav")
+                        st.audio(audio_bytes)
                 except Exception as e:
                     st.warning(f"TTS error: {e}")
 

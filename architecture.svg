@@ -40,7 +40,7 @@
 <rect x="0" y="0" width="980" height="54" fill="#161b22"/>
 <line x1="0" y1="54" x2="980" y2="54" stroke="#30363d" stroke-width="1"/>
 <text x="490" y="22" text-anchor="middle" font-size="16" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">ಹೇಳಿ ಹೋಗು ಕಾರಣ  —  Kannada Book AI Agent</text>
-<text x="490" y="42" text-anchor="middle" font-size="10" fill="#8b949e" font-family="Arial,sans-serif">End-to-End RAG Pipeline  ·  EasyOCR  ·  ChromaDB  ·  Sarvam-M  ·  bulbul:v3 TTS  ·  Streamlit Cloud</text>
+<text x="490" y="42" text-anchor="middle" font-size="10" fill="#8b949e" font-family="Arial,sans-serif">End-to-End RAG Pipeline  ·  Surya OCR  ·  ChromaDB  ·  Sarvam-M  ·  bulbul:v3 TTS  ·  Streamlit Cloud</text>
 <rect x="8" y="59" width="78" height="16" rx="4" fill="#161b22" stroke="#30363d" stroke-width="0.8"/>
 <text x="47" y="69" text-anchor="middle" dominant-baseline="middle" font-size="7.5" fill="#58a6ff" font-family="Arial,sans-serif" font-weight="bold" letter-spacing="0.8">INGESTION</text>
 <rect x="8" y="176" width="78" height="16" rx="4" fill="#161b22" stroke="#30363d" stroke-width="0.8"/>
@@ -67,7 +67,7 @@
 <text x="400" y="99" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">Preprocess</text>
 <rect x="482" y="69" width="110" height="48" rx="10" fill="#000" opacity="0.35"/>
 <rect x="480" y="66" width="110" height="48" rx="10" fill="#0d2a1e" stroke="#238636" stroke-width="1.5" filter="url(#sh)"/>
-<text x="535" y="83" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">EasyOCR</text>
+<text x="535" y="83" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="bold" fill="#e6edf3" font-family="Arial,sans-serif">Surya OCR</text>
 <text x="535" y="99" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e" font-family="Arial,sans-serif">kn + en CPU</text>
 <rect x="617" y="69" width="110" height="48" rx="10" fill="#000" opacity="0.35"/>
 <rect x="615" y="66" width="110" height="48" rx="10" fill="#1c2128" stroke="#30363d" stroke-width="1.5" filter="url(#sh)"/>

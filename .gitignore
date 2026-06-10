@@ -14,3 +14,7 @@ __pycache__/
 Thumbs.db
 .vscode/
 .vercel
+scratch/
+deploy_dist/
+api/vectors.npz
+

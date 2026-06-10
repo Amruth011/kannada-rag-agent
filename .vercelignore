@@ -16,7 +16,6 @@ __pycache__/
 
 # Exclude large media
 Heli_Hogo_Karanaaa.gif
-vectors.npz
 
 # Exclude local tools
 ocr_surya.py

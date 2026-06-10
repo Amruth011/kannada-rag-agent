@@ -120,13 +120,14 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
                   → Deployed · Feedback System · Admin Viewer
 ```
 
-| | Typical RAG Demo | This Project (v2.0) |
+| | Typical RAG Demo | This Project (v2.1) |
 |:--|:--|:--|
 | Language | English only | **Kannada + English** |
 | Input | Clean text PDF | **Scanned Kannada novel (full OCR pipeline)** |
 | Intelligence | Single Model | **Dual-Brain (Gemini 1.5 Flash + Groq Llama 3.3)** |
 | Stability | Basic | **Auto-Discovery + Rate Limit Armor (Retries)** |
-| Output | Text only | **Text + TTS audio** |
+| Output | Text only | **Formatted Markdown (Bolds, Italics, Badges) + Custom Audio Player** |
+| Usage Tracking | None | **Queries Today: X / 100 (Daily Counter)** |
 | Deployment | Local only | **Vercel API + Streamlit Frontend** |
 
 ---
@@ -217,6 +218,9 @@ This project has been heavily optimized for production stability and handles API
 3. **Rate Limit Armor**: Implements automatic retry logic with exponential backoff for `429 Too Many Requests` errors.
 4. **Vercel Optimized**: The backend is built with **FastAPI** and optimized for Vercel Serverless (under 250MB bundle size) with strict 10-second timeout management.
 5. **Smart Capping**: RAG retrieval is capped at the top 2 pages (~5,000 characters) to ensure high speed and reliability on free-tier LLMs.
+6. **Bilingual Audio Custom Media Player**: Implements a custom media player widget containing play/pause toggles, ±5s jump controls, live seek slider, and duration/progress timestamps, automatically resetting on question or language changes.
+7. **Robust Markdown Parser**: Translates raw markdown syntax (`**` and `*`) and page citations into HTML tags, rendering bold/italic fonts and citations as badge elements.
+8. **Daily Usage Counter**: Includes a client-side localStorage query limit display ("Queries Today: X / 100") to track rate limits in real-time.
 
 ---
 
@@ -224,7 +228,7 @@ This project has been heavily optimized for production stability and handles API
 |:------|:----------|:-------|
 | **1 · Ingestion** | pdf2image + Poppler | 346 PDF pages → PNG at 200 DPI |
 | **2 · Preprocessing** | OpenCV | Denoise · adaptive threshold · sharpen |
-| **3 · OCR** | EasyOCR | Kannada + English dual-language, CPU |
+| **3 · OCR** | Surya OCR | Kannada + English dual-language, CPU |
 | **4 · Normalization** | indic-nlp-library | Unicode normalization for Kannada script |
 | **5 · Chunking** | Custom chunker | 400 char chunks, 50 char overlap → 687 chunks |
 | **6 · Embeddings** | sentence-transformers | `paraphrase-multilingual-MiniLM-L12-v2` |
@@ -246,7 +250,7 @@ This project has been heavily optimized for production stability and handles API
 | Layer | Component | Technology |
 |:--|:--|:--|
 | 📄 PDF Processing | Page extraction | pdf2image + Poppler |
-| 👁️ OCR | Text extraction | EasyOCR (Kannada + English) |
+| 👁️ OCR | Text extraction | Surya OCR (Kannada + English) |
 | 🧠 Primary Brain | Large Language Model | **Gemini 1.5 Flash (via Official Google SDK)** |
 | 🧠 Secondary Brain | Multilingual LLM | **Groq Llama 3.3 Versatile (Safety Net)** |
 | 🗄️ Vector DB | Semantic search | ChromaDB (cosine similarity) |
@@ -276,7 +280,7 @@ kannada-rag-agent/
 ├── 📂 ingest/
 │   ├── pdf_to_images.py      # Phase 1 — PDF → PNG
 │   ├── preprocess_images.py  # Phase 2 — OpenCV
-│   ├── ocr_surya.py          # Phase 3 — EasyOCR
+│   ├── ocr_surya.py          # Phase 3 — Surya OCR
 │   ├── clean_text.py         # Phase 4 — Normalization
 │   └── chunker.py            # Phase 5 — Chunking
 │
@@ -342,7 +346,7 @@ Open **[http://localhost:8501](http://localhost:8501)** 🎉
 ```bash
 python pdf_to_images.py        # Phase 1 — PDF → 346 PNGs     (~5 min)
 python preprocess_images.py    # Phase 2 — OpenCV denoise      (~3 min)
-python ocr_surya.py            # Phase 3 — EasyOCR             (~3 hrs CPU)
+python ocr_surya.py            # Phase 3 — Surya OCR             (~3 hrs CPU)
 python clean_text.py           # Phase 4 — Unicode normalize   (~1 min)
 python chunker.py              # Phase 5 — 687 chunks          (~1 min)
 python embed_and_store.py      # Phase 6 — Embed → ChromaDB   (~40 min)
@@ -408,7 +412,7 @@ A complete, production-deployed AI system — built from scratch with no starter
 | | Project | Used For |
 |:--|:--------|:---------|
 | 🤖 | [Sarvam AI](https://sarvam.ai) | Indic LLM (Sarvam-M) + TTS (bulbul:v3) |
-| 👁️ | [EasyOCR](https://github.com/JaidedAI/EasyOCR) | Kannada + English OCR |
+| 👁️ | [Surya OCR](https://github.com/vikpar/surya) | Kannada + English OCR |
 | 🗄️ | [ChromaDB](https://www.trychroma.com/) | Vector database |
 | 🔤 | [indic-nlp-library](https://github.com/anoopkunchukuttan/indic_nlp_library) | Kannada Unicode normalization |
 | 🧠 | [sentence-transformers](https://www.sbert.net/) | Multilingual embeddings |
