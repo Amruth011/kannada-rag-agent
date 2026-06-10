@@ -874,6 +874,21 @@ async def root():
             
             .fade-in { animation: fadeIn 0.8s forwards; }
             @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+            /* DOWNLOAD SECTION STYLES */
+            .download-box {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .download-box:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px -10px rgba(194, 65, 12, 0.15);
+                border-color: rgba(194, 65, 12, 0.35) !important;
+            }
+            .dl-btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px -2px rgba(194, 65, 12, 0.2);
+                filter: brightness(0.95);
+            }
         </style>
     </head>
     <body>
@@ -1022,6 +1037,59 @@ async def root():
                                     <span id="audio-duration" style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">0:00</span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- E-BOOK DOWNLOAD SECTION -->
+        <div class="container fade-in" style="animation-delay: 0.3s; margin-top: 2.5rem; margin-bottom: 4rem;">
+            <div class="card" style="padding: 2.5rem; border: 1px dashed rgba(194, 65, 12, 0.25); position: relative;">
+                <!-- MEHRAB / ARCH SILHOUETTE CARD TOP OVERLAY -->
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 35px; z-index: 2; pointer-events: none; overflow: hidden; margin-top: -1px;">
+                    <svg viewBox="0 0 100 20" preserveAspectRatio="none" style="width: 100%; height: 100%; fill: var(--bg-secondary);">
+                        <path d="M0,0 L100,0 L100,20 C85,20 75,5 65,5 C58,5 55,2 50,0 C45,2 42,5 35,5 C25,5 15,20 0,20 Z" />
+                    </svg>
+                </div>
+                
+                <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.8rem; font-weight: 700;">📚 ಡೌನ್‌ಲೋಡ್ ಇ-ಪುಸ್ತಕಗಳು / Download E-Books</h2>
+                <p style="text-align: center; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2.5rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+                    Download premium-crafted digital editions of the novel <i>Heli Hogu Karana</i> (ಹೇಳಿ ಹೋಗು ಕಾರಣ). Available in standard EPUB, styled HTML, and Markdown formats.
+                </p>
+
+                <div class="download-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <!-- KANNADA EDITION -->
+                    <div class="download-box" style="background: var(--bg-secondary); border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 16px; padding: 1.8rem 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                        <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.35rem; font-weight: 700;">ಕನ್ನಡ ಆವೃತ್ತಿ<br><span style="font-size: 0.95rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">Kannada Edition</span></h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.5;">Original Kannada text of the novel, structured chapter-by-chapter with optimized formatting.</p>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                            <a href="/api/download/kannada/epub" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">EPUB</a>
+                            <a href="/api/download/kannada/html" class="dl-btn" style="text-decoration: none; background: white; border: 1px solid var(--primary); color: var(--primary); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">HTML</a>
+                            <a href="/api/download/kannada/md" class="dl-btn" style="text-decoration: none; background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">MD</a>
+                        </div>
+                    </div>
+
+                    <!-- BILINGUAL EDITION -->
+                    <div class="download-box" style="background: var(--bg-secondary); border: 2px solid var(--primary); border-radius: 16px; padding: 1.8rem 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; right: 0; background: var(--primary); color: white; font-size: 0.65rem; font-weight: 800; padding: 5px 12px; border-bottom-left-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Recommended</div>
+                        <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.35rem; font-weight: 700;">ದ್ವಿಭಾಷಾ ಆವೃತ್ತಿ<br><span style="font-size: 0.95rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">Bilingual Edition</span></h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.5;">Side-by-side Kannada and English columns. Perfect for comparative reading and language learning.</p>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                            <a href="/api/download/bilingual/epub" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">EPUB</a>
+                            <a href="/api/download/bilingual/html" class="dl-btn" style="text-decoration: none; background: white; border: 1px solid var(--primary); color: var(--primary); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">HTML</a>
+                            <a href="/api/download/bilingual/md" class="dl-btn" style="text-decoration: none; background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">MD</a>
+                        </div>
+                    </div>
+
+                    <!-- ENGLISH EDITION -->
+                    <div class="download-box" style="background: var(--bg-secondary); border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 16px; padding: 1.8rem 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                        <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.35rem; font-weight: 700;">ಇಂಗ್ಲಿಷ್ ಆವೃತ್ತಿ<br><span style="font-size: 0.95rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">English Edition</span></h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.5;">Complete English literary translation of the novel, reflecting the author's intense narrative style.</p>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                            <a href="/api/download/english/epub" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">EPUB</a>
+                            <a href="/api/download/english/html" class="dl-btn" style="text-decoration: none; background: white; border: 1px solid var(--primary); color: var(--primary); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">HTML</a>
+                            <a href="/api/download/english/md" class="dl-btn" style="text-decoration: none; background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">MD</a>
                         </div>
                     </div>
                 </div>
