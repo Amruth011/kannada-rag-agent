@@ -372,8 +372,9 @@ async def root():
         <title>ಹೇಳಿ ಹೋಗು ಕಾರಣ — Bilingual AI Book Guide</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-        <link rel="icon" href="/favicon.ico" type="image/x-icon">
+        <link rel="icon" type="image/png" href="/favicon.ico">
+        <link rel="shortcut icon" type="image/png" href="/favicon.ico">
+        <link rel="apple-touch-icon" href="/favicon.ico">
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
         <style>
             :root {
