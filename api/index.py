@@ -228,6 +228,16 @@ def call_sarvam_tts(text, language="kn-IN"):
     clean = re.sub(r'📄 Sources:.*', '', clean).strip()
     clean = re.sub(r'\[(?:GEMINI FAILED|GROQ FAILED|BACKEND ERROR|ERROR)[^\]]*\]', '', clean).strip()
 
+    # Limit text length to avoid serverless timeouts (10s limit) on Vercel
+    if len(clean) > 500:
+        truncated = clean[:500]
+        # Find last sentence boundary
+        last_boundary = max(truncated.rfind('.'), truncated.rfind('।'), truncated.rfind('?'), truncated.rfind('!'))
+        if last_boundary > 200:
+            clean = truncated[:last_boundary + 1]
+        else:
+            clean = truncated.strip() + "..."
+
     # 1. Try Sarvam TTS first if API Key is configured and language is Kannada
     is_kannada = "kn" in language.lower()
     target_lang = "kn-IN" if is_kannada else "en-IN"
