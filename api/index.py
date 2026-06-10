@@ -1,5 +1,5 @@
 # api/index.py - FastAPI version for Vercel deployment Final v5 (Stable)
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
 import os, re, requests, json, traceback, base64, time
@@ -361,15 +361,8 @@ async def voice(request: VoiceRequest):
 
 @app.get('/favicon.ico', include_in_schema=False)
 async def favicon():
-    paths = [
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "favicon.png"),
-        "api/favicon.png",
-        "favicon.png"
-    ]
-    for p in paths:
-        if os.path.exists(p):
-            return FileResponse(p, media_type="image/png")
-    return HTMLResponse(status_code=204)
+    icon_b64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAC2klEQVR4nO2WzWtcVRjGf885d2YySaY6lmibSiG0xS8QUXDRnVBxVXAhSPeuXAru+y+o4MJF/wClq9KFIFTNSkHBryIUS6tFK2mCmWk+Zu4953GRyUczM0kUsih6uJzFfS/P7zznfc99j9Z7f3KYIxyq+v+A/wag2CvojDMSaDDviGEPZgU0dqHjAc7Up1EdMi6peqQ+IQLkRKxTa6AaBNynf38cYxzA1Fvc+kyLN33kOK0nac8xMUPVBai3WV/g3s/q3qF71+055s5R3n/Q4t6AVLlail+/p++vMQVF8JGTPn3eZ9/B6POL8cZVd26TMqv4+VfSsRcVAqF2EICJDTq/8c2HnmiHyUijcO5r+ZaufZDTClB8cYlHUAiE6CaeaGv+Ii+9TfsUqbfLxxDAgMilcikyOdkAKuqaTO4tYWhGZOWcJo9qfVHO5ApXILx7n4YysxGW0FbdKADO5KRQSNEBt57IbuSz73LslMoVQsQjEjAK4N0wgcFy3gimvqceTS+8lS5cZnVRS79TTOA8KsEjAUMwgTHeVhCJ1qwWfqB1wiSPF9gPAIYsDw7aJkGpdH2a7z721IxytZP8DwACFB0iikiADdkUdXVX4rcfceZc/Op9ShEamMEzNIaqaHMVRu53tJQAqhnQiQIk2tRN+fj9XlHKKG3TG0KjXYwskwB4exn36R4jLRM5w6dX/VXh/4KFmspP97OJ07SmkUtP/Uqt78c1OhBHUis3OWZN/z06+REuUb3D//yKXIGZl/W6deYPk6tSQhWwfVPdiZpPwe5ojkjRS5fIAQABWpNcvbMc0gs/Mi9n6jWcQaUMyrcPEoqhxkadaswigDV2uYxAEWtLnDjCsCZ856cwWnTrymawI43+wC2gjtrzIQasQWQuuTyAS3ncRp7NBzjtIUCqHqUqxtuNsXHHN+DAYa3U2jr+6G/2pjxr3vy3urbBXtITX8b//BfWx5+wN+tZC4TtUtAXgAAAABJRU5ErkJggg=="
+    return Response(content=base64.b64decode(icon_b64), media_type="image/png")
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
