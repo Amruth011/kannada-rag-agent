@@ -2,7 +2,7 @@
 
 **ಲೇಖಕರು**: ರವಿ ಬೆಳಗೆರೆ
 
-![Cover](favicon.png)
+![Cover](cover.png)
 
 ---
 

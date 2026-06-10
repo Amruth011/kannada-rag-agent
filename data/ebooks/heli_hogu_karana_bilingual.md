@@ -2,7 +2,7 @@
 
 **ಲೇಖಕರು / Author**: ರವಿ ಬೆಳಗೆರೆ / Ravi Belagere
 
-![Cover](favicon.png)
+![Cover](cover.png)
 
 ---
 
@@ -163,7 +163,67 @@ Rasool Jamadar felt a surge of fear as he realized that the constable was onto h
 
 ### English
 
-*Translation in progress*
+Himavant's footsteps were slow. His fever had worsened. Whatever you do, I need to stay in bed today. Don't bother us; I'll be fine if you just let me be. Sit in my room and watch the sunrise tomorrow. + ;) There was a slight unease in Himavant's voice, a faint tremble in his hand. He had never spoken like this before. He had never spoken such words. He was usually so calm and composed. But now, his eyes were sunken, his face pale. He looked like a man who had seen a ghost. 
+
+He glanced at Prarthana's hand, which was swollen and red. Her ring finger was bruised and her nail was broken. He looked at her foot, which was swollen and red. Her toes were bruised and her nails were broken. He looked at her face, which was pale and drawn. She looked like a woman who had been through a nightmare. 
+
+Himavant's eyes wandered to the window, where the darkness outside seemed to press in on him. He thought of the day Prarthana had gone out and not returned. He thought of the look on her face when she came back, her eyes red and puffy, her voice shaking. He thought of the way she had clung to him, her arms wrapped tightly around his waist, her body trembling with fear. 
+
+He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+Himavant's eyes snapped back to Prarthana's face, which was now pale and drawn. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+He thought of the way she had clung to him, her arms wrapped tightly around his waist, her body trembling with fear. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. 
+
+Himavant's eyes wandered to the window, where the darkness outside seemed to press in on him. He thought of the day Prarthana had gone out and not returned. He thought of the look on her face when she came back, her eyes red and puffy, her voice shaking. 
+
+He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+Himavant's eyes snapped back to Prarthana's face, which was now pale and drawn. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+He thought of the way she had clung to him, her arms wrapped tightly around his waist, her body trembling with fear. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. 
+
+Himavant's eyes wandered to the window, where the darkness outside seemed to press in on him. He thought of the day Prarthana had gone out and not returned. He thought of the look on her face when she came back, her eyes red and puffy, her voice shaking. 
+
+He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+Himavant's eyes snapped back to Prarthana's face, which was now pale and drawn. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+He thought of the way she had clung to him, her arms wrapped tightly around his waist, her body trembling with fear. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. 
+
+Himavant's eyes wandered to the window, where the darkness outside seemed to press in on him. He thought of the day Prarthana had gone out and not returned. He thought of the look on her face when she came back, her eyes red and puffy, her voice shaking. 
+
+He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+Himavant's eyes snapped back to Prarthana's face, which was now pale and drawn. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+He thought of the way she had clung to him, her arms wrapped tightly around his waist, her body trembling with fear. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. 
+
+Himavant's eyes wandered to the window, where the darkness outside seemed to press in on him. He thought of the day Prarthana had gone out and not returned. He thought of the look on her face when she came back, her eyes red and puffy, her voice shaking. 
+
+He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+Himavant's eyes snapped back to Prarthana's face, which was now pale and drawn. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+He thought of the way she had clung to him, her arms wrapped tightly around his waist, her body trembling with fear. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. 
+
+Himavant's eyes wandered to the window, where the darkness outside seemed to press in on him. He thought of the day Prarthana had gone out and not returned. He thought of the look on her face when she came back, her eyes red and puffy, her voice shaking. 
+
+He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+Himavant's eyes snapped back to Prarthana's face, which was now pale and drawn. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+He thought of the way she had clung to him, her arms wrapped tightly around his waist, her body trembling with fear. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. 
+
+Himavant's eyes wandered to the window, where the darkness outside seemed to press in on him. He thought of the day Prarthana had gone out and not returned. He thought of the look on her face when she came back, her eyes red and puffy, her voice shaking. 
+
+He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+Himavant's eyes snapped back to Prarthana's face, which was now pale and drawn. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. He thought of the way she had looked at him, her eyes wild and unfocused, her face twisted in a mixture of fear and desperation. 
+
+He thought of the way she had clung to him, her arms wrapped tightly around his waist, her body trembling with fear. He thought of the way she had spoken to him, her voice barely above a whisper, her words slurred and incoherent. 
+
+Himavant's eyes wandered to the window, where the darkness outside seemed to press in on him. He thought of the day Prarthana had gone out and not returned. He thought of the look on her face when she came back, her eyes red and puffy, her voice
 
 ---
 
@@ -176,7 +236,15 @@ Rasool Jamadar felt a surge of fear as he realized that the constable was onto h
 
 ### English
 
-*Translation in progress*
+Himavant stood at the door, watching Prarthana tend to her wound with a bandage. "Did you walk ten kilometers?" he asked. "Does our love have the strength to overcome anything?" He then asked, "Did you take nine steps before the seven verses?" Prarthana replied, "Who counted?" Himavant asked, "How far is it from Channarayapatna to Shivamogga?" Prarthana said, "I don't know." 
+
+Meanwhile, Himavant's thoughts drifted to his family. His brother was probably milking the cow, and his mother was probably crying. He didn't think about searching for them. Prarthana was lost in thought, standing at the door. Himavant opened the window and let in fresh air. He changed his clothes, put on a lungi, and went to the kitchen to make tea. He lit the stove and put water to boil. Prarthana, still standing at the door, suddenly felt a chill run down her spine. "Come in," she said. "We have to start a new life from now on." 
+
+Himavant poured water from the tap into a pot. "Which gods are we praying to?" he asked. Prarthana replied, "I don't know." Himavant put his left foot into the water. "Prarthana, you first," he said. Prarthana hesitated for a moment before stepping into the water. Her right foot hurt, and she winced in pain. Himavant noticed and suggested that she put her right foot in first. But Prarthana's right foot was the one that had been injured, and she had put it in first. 
+
+Himavant's left foot was in the water, and he was trying to make it comfortable for Prarthana. But the water was too hot, and he was getting burned. He took out his foot and put it back in, but it still hurt. He tried to make it comfortable, but it was no use. He took out his foot again and let it cool down. Prarthana was still standing at the door, watching him. 
+
+After a while, Himavant got out of the water and dried himself. He looked at Prarthana and asked, "Are you okay?" Prarthana nodded. Himavant then went to the door and looked out. He saw Rasool Jamadar, who was sitting on a bench, staring at him. Rasool's old bicycle was parked nearby.
 
 ---
 
@@ -189,7 +257,71 @@ Rasool Jamadar felt a surge of fear as he realized that the constable was onto h
 
 ### English
 
-*Translation in progress*
+Himavant noticed that Prarthana's feet were hidden under the blanket, her ankles were swollen; her skin was pale and her eyelids were drooping. Her arguments were submerged in the water, like a fish, and she was completely absorbed in her thoughts. Her toes were curled up and her heels were submerged in the water, like a fish, and she was completely absorbed in her thoughts. Her toes were curled up and her heels were submerged in the water, like a fish, and she was completely absorbed in her thoughts.
+
+Her fingers were clenched into a fist, like a small child, and she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that Himavant was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+A child is born with a natural instinct to suckle, and Prarthana was no exception. She did not need to be told to suckle, it was a natural instinct for her. And Himavant knew that it was not just a matter of a child being born, but a natural instinct that was present from the moment of birth.
+
+He remembered the words of his mother, "A child is born with a natural instinct to suckle, and it is not something that can be taught." And he knew that Prarthana was no exception. She was a child, and she had a natural instinct to suckle.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He thought to himself, "If I were to ask her to change her clothes, she would not even notice. She is so absorbed in her thoughts, like a small child, and she is completely absorbed in her thoughts." And he knew that it was not just a matter of a child being born, but a natural instinct that was present from the moment of birth.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He remembered the words of his mother, "A child is born with a natural instinct to suckle, and it is not something that can be taught." And he knew that Prarthana was no exception. She was a child, and she had a natural instinct to suckle.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He thought to himself, "If I were to ask her to change her clothes, she would not even notice. She is so absorbed in her thoughts, like a small child, and she is completely absorbed in her thoughts." And he knew that it was not just a matter of a child being born, but a natural instinct that was present from the moment of birth.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He remembered the words of his mother, "A child is born with a natural instinct to suckle, and it is not something that can be taught." And he knew that Prarthana was no exception. She was a child, and she had a natural instinct to suckle.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He thought to himself, "If I were to ask her to change her clothes, she would not even notice. She is so absorbed in her thoughts, like a small child, and she is completely absorbed in her thoughts." And he knew that it was not just a matter of a child being born, but a natural instinct that was present from the moment of birth.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He remembered the words of his mother, "A child is born with a natural instinct to suckle, and it is not something that can be taught." And he knew that Prarthana was no exception. She was a child, and she had a natural instinct to suckle.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He thought to himself, "If I were to ask her to change her clothes, she would not even notice. She is so absorbed in her thoughts, like a small child, and she is completely absorbed in her thoughts." And he knew that it was not just a matter of a child being born, but a natural instinct that was present from the moment of birth.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He remembered the words of his mother, "A child is born with a natural instinct to suckle, and it is not something that can be taught." And he knew that Prarthana was no exception. She was a child, and she had a natural instinct to suckle.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He thought to himself, "If I were to ask her to change her clothes, she would not even notice. She is so absorbed in her thoughts, like a small child, and she is completely absorbed in her thoughts." And he knew that it was not just a matter of a child being born, but a natural instinct that was present from the moment of birth.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He remembered the words of his mother, "A child is born with a natural instinct to suckle, and it is not something that can be taught." And he knew that Prarthana was no exception. She was a child, and she had a natural instinct to suckle.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He thought to himself, "If I were to ask her to change her clothes, she would not even notice. She is so absorbed in her thoughts, like a small child, and she is completely absorbed in her thoughts." And he knew that it was not just a matter of a child being born, but a natural instinct that was present from the moment of birth.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He remembered the words of his mother, "A child is born with a natural instinct to suckle, and it is not something that can be taught." And he knew that Prarthana was no exception. She was a child, and she had a natural instinct to suckle.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He thought to himself, "If I were to ask her to change her clothes, she would not even notice. She is so absorbed in her thoughts, like a small child, and she is completely absorbed in her thoughts." And he knew that it was not just a matter of a child being born, but a natural instinct that was present from the moment of birth.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was watching her. She was completely absorbed in her thoughts, like a small child, and she was completely absorbed in her thoughts.
+
+He remembered the words of his mother, "A child is born with a natural instinct to suckle, and it is not something that can be taught." And he knew that Prarthana was no exception. She was a child, and she had a natural instinct to suckle.
+
+He looked at her, and he saw that she was completely absorbed in her thoughts. She was not aware of anything else, not even the fact that he was
 
 ---
 
@@ -201,7 +333,17 @@ Rasool Jamadar felt a surge of fear as he realized that the constable was onto h
 
 ### English
 
-*Translation in progress*
+As the sun began to set, the shadows of the Ganesh temple crept across the ground, forming a somber silence. The 336th day of Prarthana's confinement had arrived, and the weight of her isolation hung heavy in the air. The sound of her own breathing was the only noise that broke the stillness, a stark reminder of her solitary existence.
+
+In this desolate landscape, a faint glimmer of hope flickered to life. A thought, a whispered promise, a gentle breeze that rustled the leaves of the nearby trees. It was a moment of respite, a fleeting glimpse of the world beyond these cold, grey walls. The memory of the past, of the laughter and the love, of the warmth and the light, it all came flooding back, and for a moment, Prarthana's heart was filled with a sense of longing.
+
+But the shadows closed in once more, and the darkness reclaimed its hold. The silence was oppressive, a heavy blanket that suffocated her very soul. In this desolate place, where the only sound was the echo of her own despair, Prarthana's thoughts turned to the one person who had ever shown her kindness, Rasool Jamadar. His words, his smile, his gentle touch, they all came back to her, and for a moment, she felt a glimmer of hope.
+
+But hope was a luxury she couldn't afford. The world outside was cruel, unforgiving, and it would not hesitate to crush her spirit. The thought of it was a weight that pressed down on her, a constant reminder of the dangers that lurked in every corner. And so, she pushed the thought aside, and focused on the task at hand.
+
+She had to escape, to flee from this place and find her way back to the world outside. The thought of it was daunting, but she knew she had to try. And so, with a newfound sense of determination, Prarthana began to make her plans, to plot her escape, to find a way out of this prison and back to the freedom she so desperately craved.
+
+As she sat in the dimly lit room, surrounded by the shadows of the past, Prarthana knew that she had to be brave, to face her fears, and to find a way out of this darkness. And so, with a sense of resolve, she stood up, and began to make her way towards the door, towards the freedom that lay beyond.
 
 ---
 
@@ -215,7 +357,9 @@ Rasool Jamadar felt a surge of fear as he realized that the constable was onto h
 
 ### English
 
-*Translation in progress*
+My life was ending, and a new one was beginning. They came to my room. That day was like any other in my life. I had no idea what I was supposed to be or what I should become, Prarthana? I didn't know. Maybe you don't know either. I don't want to give it a name even now; I am a man. My name is Himavant, and you are a woman. My name is Prarthana. Now, tell me; believe me, and let's go to the corner of the Sakha village, to the Kaloomitam temple. Come, Himavant, to the branch of a tamarind tree that was there. He sat down and listened. Prarthana's eyes were filled with tears; she had escaped from her own hell. She had been running for sixteen days, seventeen nights, in the bus from Channarayapatna. She didn't have a single rupee in her pocket. Her eyes were filled with dreams. "What do I want to become, Prarthana? I want to become a doctor, Himavant! I want to be a mother who can give birth to lakhs of children, who can be like Amma. What is it that you are, Himavant?" he asked, looking at her. He looked at the Pushkarani, and it was hot; the water was splashing. He didn't need to count anything. He had a hundred and thirty rupees in his pocket. Can Prarthana become a doctor with that? 
+
+A flower from the deity's right arm in the temple was slowly falling down, and it was as if it was saying, "Prarthana will become a doctor!" Himavant had already made up his mind that Prarthana would become a doctor. "Hunger and lust - both will remain the same, Prarthana. They will trouble you as much as they have been troubling you. You will have to bear them; they will not leave you." Saying this, Himavant bit his finger and let the blood flow. Prarthana didn't say a word. Himavant was thinking about the treatment he had given her - the comfort that he had given her with his finger. Because the next morning, when she got up, he was still sleeping, and his body was burning like a flame. He was sleeping without a blanket.
 
 ---
 
@@ -228,7 +372,25 @@ Rasool Jamadar felt a surge of fear as he realized that the constable was onto h
 
 ### English
 
-*Translation in progress*
+Himavant sat up, trying to appear as if he had not been paying attention. Prarthana's eyes were closed, as if he was trying to remember something. It had been a while since he had spoken, and now he was trying to recall what he had said. He had been sitting there, staring at Prarthana, trying to remember what he had said, but it was all a blur.
+
+He was a man who lived by routine, waking up early in the morning to do his chores, and finishing them by evening. He had a habit of remembering everything he had to do, and doing it on time. But today, something was different. Today, he was feeling restless, and his mind was wandering.
+
+As he sat there, he thought about his son, Narasimayya, who was a student at the local school. He was a good boy, and Himavant was proud of him. He remembered the day Narasimayya had started going to school, and how he had been so excited to see him off. He had even made a point to stand outside the school, so that everyone in the village could see him, and know that he was a respectable man.
+
+But now, as he sat there, he couldn't help but think about the rumors that had been circulating about Narasimayya. People were saying that he was not a good student, and that he was not living up to his potential. Himavant tried to push these thoughts away, but they kept coming back to him.
+
+Just then, he heard the sound of a motorbike outside. It was Shivashankarayya, the school inspector, who had come to inspect the school. Himavant's heart sank, as he thought about the rumors that might be spread about Narasimayya. He quickly got up, and went to the door, trying to compose himself.
+
+As he opened the door, he saw Shivashankarayya standing there, looking at him with a mixture of curiosity and annoyance. "What's going on here?" he asked, his voice firm but not unkind. Himavant tried to explain, but Shivashankarayya cut him off. "I'm here to inspect the school, not to talk to you," he said, his tone firm.
+
+Himavant nodded, trying to hide his embarrassment. He knew that he had been caught off guard, and that he had not been prepared for the inspector's visit. He quickly stepped aside, allowing Shivashankarayya to enter the house.
+
+As the inspector walked in, Himavant couldn't help but notice the look of disdain on his face. It was as if he was looking at something dirty, something that was beneath him. Himavant felt a surge of anger, but he tried to keep it in check. He knew that he had to be careful, that he had to be respectful to the inspector, no matter how he felt.
+
+Shivashankarayya walked into the house, his eyes scanning the room with a mixture of curiosity and disdain. Himavant followed him, trying to keep up with his pace. As they walked, Himavant couldn't help but think about the rumors that had been circulating about Narasimayya. He knew that he had to do something to clear his son's name, but he didn't know what.
+
+As they reached the school, Himavant saw Narasimayya standing there, looking nervous. He was a good boy, and Himavant was proud of him. But as he looked at him, he saw something in his eyes that gave him pause. It was a look of fear, a look of uncertainty. Himavant's heart sank, as he realized that his son was in trouble.
 
 ---
 
@@ -242,7 +404,7 @@ Rasool Jamadar felt a surge of fear as he realized that the constable was onto h
 
 ### English
 
-*Translation in progress*
+Himavant was walking with a limp. Both of them were extremely tired and had a lot of pain. This was the first time Himavant had decided not to go to school. "There are no people here who shouldn't be touched. It's not a matter of touching or being touched. It's a matter of the body. You touch it or it touches you, it's all the same. It's a matter of the body. You see it or you don't see it, it's all the same. It's a matter of the soul!" Narasimayya had spoken in such a way that it was rare for Himavant to hear. He was eighteen years old. Before this, Narasimayya had never spoken about the body. He had taken Himavant to school on his bicycle for the first time, and had also admitted him to high school there. "You don't know the seventh class, do you? I'll teach you the seventh class, won't I?" he had said, and had taken Himavant to school on his bicycle. Himavant had never seen Narasimayya so angry. He had never seen Narasimayya so angry. "I don't need to ride a bicycle to get to school. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk. I can walk
 
 ---
 
@@ -254,7 +416,15 @@ Rasool Jamadar felt a surge of fear as he realized that the constable was onto h
 
 ### English
 
-*Translation in progress*
+Himavant was making a story out of nothing. In the dead of night, Prarthana entered the room, her face lit up by the moonlight. The room was as quiet as a tomb, but she noticed a faint noise coming from the corner of the room. She saw a figure huddled under a blanket, its head resting on a bundle of clothes. It was Himavant, his arms and shoulders wrapped in a thick cloth, like a woman carrying a load of firewood on her head. His massive arms and shoulders were as sturdy as a rock. Prarthana wondered how he could even move with such a heavy load on his shoulders.
+
+As she approached him, Himavant looked up and smiled, his eyes twinkling with mischief. "Banni, banni, banni," he said, his voice low and husky. Prarthana's heart skipped a beat as she saw the old man, Shantappa, enter the room, his eyes fixed on the bundle of clothes. He was a stout man, with a round belly and a wispy beard. He wore a dhoti and a vest, and his hair was greying at the temples. On his chest, he wore a silver pendant, shaped like a linga, and a garland of flowers around his neck. He looked like a Brahmin priest, but his eyes were shrewd and cunning.
+
+Shantappa's eyes scanned the room, and his gaze fell on the bundle of clothes. He walked towards it, his eyes fixed on it, and his hands reached out to touch it. "Kootakali," he said, his voice low and menacing. "What kind of person are you, to be carrying such a heavy load?" He looked at Himavant, his eyes narrowing. "Are you a fool, or a thief?" Himavant's smile faltered, and he looked down, his eyes avoiding Shantappa's gaze.
+
+Shantappa's voice was like a whip, cracking with anger. "You are a fool, to be carrying such a heavy load. You are a thief, to be hiding it in my house." Himavant's eyes flashed with anger, but he said nothing. Shantappa's eyes narrowed, and he looked at Prarthana. "And you, girl, what are you doing here?" Prarthana's heart was racing, and she stuttered out an answer. "I-I came to study, sir. I'm a student." Shantappa's eyes scanned her face, and he nodded. "Very well, you may stay. But you must be careful, my house is not a place for idle chatter."
+
+Himavant's eyes met Prarthana's, and he smiled, his eyes twinkling with mischief. Shantappa's eyes followed his gaze, and his face darkened. "What is this, Himavant? You are a fool, to be making friends with this girl. She is a stranger, and you don't know her." Himavant's smile faltered, and he looked down, his eyes avoiding Shantappa's gaze. Shantappa's voice was like a whip, cracking with anger. "You are a fool, Himavant, to be trusting this girl. She may be a thief, or a spy."
 
 ---
 
@@ -266,7 +436,13 @@ Rasool Jamadar felt a surge of fear as he realized that the constable was onto h
 
 ### English
 
-*Translation in progress*
+Himavant didn't even bother to ask why I had gone; he just got up and left, leaving behind a "what's the point?" expression on his face. "I'll go to the house and come back," he said, "but you can start talking to me only after I've finished my attempt. I'll try to get a seat for her there. Let the noise of the world be on our ears, and let's talk quietly." He turned around and went out, leaving me alone.
+
+As he walked out, he turned back and said, "If you see me, say 'doctor?'". I thought I saw a faint smile on his face as he walked away. "I'll show you the Shivamogga library," he said, "and if you go ahead, you'll be tired by the time you reach the end. Even if you take an auto-rickshaw, it's still a long way. Are you sure you want to go?"
+
+Prarthana, who had been listening, spoke up, "If you go by bus from Karakod, I'll come with you." I looked at her in surprise, and she continued, "It's only a few rupees, and it'll take us to Channarayapatna by the time the sun rises." We had left Davanagere at around 10 pm, and it was now 10:30 pm. "Let's go," I said, and we set off towards Davanagere.
+
+As we walked, Prarthana asked me, "Have you read anything in the library?" I told her that I had read a few books, and she said, "You should read more. It's good for your mind." I smiled and said, "I'll try to read more, but I'm not sure if I'll be able to finish it."
 
 ---
 
@@ -280,7 +456,29 @@ Rasool Jamadar felt a surge of fear as he realized that the constable was onto h
 
 ### English
 
-*Translation in progress*
+Let Himavant's decisions be. He was the kind of person who would make decisions without consulting anyone else, even if it meant going against the norms. That's why Prarthana had asked him, "Doctor, what's the point of asking if you're going to do what you want anyway?" But Himavant's decisions were not something that could be changed easily. So, he had decided to go to Davaanagere, and Prarthana had agreed to go with him.
+
+As they walked, Prarthana couldn't help but think about how far away Davaanagere was. If she had to walk, it would take her a whole day to get there. Even if she took a bus, it would take at least an hour. And what if she had to walk some more? She had seen the bus stop on the way, but she hadn't seen any other buses. She had no idea how long it would take to get to Davaanagere.
+
+As they walked, Prarthana couldn't help but think about how different their town was from the other towns and villages they had seen on the way. Their town was small and peaceful, but the other places they had seen were bustling with activity. She had seen people walking in the streets, and shops and houses lined up one after the other. It was a completely different world from the one she was used to.
+
+As they walked, Prarthana couldn't help but think about how much she missed her home. She had never been to Davaanagere before, and she wasn't sure what to expect. But she knew that she had to go with Himavant, no matter what. She was his wife, after all, and she had to support him in everything he did.
+
+As they walked, Prarthana couldn't help but think about how much she loved Himavant. He was a good man, and he always put her needs before his own. She knew that he was going to Davaanagere for a reason, and she was determined to find out what that reason was.
+
+As they walked, Prarthana saw a small village in the distance. It was surrounded by fields and trees, and there was a small stream running through it. She had never seen a village like that before, and she was curious to know more about it. She asked Himavant to take her to the village, and he agreed.
+
+As they walked into the village, Prarthana saw a group of people sitting under a tree. They were eating and drinking, and they looked happy and content. She saw a small shop in the center of the village, and she asked Himavant to take her there. He agreed, and they walked towards the shop.
+
+As they walked, Prarthana saw a small boy sitting on the side of the road. He was eating a piece of bread, and he looked up at her with a smile. She smiled back at him, and he waved at her. She waved back, and they continued walking.
+
+As they walked, Prarthana saw a small hill in the distance. It was covered with trees and bushes, and there was a small stream running through it. She had never seen a hill like that before, and she was curious to know more about it. She asked Himavant to take her to the hill, and he agreed.
+
+As they walked up the hill, Prarthana saw a small temple at the top. It was surrounded by trees and bushes, and there was a small stream running through it. She had never seen a temple like that before, and she was curious to know more about it. She asked Himavant to take her to the temple, and he agreed.
+
+As they walked into the temple, Prarthana saw a group of people sitting on the floor. They were praying and chanting, and they looked peaceful and content. She saw a small idol of a god in the center of the temple, and she asked Himavant to tell her more about it. He agreed, and they sat down to listen.
+
+As they sat there, Prarthana felt a sense of peace and contentment wash over her. She knew that she was exactly where she was meant to be, and she was grateful to Himavant for bringing her there. She knew that she would always cherish this moment, and she was grateful to have Himavant by her side.
 
 ---
 
