@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import os, re, requests, json, traceback, base64, time
-from typing import List
+from typing import List, Optional
 from dotenv import load_dotenv
 import google.generativeai as genai
 
@@ -26,6 +26,7 @@ app = FastAPI(title="Kannada Book AI Agent + Voice")
 class ChatRequest(BaseModel):
     question: str
     language: str = "English"
+    history: Optional[List[dict]] = []
 
 class ChatResponse(BaseModel):
     answer: str
@@ -101,8 +102,8 @@ def search_text(query, data, top_k=5):
     results.sort(key=lambda x: x['score'], reverse=True)
     return results[:top_k]
 
-def call_groq(prompt, retries=2):
-    """Fallback to Groq (Llama 3.3) with Rate Limit Armor."""
+def call_groq(prompt, history=None, retries=1):
+    """Fallback to Groq with active model fallbacks (Llama 3.3 -> Llama 3.1 -> Llama 4 Scout)."""
     if not GROQ_API_KEY:
         return "[ERROR]: GROQ_API_KEY is missing."
     
@@ -111,34 +112,45 @@ def call_groq(prompt, retries=2):
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
     }
-    payload = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": [
-            {"role": "system", "content": BOOK_CONTEXT},
-            {"role": "user", "content": prompt}
-        ],
-        "temperature": 0.2,
-        "max_tokens": 1024
-    }
     
-    for attempt in range(retries + 1):
-        try:
-            resp = requests.post(url, headers=headers, json=payload, timeout=30)
-            if resp.status_code == 200:
-                return resp.json()["choices"][0]["message"]["content"]
+    models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "meta-llama/llama-4-scout-17b-16e-instruct"]
+    
+    last_err = ""
+    for model in models:
+        for attempt in range(retries + 1):
+            messages = [{"role": "system", "content": BOOK_CONTEXT}]
+            if history:
+                for msg in history:
+                    role = "user" if msg.get("role") == "user" else "assistant"
+                    messages.append({"role": role, "content": msg.get("content", "")})
+            messages.append({"role": "user", "content": prompt})
             
-            if resp.status_code == 429: # Rate Limit
-                if attempt < retries:
-                    time.sleep(3) # Shorter sleep to avoid Vercel 10s timeout
+            payload = {
+                "model": model,
+                "messages": messages,
+                "temperature": 0.2,
+                "max_tokens": 1024
+            }
+            
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=20)
+                if resp.status_code == 200:
+                    return resp.json()["choices"][0]["message"]["content"]
+                elif resp.status_code == 429:
+                    last_err = f"Rate limit 429 on {model}"
+                    if model != models[-1]:
+                        break
+                    time.sleep(2)
                     continue
-            
-            resp.raise_for_status()
-        except Exception as e:
-            if attempt < retries:
-                time.sleep(2)
-                continue
-            return f"[GROQ ERROR]: {str(e)}"
-    return "[ERROR]: Groq rate limit exhausted."
+                resp.raise_for_status()
+            except Exception as e:
+                last_err = f"{model} error: {str(e)}"
+                if attempt < retries:
+                    time.sleep(1.5)
+                    continue
+                break
+                
+    return f"[GROQ FAILED]: {last_err}"
 
 def get_best_gemini_model():
     """Helper to find the best available model for this specific API key."""
@@ -159,15 +171,14 @@ def get_best_gemini_model():
     except Exception:
         return "gemini-2.5-flash"
 
-def call_gemini(prompt, retries=1):
+def call_gemini(prompt, history=None, retries=1):
     """Deepest Gemini Safety Bypass + System Prompting."""
     if not GEMINI_API_KEY: 
-        return call_groq(prompt)
+        return call_groq(prompt, history=history)
     
     last_error = ""
     model_name = get_best_gemini_model()
     
-    # 1. Standard Safety Settings (Guaranteed compatibility)
     safety_settings = [
         {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
         {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
@@ -177,18 +188,24 @@ def call_gemini(prompt, retries=1):
     
     for attempt in range(retries + 1):
         try:
-            # 2. Use System Instruction (Makes Gemini less sensitive to content blocks)
             model = genai.GenerativeModel(
                 model_name=model_name,
                 system_instruction=BOOK_CONTEXT
             )
-            response = model.generate_content(prompt, safety_settings=safety_settings)
+            if history:
+                contents = []
+                for msg in history:
+                    role = "user" if msg.get("role") == "user" else "model"
+                    contents.append({"role": role, "parts": [{"text": msg.get("content", "")}]})
+                contents.append({"role": "user", "parts": [{"text": prompt}]})
+                response = model.generate_content(contents, safety_settings=safety_settings)
+            else:
+                response = model.generate_content(prompt, safety_settings=safety_settings)
             
-            # 3. Robust candidate checking
             if response.candidates:
                 candidate = response.candidates[0]
                 if candidate.content and candidate.content.parts:
-                    return response.text
+                    return response.text.strip()
                 if candidate.finish_reason:
                     last_error = f"Blocked (Reason: {candidate.finish_reason})"
             else:
@@ -202,17 +219,14 @@ def call_gemini(prompt, retries=1):
                     continue
             break 
                 
-    return f"[GEMINI FAILED ({model_name}): {last_error[:100]}] " + call_groq(prompt)
+    return call_groq(prompt, history=history)
 
 def call_sarvam_tts(text, language="kn-IN"):
     """Call Sarvam TTS 'Meera' voice (bulbul:v3) with fallback to Google TTS (gTTS)."""
     # Clean citations and errors
     clean = re.sub(r'\[Page \d+\]:', '', text).strip()
     clean = re.sub(r'📄 Sources:.*', '', clean).strip()
-    clean = re.sub(r'\[GEMINI FAILED.*\]', '', clean).strip()
-    clean = re.sub(r'\[GROQ ERROR.*\]', '', clean).strip()
-    clean = re.sub(r'\[BACKEND ERROR.*\]', '', clean).strip()
-    clean = re.sub(r'\[ERROR.*\]', '', clean).strip()
+    clean = re.sub(r'\[(?:GEMINI FAILED|GROQ FAILED|BACKEND ERROR|ERROR)[^\]]*\]', '', clean).strip()
 
     # 1. Try Sarvam TTS first if API Key is configured and language is Kannada
     is_kannada = "kn" in language.lower()
@@ -333,7 +347,7 @@ ANSWER in English:"""
 ಪ್ರಶ್ನೆ: {request.question}
 ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ:"""
         
-        answer = call_gemini(full_prompt)
+        answer = call_gemini(full_prompt, history=request.history)
         return ChatResponse(answer=answer, sources=retrieved_pages)
     except Exception:
         return ChatResponse(answer=f"[BACKEND ERROR]: {traceback.format_exc()[:500]}", sources=[])
@@ -949,6 +963,7 @@ async def root():
             let isSpeaking = false;
             let currentAudio = null;
             let isSeeking = false;
+            let chatHistory = [];
 
             // Usage Counter Functions
             function updateUsageCounter() {
@@ -987,6 +1002,7 @@ async def root():
             }
 
             function setQ(txt) {
+                chatHistory = []; // Reset history to start a fresh thread
                 document.getElementById('q').value = txt;
                 ask();
             }
@@ -1135,7 +1151,11 @@ async def root():
                 
                 btn.disabled = true; load.style.display = 'flex'; cont.style.display = 'none';
                 try {
-                    const r = await fetch('/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({question: q, language: lang})});
+                    const r = await fetch('/chat', { 
+                        method: 'POST', 
+                        headers: {'Content-Type': 'application/json'}, 
+                        body: JSON.stringify({question: q, language: lang, history: chatHistory})
+                    });
                     const d = await r.json();
                     
                     // Increment and update local usage count
@@ -1143,6 +1163,18 @@ async def root():
                     
                     currentText = d.answer;
                     res.innerHTML = formatMarkdown(d.answer);
+                    
+                    // Update conversational memory if it is a successful non-error response
+                    const isError = d.answer.startsWith('[GROQ FAILED]') || d.answer.startsWith('[BACKEND ERROR]') || d.answer.startsWith('[ERROR]');
+                    if (!isError) {
+                        chatHistory.push({role: "user", content: q});
+                        chatHistory.push({role: "assistant", content: d.answer});
+                        // Limit to last 10 messages (5 turns)
+                        if (chatHistory.length > 10) {
+                            chatHistory = chatHistory.slice(chatHistory.length - 10);
+                        }
+                    }
+                    
                     cont.style.display = 'block';
                     cont.classList.add('fade-in');
                     
@@ -1173,6 +1205,17 @@ async def root():
                     vBtn.style.display = 'inline-flex';
                     vLoad.style.display = 'none';
                     document.getElementById('media-player').style.display = 'none';
+                    return;
+                }
+                
+                // Block speech if the output is an error message
+                const isError = currentText.startsWith('[GROQ FAILED]') || 
+                                currentText.startsWith('[BACKEND ERROR]') || 
+                                currentText.startsWith('[ERROR]') || 
+                                currentText.includes('exceeded your current quota') || 
+                                currentText.includes('error:');
+                                
+                if (isError) {
                     return;
                 }
                 

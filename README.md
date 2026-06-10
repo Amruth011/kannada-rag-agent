@@ -5,8 +5,11 @@
 <br/>
 
 <p>
+<a href="https://kannada-rag-agent.vercel.app/">
+  <img src="https://img.shields.io/badge/🚀 Live App-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white"/>
+</a>
 <a href="https://kannada-rag-agent-hqvwhfejguymb9ijrvz4hd.streamlit.app/">
-  <img src="https://img.shields.io/badge/🚀 Live App-Streamlit Cloud-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white"/>
+  <img src="https://img.shields.io/badge/📊 Dashboard-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white"/>
 </a>
 <a href="https://github.com/Amruth011/kannada-rag-agent">
   <img src="https://img.shields.io/badge/GitHub-Source Code-181717?style=for-the-badge&logo=github&logoColor=white"/>
@@ -58,7 +61,9 @@
 
 > 🎥 **Demo shows:** English Q&A with citations · Kannada Q&A · Kannada TTS audio playback
 >
-> **[▶ Try it live right now →](https://kannada-rag-agent-hqvwhfejguymb9ijrvz4hd.streamlit.app/)**
+> **[▶ Try the Live Vercel App →](https://kannada-rag-agent.vercel.app/)**
+>
+> **[📊 Open Streamlit Dashboard →](https://kannada-rag-agent-hqvwhfejguymb9ijrvz4hd.streamlit.app/)**
 
 </div>
 
@@ -124,11 +129,11 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 |:--|:--|:--|
 | Language | English only | **Kannada + English** |
 | Input | Clean text PDF | **Scanned Kannada novel (full OCR pipeline)** |
-| Intelligence | Single Model | **Dual-Brain (Gemini 1.5 Flash + Groq Llama 3.3)** |
+| Intelligence | Single Model | **Dual-Brain (Gemini + Groq Llama/Scout Fallbacks)** |
 | Stability | Basic | **Auto-Discovery + Rate Limit Armor (Retries)** |
 | Output | Text only | **Formatted Markdown (Bolds, Italics, Badges) + Custom Audio Player** |
 | Usage Tracking | None | **Queries Today: X / 100 (Daily Counter)** |
-| Deployment | Local only | **Vercel API + Streamlit Frontend** |
+| Deployment | Local only | **Vercel Edge UI/API + Streamlit Cloud App** |
 
 ---
 
@@ -227,11 +232,11 @@ This project has been heavily optimized for production stability and handles API
 This project is deployed across two environments with customized retrieval mechanisms optimized for their runtimes:
 
 #### 1. Serverless Edge Architecture (Vercel)
-- **Frontend/Backend**: Served as a unified **FastAPI** application with a vanilla HTML5/CSS3/JavaScript user interface styled in premium Indic aesthetics.
-- **Lightweight Retrieval**: Since serverless functions on Vercel have a strict bundle size limit (250MB) and 10s execution limits, it uses an in-memory word-transliteration keyword index over pre-extracted book content (`data.json`). This bypasses the need for heavy machine learning packages (like PyTorch, Tokenizers, ChromaDB) and avoids cold start delays.
-- **LLM Engine**: Dual-Brain fallback routing. Defaults to **Gemini 1.5 Flash** (or auto-discovered Gemini 2.5/2.0) and automatically redirects queries to **Groq Llama 3.3 Versatile** if quota limit (429) occurs.
-- **Speech Engine**: Synthesizes bilingual voice outputs using **Sarvam AI (bulbul:v3)** and falls back to **Google TTS (gTTS)** if quota errors happen.
-- **Interactive Voice Player**: Native browser HTML5 controls equipped with custom seeking timeline, skip buttons, and auto-reset play triggers.
+- **Frontend/Backend**: Served as a unified **FastAPI** application with a vanilla HTML5/CSS3/JavaScript user interface styled in premium dark aesthetics.
+- **Serverless Vector Search**: Since serverless functions have a strict size limit, it implements a custom NumPy similarity search over `vectors.npz` (pre-computed 687 chunk embeddings) using Hugging Face's Feature Extraction API, bypassing heavy local packages.
+- **LLM Engine**: Dual-Brain fallback routing with conversational memory (5 turns). Defaults to Gemini 2.5/1.5 Flash and redirects to Groq (Llama 3.3/3.1/Llama 4 Scout) if rate-limited.
+- **Speech Engine**: Synthesizes bilingual voice outputs using **Sarvam AI (bulbul:v3)** and falls back to **Google TTS (gTTS)** if quota errors occur.
+- **Interactive Voice Player**: Native browser HTML5 controls equipped with custom seeking timeline, play/pause, stop, and ±5s skip buttons.
 - **Quota Armor**: Displays daily query usage status tracking limits using client-side `localStorage`.
 
 #### 2. Full Semantic RAG Architecture (Streamlit Cloud)
@@ -248,9 +253,9 @@ This project is deployed across two environments with customized retrieval mecha
 |:---|:---|:---|
 | **1 · OCR Ingestion** | Surya OCR (Kannada + English, CPU) | Surya OCR (Kannada + English, CPU) |
 | **2 · Chunking** | Page-level indexing | 400-char semantic chunks (50 overlap) |
-| **3 · Vector Indexing** | In-Memory JSON Keyword mapping | ChromaDB + Multilingual Sentence-Transformers |
-| **4 · Query Routing** | Direct transliterated search over `data.json` | LangChain ReAct Agent with Tool wrappers |
-| **5 · Metadata Filter** | Direct page number parser | LangChain Chroma metadata filters |
+| **3 · Vector Indexing** | NumPy Cosine Similarity (`vectors.npz`) | ChromaDB + Multilingual Sentence-Transformers |
+| **4 · Query Routing** | Fallback Chain (Gemini -> Groq) with Memory | LangChain ReAct Agent with Tool wrappers |
+| **5 · Metadata Filter** | Direct page parser + NumPy slice | LangChain Chroma metadata filters |
 | **6 · Primary Brain** | Gemini 1.5 Flash (Auto-Discovery) | Gemini 1.5 Flash |
 | **7 · Secondary Brain** | Groq Llama 3.3 Versatile (Safety Net) | Groq Llama 3.3 Versatile |
 | **8 · Speech Synthesis** | Sarvam AI bulbul:v3 + gTTS Fallback | Sarvam AI bulbul:v3 + gTTS Fallback |
