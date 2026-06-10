@@ -1108,6 +1108,203 @@ async def root():
                 box-shadow: 0 4px 12px -2px rgba(194, 65, 12, 0.2);
                 filter: brightness(0.95);
             }
+
+            /* TABS NAVIGATION */
+            .tabs-nav {
+                display: flex;
+                border-bottom: 2px solid rgba(194, 65, 12, 0.08);
+                margin-bottom: 2.2rem;
+                gap: 1.2rem;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+                justify-content: center;
+            }
+            .tab-btn {
+                background: none;
+                border: none;
+                font-family: inherit;
+                font-size: 0.95rem;
+                font-weight: 700;
+                color: var(--text-muted);
+                border-bottom: 3px solid transparent;
+                padding: 0.6rem 1.2rem;
+                cursor: pointer;
+                outline: none;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                white-space: nowrap;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                border-radius: 8px 8px 0 0;
+            }
+            .tab-btn:hover {
+                color: var(--primary);
+                background: rgba(194, 65, 12, 0.02);
+            }
+            .tab-btn.active {
+                color: var(--primary);
+                border-bottom-color: var(--primary);
+            }
+            .tab-section {
+                display: none;
+            }
+            .tab-section.active {
+                display: block;
+            }
+
+            /* CHARACTER MAP */
+            .map-container {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: center;
+                margin-top: 1rem;
+            }
+            .network-svg {
+                width: 100%;
+                max-width: 550px;
+                height: auto;
+                background: linear-gradient(145deg, #ffffff 0%, #fffbf8 100%);
+                border: 1px solid rgba(194, 65, 12, 0.1);
+                border-radius: 20px;
+                box-shadow: inset 0 4px 15px rgba(194, 65, 12, 0.01);
+            }
+            .node {
+                cursor: pointer;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .node circle {
+                transition: r 0.3s, fill 0.3s, stroke 0.3s, stroke-width 0.3s;
+            }
+            .node:hover circle {
+                r: 28;
+                stroke-width: 3.5;
+            }
+            .node text {
+                font-family: var(--font-sans);
+                font-weight: 700;
+                transition: font-size 0.3s, fill 0.3s;
+                pointer-events: none;
+            }
+            .node:hover text {
+                font-size: 13px;
+                fill: var(--primary);
+            }
+            .edge {
+                transition: stroke-width 0.3s, stroke 0.3s, opacity 0.3s;
+            }
+            .edge-label {
+                font-family: var(--font-sans);
+                font-weight: 600;
+                pointer-events: none;
+            }
+            .char-card {
+                background: #fbf9f6;
+                border: 1px solid rgba(194, 65, 12, 0.12);
+                border-left: 4px solid var(--primary);
+                padding: 1.8rem;
+                border-radius: 18px;
+                width: 100%;
+                box-sizing: border-box;
+                text-align: left;
+                transition: all 0.3s;
+            }
+            .char-card h3 {
+                margin-top: 0;
+                color: var(--primary);
+                font-family: var(--font-serif);
+                font-size: 1.4rem;
+                margin-bottom: 0.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .char-card .badge {
+                font-family: var(--font-sans);
+                font-size: 0.75rem;
+                font-weight: 700;
+                background: var(--primary-light);
+                color: var(--primary);
+                padding: 4px 10px;
+                border-radius: 99px;
+            }
+            .char-card .meta-title {
+                font-size: 0.8rem;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+                margin-top: 1.2rem;
+            }
+            .char-card .desc {
+                line-height: 1.6;
+                color: var(--text);
+                font-size: 0.95rem;
+            }
+            .char-tabs {
+                display: flex;
+                gap: 8px;
+                margin-bottom: 1rem;
+            }
+            .char-tab-btn {
+                background: white;
+                border: 1px solid rgba(194, 65, 12, 0.15);
+                border-radius: 6px;
+                padding: 4px 10px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                cursor: pointer;
+                color: var(--text-muted);
+            }
+            .char-tab-btn.active {
+                background: var(--primary);
+                color: white;
+                border-color: var(--primary);
+            }
+
+            /* QUOTE MAKER */
+            .quote-creator-box {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: center;
+                margin-top: 1rem;
+            }
+            .creator-controls {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 1.2rem;
+                text-align: left;
+            }
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+            .control-group label {
+                font-size: 0.8rem;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .control-group select, .control-group textarea {
+                background: #ffffff;
+                border: 1.5px solid rgba(194, 65, 12, 0.15);
+                padding: 10px 12px;
+                border-radius: 10px;
+                font-family: inherit;
+                font-size: 0.95rem;
+                outline: none;
+                box-sizing: border-box;
+                color: var(--text);
+                transition: border-color 0.2s;
+            }
+            .control-group select:focus, .control-group textarea:focus {
+                border-color: var(--primary);
+            }
         </style>
     </head>
     <body>
@@ -1181,134 +1378,259 @@ async def root():
                         <path d="M0,0 L100,0 L100,20 C85,20 75,5 65,5 C58,5 55,2 50,0 C45,2 42,5 35,5 C25,5 15,20 0,20 Z" />
                     </svg>
                 </div>
-                <div class="settings">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="auto-speak"> 🔊 Auto-play Voice Output
-                    </label>
-                    <span id="usage-counter" style="font-size: 0.85rem; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 4px 10px; border-radius: 99px;">Queries Today: 0 / 100</span>
-                    <label class="toggle-label">
-                        🌐 Output Language: 
-                        <select id="lang-select" style="background:#ffffff; border:1px solid rgba(194, 65, 12, 0.2); color:#0f172a; border-radius:8px; padding:4px 10px; font-family:inherit; outline:none; cursor:pointer; font-weight:600;">
-                            <option value="English">English</option>
-                            <option value="Kannada">ಕನ್ನಡ (Kannada)</option>
-                        </select>
-                    </label>
+
+                <!-- TABS NAVIGATION -->
+                <div class="tabs-nav" style="margin-top: 10px;">
+                    <button class="tab-btn active" onclick="switchTab('chat')">💬 AI Guide</button>
+                    <button class="tab-btn" onclick="switchTab('charmap')">🗺️ Character Map</button>
+                    <button class="tab-btn" onclick="switchTab('quotemaker')">🎨 Quote Creator</button>
+                    <button class="tab-btn" onclick="switchTab('downloads')">📚 E-Books</button>
                 </div>
 
-                <div class="suggestions">
-                    <button class="sug-btn" onclick="setQ('Who is Himavant?')">Who is Himavant?</button>
-                    <button class="sug-btn" onclick="setQ('Describe Prarthana')">About Prarthana</button>
-                    <button class="sug-btn" onclick="setQ('What are the main themes?')">Main Themes</button>
-                    <button class="sug-btn" onclick="setQ('How is Ravi related?')">Ravi's Role</button>
-                </div>
+                <!-- SECTION 1: AI CHAT GUIDE -->
+                <div id="section-chat" class="tab-section active">
+                    <div class="settings">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="auto-speak"> 🔊 Auto-play Voice Output
+                        </label>
+                        <span id="usage-counter" style="font-size: 0.85rem; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 4px 10px; border-radius: 99px;">Queries Today: 0 / 100</span>
+                        <label class="toggle-label">
+                            🌐 Output Language: 
+                            <select id="lang-select" style="background:#ffffff; border:1px solid rgba(194, 65, 12, 0.2); color:#0f172a; border-radius:8px; padding:4px 10px; font-family:inherit; outline:none; cursor:pointer; font-weight:600;">
+                                <option value="English">English</option>
+                                <option value="Kannada">ಕನ್ನಡ (Kannada)</option>
+                            </select>
+                        </label>
+                    </div>
 
-                <input type="text" id="q" placeholder="What would you like to know?" required autoComplete="off">
-                <button id="btn" class="main-btn" onclick="ask()">Analyze the Book</button>
-                
-                <div id="loading" class="lotus-container" style="display:none;">
-                    <svg viewBox="0 0 100 100" class="lotus-svg" style="width: 80px; height: 80px;">
-                        <circle cx="50" cy="50" r="10" fill="none" stroke="var(--primary)" stroke-width="1.2" class="pulsing-ring ring-1" />
-                        <circle cx="50" cy="50" r="25" fill="none" stroke="var(--primary)" stroke-width="0.9" class="pulsing-ring ring-2" />
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--primary)" stroke-width="0.6" class="pulsing-ring ring-3" />
-                        <circle cx="50" cy="50" r="5" fill="var(--primary)" />
-                        <g class="lotus-petals" fill="var(--primary)" opacity="0.9">
-                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" />
-                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(45 50 50)" />
-                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(90 50 50)" />
-                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(135 50 50)" />
-                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(180 50 50)" />
-                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(225 50 50)" />
-                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(270 50 50)" />
-                            <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(315 50 50)" />
-                            
-                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(22.5 50 50)" />
-                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(67.5 50 50)" />
-                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(112.5 50 50)" />
-                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(157.5 50 50)" />
-                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(202.5 50 50)" />
-                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(247.5 50 50)" />
-                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(292.5 50 50)" />
-                            <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(337.5 50 50)" />
-                        </g>
-                    </svg>
-                    <div style="font-weight: 700; color: var(--primary); font-family: var(--font-serif); letter-spacing: 0.5px;">ಕಾದಂಬರಿ ವಿಶ್ಲೇಷಣೆ ಮಾಡಲಾಗುತ್ತಿದೆ...</div>
-                </div>
-                
-                <div id="ans-container">
-                    <div id="ans">
-                        <div id="text-res"></div>
-                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                            <button id="v-btn" class="voice-btn" onclick="speak()">
-                                <span>🔊 Hear in English</span>
-                            </button>
-                            <div id="v-loading" style="display:none;"><div class="loader"></div></div>
-                            
-                            <!-- CUSTOM VOICE PLAYER WIDGET -->
-                            <div id="media-player" style="display: none; align-items: center; gap: 12px; padding: 0.6rem 1rem; background: #faf6f0; border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 14px; flex-grow: 1; min-width: 260px;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <button id="play-pause-btn" class="player-btn" onclick="togglePlayPause()" style="background: var(--primary); border: none; width: 32px; height: 32px; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; outline: none;">▶</button>
-                                    <button class="player-btn" onclick="skipAudio(-5)" style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 0.85rem; font-weight: bold; outline: none; padding: 2px;">↩ 5s</button>
-                                    <button class="player-btn" onclick="skipAudio(5)" style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 0.85rem; font-weight: bold; outline: none; padding: 2px;">5s ↪</button>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 8px; flex-grow: 1;">
-                                    <span id="audio-current-time" style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">0:00</span>
-                                    <input type="range" id="audio-slider" value="0" style="flex-grow: 1; height: 5px; border-radius: 3px; cursor: pointer; accent-color: var(--primary); outline: none;">
-                                    <span id="audio-duration" style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">0:00</span>
+                    <div class="suggestions">
+                        <button class="sug-btn" onclick="setQ('Who is Himavant?')">Who is Himavant?</button>
+                        <button class="sug-btn" onclick="setQ('Describe Prarthana')">About Prarthana</button>
+                        <button class="sug-btn" onclick="setQ('What are the main themes?')">Main Themes</button>
+                        <button class="sug-btn" onclick="setQ('How is Ravi related?')">Ravi's Role</button>
+                    </div>
+
+                    <input type="text" id="q" placeholder="What would you like to know?" required autoComplete="off">
+                    <button id="btn" class="main-btn" onclick="ask()">Analyze the Book</button>
+                    
+                    <div id="loading" class="lotus-container" style="display:none;">
+                        <svg viewBox="0 0 100 100" class="lotus-svg" style="width: 80px; height: 80px;">
+                            <circle cx="50" cy="50" r="10" fill="none" stroke="var(--primary)" stroke-width="1.2" class="pulsing-ring ring-1" />
+                            <circle cx="50" cy="50" r="25" fill="none" stroke="var(--primary)" stroke-width="0.9" class="pulsing-ring ring-2" />
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="var(--primary)" stroke-width="0.6" class="pulsing-ring ring-3" />
+                            <circle cx="50" cy="50" r="5" fill="var(--primary)" />
+                            <g class="lotus-petals" fill="var(--primary)" opacity="0.9">
+                                <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" />
+                                <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(45 50 50)" />
+                                <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(90 50 50)" />
+                                <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(135 50 50)" />
+                                <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(180 50 50)" />
+                                <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(225 50 50)" />
+                                <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(270 50 50)" />
+                                <path d="M50,35 C47,45 47,49 50,50 C53,49 53,45 50,35 Z" transform="rotate(315 50 50)" />
+                                
+                                <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(22.5 50 50)" />
+                                <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(67.5 50 50)" />
+                                <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(112.5 50 50)" />
+                                <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(157.5 50 50)" />
+                                <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(202.5 50 50)" />
+                                <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(247.5 50 50)" />
+                                <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(292.5 50 50)" />
+                                <path d="M50,22 C45,40 45,47 50,50 C55,47 55,40 50,22 Z" opacity="0.6" transform="rotate(337.5 50 50)" />
+                            </g>
+                        </svg>
+                        <div style="font-weight: 700; color: var(--primary); font-family: var(--font-serif); letter-spacing: 0.5px;">ಕಾದಂಬರಿ ವಿಶ್ಲೇಷಣೆ ಮಾಡಲಾಗುತ್ತಿದೆ...</div>
+                    </div>
+                    
+                    <div id="ans-container">
+                        <div id="ans">
+                            <div id="text-res"></div>
+                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <button id="v-btn" class="voice-btn" onclick="speak()">
+                                    <span>🔊 Hear in English</span>
+                                </button>
+                                <div id="v-loading" style="display:none;"><div class="loader"></div></div>
+                                
+                                <!-- CUSTOM VOICE PLAYER WIDGET -->
+                                <div id="media-player" style="display: none; align-items: center; gap: 12px; padding: 0.6rem 1rem; background: #faf6f0; border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 14px; flex-grow: 1; min-width: 260px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <button id="play-pause-btn" class="player-btn" onclick="togglePlayPause()" style="background: var(--primary); border: none; width: 32px; height: 32px; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; outline: none;">▶</button>
+                                        <button class="player-btn" onclick="skipAudio(-5)" style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 0.85rem; font-weight: bold; outline: none; padding: 2px;">↩ 5s</button>
+                                        <button class="player-btn" onclick="skipAudio(5)" style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 0.85rem; font-weight: bold; outline: none; padding: 2px;">5s ↪</button>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px; flex-grow: 1;">
+                                        <span id="audio-current-time" style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">0:00</span>
+                                        <input type="range" id="audio-slider" value="0" style="flex-grow: 1; height: 5px; border-radius: 3px; cursor: pointer; accent-color: var(--primary); outline: none;">
+                                        <span id="audio-duration" style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">0:00</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- E-BOOK DOWNLOAD SECTION -->
-        <div class="container fade-in" style="animation-delay: 0.3s; margin-top: 2.5rem; margin-bottom: 3rem;">
-            <div class="card" style="padding: 2.5rem; border: 1px dashed rgba(194, 65, 12, 0.25); position: relative;">
-                <!-- MEHRAB / ARCH SILHOUETTE CARD TOP OVERLAY -->
-                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 35px; z-index: 2; pointer-events: none; overflow: hidden; margin-top: -1px;">
-                    <svg viewBox="0 0 100 20" preserveAspectRatio="none" style="width: 100%; height: 100%; fill: var(--bg-secondary);">
-                        <path d="M0,0 L100,0 L100,20 C85,20 75,5 65,5 C58,5 55,2 50,0 C45,2 42,5 35,5 C25,5 15,20 0,20 Z" />
-                    </svg>
+                <!-- SECTION 2: CHARACTER MAP -->
+                <div id="section-charmap" class="tab-section">
+                    <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.6rem; font-weight: 700;">🗺️ ಪಾತ್ರಗಳ ನಕ್ಷೆ / Character Relationship Map</h2>
+                    <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5;">
+                        Click on character nodes to explore their background, key page references, and dynamic connections in the story.
+                    </p>
+                    <div class="map-container">
+                        <!-- Responsive SVG Network Graph -->
+                        <svg viewBox="0 0 500 360" class="network-svg">
+                            <defs>
+                                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feGaussianBlur stdDeviation="3" result="blur" />
+                                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                </filter>
+                            </defs>
+                            <!-- Connection Lines (Edges) -->
+                            <g stroke="#c2410c" stroke-linecap="round">
+                                <!-- Himavant <-> Prarthana -->
+                                <path d="M 250,180 Q 160,135 110,90" stroke-width="2.5" fill="none" opacity="0.4" class="edge" id="edge-him-pra" />
+                                <!-- Himavant <-> Ravi -->
+                                <path d="M 250,180 Q 340,135 390,90" stroke-width="2.5" fill="none" opacity="0.4" class="edge" id="edge-him-rav" />
+                                <!-- Prarthana <-> Ravi -->
+                                <path d="M 110,90 Q 250,60 390,90" stroke-width="1.5" stroke-dasharray="3,3" fill="none" opacity="0.3" class="edge" id="edge-pra-rav" />
+                                <!-- Himavant <-> Rasool -->
+                                <path d="M 250,180 Q 200,240 150,290" stroke-width="2" fill="none" opacity="0.4" class="edge" id="edge-him-ras" />
+                                <!-- Himavant <-> Ravi Belagere -->
+                                <path d="M 250,180 Q 300,240 350,290" stroke-width="2" fill="none" opacity="0.4" class="edge" id="edge-him-bel" />
+                            </g>
+
+                            <!-- Edge Labels -->
+                            <g font-size="8" fill="var(--text-muted)" text-anchor="middle" class="edge-label">
+                                <text x="170" y="145" transform="rotate(-30 170 145)">Love / ಪ್ರೇಮ</text>
+                                <text x="330" y="145" transform="rotate(30 330 145)">Friend / ಸ್ನೇಹ</text>
+                                <text x="175" y="225" transform="rotate(30 175 225)">Loyalty / ನಿಷ್ಠೆ</text>
+                                <text x="325" y="225" transform="rotate(-30 325 225)">Narrator / ನಿರೂಪಕ</text>
+                            </g>
+
+                            <!-- Character Nodes -->
+                            <!-- Prarthana -->
+                            <g class="node" onclick="clickChar('prarthana')" id="node-prarthana">
+                                <circle cx="110" cy="90" r="22" fill="#fff" stroke="#ca8a04" stroke-width="2.5" filter="url(#glow)" />
+                                <text x="110" y="94" font-size="10" text-anchor="middle" fill="#0f172a">ಪ್ರಾರ್ಥನಾ</text>
+                            </g>
+                            <!-- Ravi -->
+                            <g class="node" onclick="clickChar('ravi')" id="node-ravi">
+                                <circle cx="390" cy="90" r="22" fill="#fff" stroke="#4338ca" stroke-width="2.5" filter="url(#glow)" />
+                                <text x="390" y="94" font-size="10" text-anchor="middle" fill="#0f172a">ರವಿ</text>
+                            </g>
+                            <!-- Rasool Jamadar -->
+                            <g class="node" onclick="clickChar('rasool')" id="node-rasool">
+                                <circle cx="150" cy="290" r="22" fill="#fff" stroke="#475569" stroke-width="2" />
+                                <text x="150" y="294" font-size="9" text-anchor="middle" fill="#0f172a">ರಸೂಲ್</text>
+                            </g>
+                            <!-- Ravi Belagere -->
+                            <g class="node" onclick="clickChar('belagere')" id="node-belagere">
+                                <circle cx="350" cy="290" r="22" fill="#fff" stroke="#dc2626" stroke-width="2" />
+                                <text x="350" y="294" font-size="9" text-anchor="middle" fill="#0f172a">ಬೆಳಗೆರೆ</text>
+                            </g>
+                            <!-- Himavant (Protagonist) -->
+                            <g class="node" onclick="clickChar('himavant')" id="node-himavant">
+                                <circle cx="250" cy="180" r="25" fill="#fff" stroke="#c2410c" stroke-width="3" filter="url(#glow)" />
+                                <text x="250" y="184" font-size="11" font-weight="bold" text-anchor="middle" fill="#c2410c">ಹಿಮವಂತ್</text>
+                            </g>
+                        </svg>
+
+                        <!-- Character Biography Card -->
+                        <div id="char-detail-card" class="char-card" style="display:none;">
+                            <div class="char-tabs">
+                                <button class="char-tab-btn active" id="btn-char-en" onclick="setCharLang('en')">English</button>
+                                <button class="char-tab-btn" id="btn-char-kn" onclick="setCharLang('kn')">ಕನ್ನಡ</button>
+                            </div>
+                            <h3 id="char-name">Character Name <span class="badge" id="char-badge">Protagonist</span></h3>
+                            <div class="meta-title">Role / ಪಾತ್ರ</div>
+                            <div class="desc" id="char-desc">Select a character in the network map above to view details.</div>
+                            <div class="meta-title">Page Occurrences / ಕಾಣಿಸಿಕೊಳ್ಳುವ ಪುಟಗಳು</div>
+                            <div class="desc" id="char-pages" style="font-weight:700; color:var(--primary);">Pages ...</div>
+                        </div>
+                    </div>
                 </div>
-                
-                <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.8rem; font-weight: 700;">📚 ಡೌನ್‌ಲೋಡ್ ಇ-ಪುಸ್ತಕಗಳು / Download E-Books</h2>
-                <p style="text-align: center; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2.5rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
-                    Download premium-crafted digital editions of the novel <i>Heli Hogu Karana</i> (ಹೇಳಿ ಹೋಗು ಕಾರಣ). Available in standard EPUB, styled HTML, and Markdown formats.
-                </p>
 
-                <div class="download-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-                    <!-- KANNADA EDITION -->
-                    <div class="download-box" style="background: var(--bg-secondary); border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 16px; padding: 1.8rem 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
-                        <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.35rem; font-weight: 700;">ಕನ್ನಡ ಆವೃತ್ತಿ<br><span style="font-size: 0.95rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">Kannada Edition</span></h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.5;">Original Kannada text of the novel, structured chapter-by-chapter with optimized formatting.</p>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                            <button onclick="openDownloadModal('kannada', 'epub')" class="dl-btn" style="background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; border: none; cursor: pointer; font-family: inherit; outline: none;">EPUB</button>
-                            <button onclick="openDownloadModal('kannada', 'html')" class="dl-btn" style="background: white; border: 1px solid var(--primary); color: var(--primary); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; cursor: pointer; font-family: inherit; outline: none;">HTML</button>
-                            <button onclick="openDownloadModal('kannada', 'md')" class="dl-btn" style="background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; cursor: pointer; font-family: inherit; outline: none;">MD</button>
+                <!-- SECTION 3: INSTAGRAM QUOTE CREATOR -->
+                <div id="section-quotemaker" class="tab-section">
+                    <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.6rem; font-weight: 700;">🎨 ಇನ್‌ಸ್ಟಾಗ್ರಾಮ್ ಕೋಟ್ ಮೇಕರ್ / Quote Creator</h2>
+                    <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.8rem; line-height: 1.5;">
+                        Create beautiful, custom-styled quote cards from the novel. Download and share on your Instagram story to support the author!
+                    </p>
+                    <div class="quote-creator-box">
+                        <canvas id="quote-canvas" width="600" height="600" style="width: 100%; max-width: 380px; border-radius: 16px; border: 1px solid rgba(194, 65, 12, 0.15); display: block; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06);"></canvas>
+                        
+                        <div class="creator-controls">
+                            <div class="control-group">
+                                <label>1. Pick a Famous Quote / ಕೋಟ್ ಆಯ್ಕೆ ಮಾಡಿ</label>
+                                <select id="quote-presets" onchange="applyQuotePreset(this.value)">
+                                    <option value="">-- Custom Quote / ನಿಮ್ಮದೇ ಆದ ವಾಕ್ಯ --</option>
+                                    <option value="ಪ್ರೀತಿ ಎಂದರೆ ಕೇವಲ ಮುಖ ನೋಡುವುದಲ್ಲ, ಪರಸ್ಪರ ಮೌನವನ್ನು ಅರ್ಥ ಮಾಡಿಕೊಳ್ಳುವುದು.">ಪ್ರೀತಿ ಎಂದರೆ ಮೌನವನ್ನು ಅರ್ಥ ಮಾಡಿಕೊಳ್ಳುವುದು (Love & Silence)</option>
+                                    <option value="ಜೀವನದಲ್ಲಿ ಕೆಲವೊಮ್ಮೆ ಉತ್ತರಗಳಿಗಿಂತ ಪ್ರಶ್ನೆಗಳೇ ಹೆಚ್ಚು ಸುಂದರವಾಗಿರುತ್ತವೆ.">ಉತ್ತರಗಳಿಗಿಂತ ಪ್ರಶ್ನೆಗಳೇ ಸುಂದರ (Beautiful Questions)</option>
+                                    <option value="ಹೇಳಿ ಹೋಗು ಕಾರಣ... ಯಾಕೆಂದರೆ ನಿನಗಾಗಿ ಕಾಯುವ ಹೃದಯ ಇಲ್ಲಿದೆ.">ಹೇಳಿ ಹೋಗು ಕಾರಣ... (Heli Hogu Karana Theme)</option>
+                                    <option value="ಮೌನಕ್ಕೂ ಒಂದು ಭಾಷೆಯಿದೆ, ಅದನ್ನ ಆಲಿಸಲು ಒಂದು ವಿಶೇಷವಾದ ಪ್ರೇಮ ಬೇಕು.">ಮೌನಕ್ಕೂ ಒಂದು ಭಾಷೆಯಿದೆ (Language of Silence)</option>
+                                    <option value="ನಾವು ಪ್ರೀತಿಸುವವರ ಕೊರತೆಗಿಂತ, ನಮ್ಮನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವವರ ಕೊರತೆಯೇ ಹೆಚ್ಚು ನೋವು ಕೊಡುತ್ತದೆ.">ನಮ್ಮನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವವರ ಕೊರತೆ (Being Understood)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label>2. Customize Quote Text / ವಾಕ್ಯವನ್ನು ಬದಲಿಸಿ</label>
+                                <textarea id="quote-text" rows="3" oninput="drawQuoteCard()" placeholder="Type your custom quote here..."></textarea>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label>3. Select Style Theme / ಶೈಲಿ ಆಯ್ಕೆ</label>
+                                <select id="quote-style" onchange="drawQuoteCard()">
+                                    <option value="saffron">Saffron Gold / ಕೇಸರಿ ಚಿನ್ನ</option>
+                                    <option value="vintage">Terracotta Vintage / ವಿಂಟೇಜ್ ಮಣ್ಣು</option>
+                                    <option value="midnight">Midnight Shadow / ಕತ್ತಲೆಯ ನೆರಳು</option>
+                                </select>
+                            </div>
+                            
+                            <button onclick="downloadQuoteCard()" class="main-btn" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <span>📥 Save Quote Card to Device</span>
+                            </button>
                         </div>
                     </div>
+                </div>
 
-                    <!-- BILINGUAL EDITION -->
-                    <div class="download-box" style="background: var(--bg-secondary); border: 2px solid var(--primary); border-radius: 16px; padding: 1.8rem 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: 0; right: 0; background: var(--primary); color: white; font-size: 0.65rem; font-weight: 800; padding: 5px 12px; border-bottom-left-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Recommended</div>
-                        <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.35rem; font-weight: 700;">ದ್ವಿಭಾಷಾ ಆವೃತ್ತಿ<br><span style="font-size: 0.95rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">Bilingual Edition</span></h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.5;">Side-by-side Kannada and English columns. Perfect for comparative reading and language learning.</p>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                            <button onclick="openDownloadModal('bilingual', 'epub')" class="dl-btn" style="background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; border: none; cursor: pointer; font-family: inherit; outline: none;">EPUB</button>
-                            <button onclick="openDownloadModal('bilingual', 'html')" class="dl-btn" style="background: white; border: 1px solid var(--primary); color: var(--primary); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; cursor: pointer; font-family: inherit; outline: none;">HTML</button>
-                            <button onclick="openDownloadModal('bilingual', 'md')" class="dl-btn" style="background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; cursor: pointer; font-family: inherit; outline: none;">MD</button>
+                <!-- SECTION 4: E-BOOK DOWNLOADS -->
+                <div id="section-downloads" class="tab-section">
+                    <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.6rem; font-weight: 700;">📚 ಇ-ಪುಸ್ತಕಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ / Download E-Books</h2>
+                    <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.8rem; line-height: 1.5;">
+                        To support translation costs and cover server bills, e-books are password locked. DM `@heli.hogu.kaarana` on Instagram to get the password!
+                    </p>
+                    <div class="download-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem;">
+                        <!-- KANNADA EDITION -->
+                        <div class="download-box" style="background: var(--bg-secondary); border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.25rem; font-weight: 700;">ಕನ್ನಡ ಆವೃತ್ತಿ<br><span style="font-size: 0.85rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">Kannada Edition</span></h3>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; flex-grow: 1; line-height: 1.4;">Original Kannada text of the novel, structured with chapter-by-chapter formatting.</p>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                                <button onclick="openDownloadModal('kannada', 'epub')" class="dl-btn" style="background: var(--primary); color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer; outline: none;">EPUB</button>
+                                <button onclick="openDownloadModal('kannada', 'html')" class="dl-btn" style="background: white; border: 1px solid var(--primary); color: var(--primary); padding: 7px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; outline: none;">HTML</button>
+                                <button onclick="openDownloadModal('kannada', 'md')" class="dl-btn" style="background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 7px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; outline: none;">MD</button>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- ENGLISH EDITION -->
-                    <div class="download-box" style="background: var(--bg-secondary); border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 16px; padding: 1.8rem 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
-                        <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.35rem; font-weight: 700;">ಇಂಗ್ಲಿಷ್ ಆವೃತ್ತಿ<br><span style="font-size: 0.95rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">English Edition</span></h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.5;">Complete English literary translation of the novel, reflecting the author's intense narrative style.</p>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                            <button onclick="openDownloadModal('english', 'epub')" class="dl-btn" style="background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; border: none; cursor: pointer; font-family: inherit; outline: none;">EPUB</button>
-                            <button onclick="openDownloadModal('english', 'html')" class="dl-btn" style="background: white; border: 1px solid var(--primary); color: var(--primary); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; cursor: pointer; font-family: inherit; outline: none;">HTML</button>
-                            <button onclick="openDownloadModal('english', 'md')" class="dl-btn" style="background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; cursor: pointer; font-family: inherit; outline: none;">MD</button>
+                        <!-- BILINGUAL EDITION -->
+                        <div class="download-box" style="background: var(--bg-secondary); border: 2px solid var(--primary); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;">
+                            <div style="position: absolute; top: 0; right: 0; background: var(--primary); color: white; font-size: 0.6rem; font-weight: 800; padding: 4px 8px; border-bottom-left-radius: 6px; text-transform: uppercase;">Best</div>
+                            <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.25rem; font-weight: 700;">ದ್ವಿಭಾಷಾ ಆವೃತ್ತಿ<br><span style="font-size: 0.85rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">Bilingual Edition</span></h3>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; flex-grow: 1; line-height: 1.4;">Side-by-side Kannada and English columns. Ideal for comparative reading.</p>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                                <button onclick="openDownloadModal('bilingual', 'epub')" class="dl-btn" style="background: var(--primary); color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer; outline: none;">EPUB</button>
+                                <button onclick="openDownloadModal('bilingual', 'html')" class="dl-btn" style="background: white; border: 1px solid var(--primary); color: var(--primary); padding: 7px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; outline: none;">HTML</button>
+                                <button onclick="openDownloadModal('bilingual', 'md')" class="dl-btn" style="background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 7px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; outline: none;">MD</button>
+                            </div>
+                        </div>
+
+                        <!-- ENGLISH EDITION -->
+                        <div class="download-box" style="background: var(--bg-secondary); border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.25rem; font-weight: 700;">ಇಂಗ್ಲಿಷ್ ಆವೃತ್ತಿ<br><span style="font-size: 0.85rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">English Edition</span></h3>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; flex-grow: 1; line-height: 1.4;">Complete English literary translation reflecting the author's intense story arc.</p>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                                <button onclick="openDownloadModal('english', 'epub')" class="dl-btn" style="background: var(--primary); color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer; outline: none;">EPUB</button>
+                                <button onclick="openDownloadModal('english', 'html')" class="dl-btn" style="background: white; border: 1px solid var(--primary); color: var(--primary); padding: 7px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; outline: none;">HTML</button>
+                                <button onclick="openDownloadModal('english', 'md')" class="dl-btn" style="background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 7px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; outline: none;">MD</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1389,6 +1711,289 @@ async def root():
         <script>
             let selectedEdition = "";
             let selectedFormat = "";
+
+            // --- TAB SWITCHER LOGIC ---
+            function switchTab(tabId) {
+                const buttons = document.querySelectorAll('.tab-btn');
+                buttons.forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                const clickedBtn = document.querySelector(`.tab-btn[onclick="switchTab('${tabId}')"]`);
+                if (clickedBtn) clickedBtn.classList.add('active');
+                
+                const sections = document.querySelectorAll('.tab-section');
+                sections.forEach(sec => sec.classList.remove('active'));
+                
+                const targetSec = document.getElementById(`section-${tabId}`);
+                if (targetSec) targetSec.classList.add('active');
+                
+                if (tabId === 'quotemaker') {
+                    // Slight delay to ensure canvas is rendered
+                    setTimeout(drawQuoteCard, 20);
+                }
+            }
+
+            // --- CHARACTER MAP DATA & LOGIC ---
+            const CHAR_DATA = {
+                himavant: {
+                    name_en: "Himavant",
+                    name_kn: "ಹಿಮವಂತ್",
+                    badge_en: "Protagonist",
+                    badge_kn: "ಕಥಾನಾಯಕ",
+                    desc_en: "The passionate, intense protagonist of Heli Hogu Karana. He is a man of deep emotions, conflicted by his love for Prarthana and his complex life choices in a gritty underworld environment.",
+                    desc_kn: "ಕಾದಂಬರಿಯ ಕಥಾನಾಯಕ. ತೀವ್ರವಾದ ಭಾವನೆಗಳುಳ್ಳ, ಪ್ರಾರ್ಥನಾಳ ಮೇಲಿನ ಪ್ರೀತಿ ಹಾಗೂ ತನ್ನ ಜೀವನದ ಸಂಕೀರ್ಣ ನಿರ್ಧಾರಗಳ ನಡುವೆ ಒದ್ದಾಡುವ ತೇಜಸ್ವಿ ವ್ಯಕ್ತಿತ್ವ.",
+                    pages: "Major presence throughout the novel (e.g. Pages 1, 10, 45, 120, 240, 310)"
+                },
+                prarthana: {
+                    name_en: "Prarthana",
+                    name_kn: "ಪ್ರಾರ್ಥನಾ",
+                    badge_en: "Female Lead",
+                    badge_kn: "ನಾಯಕಿ",
+                    desc_en: "The mysterious, beautiful female lead. Her relationship with Himavant is full of emotional depth, silence, and unspoken words, driving much of the story's emotional tension.",
+                    desc_kn: "ಕಾದಂಬರಿಯ ನಾಯಕಿ. ಹಿಮವಂತನ ಪ್ರೀತಿಯ ಸೆಲೆ. ಅವಳ ಮೌನ, ಗಾಂಭೀರ್ಯ ಮತ್ತು ರಹಸ್ಯಮಯ ನಡವಳಿಕೆ ಇಡೀ ಕಥೆಗೆ ಹೊಸ ಭಾವನಾತ್ಮಕ ತಿರುವು ನೀಡುತ್ತದೆ.",
+                    pages: "Pages 5, 22, 54, 108, 195, 280, 340"
+                },
+                ravi: {
+                    name_en: "Ravi",
+                    name_kn: "ರವಿ",
+                    badge_en: "Close Friend",
+                    badge_kn: "ಆತ್ಮೀಯ ಗೆಳೆಯ",
+                    desc_en: "Himavant's close companion and sounding board. He plays a vital role in balancing Himavant's volatile decisions and acts as a bridge of sanity in his turbulent life.",
+                    desc_kn: "ಹಿಮವಂತನ ನಿಷ್ಠಾವಂತ ಒಡನಾಡಿ. ಕಷ್ಟದ ಸಮಯದಲ್ಲಿ ಜೊತೆಯಾಗಿ ನಿಂತು, ಜೀವನದ ಮಹತ್ತರ ತಿರುವುಗಳಲ್ಲಿ ಮಾರ್ಗದರ್ಶನ ನೀಡುವ ವಿಶ್ವಾಸಾರ್ಹ ಗೆಳೆಯ.",
+                    pages: "Pages 15, 42, 87, 134, 210, 295"
+                },
+                rasool: {
+                    name_en: "Rasool Jamadar",
+                    name_kn: "ರಸೂಲ್ ಜಮಾದಾರ",
+                    badge_en: "Companion / Protector",
+                    badge_kn: "ನಿಷ್ಠಾವಂತ ರಕ್ಷಕ",
+                    desc_en: "A rugged associate and protector, representing the fierce and loyal underground world elements in Ravi Belagere's classic narrative landscape.",
+                    desc_kn: "ಹಿಮವಂತನಿಗೆ ನೆರಳಾಗಿ ನಿಲ್ಲುವ ಒರಟು ಸ್ವಭಾವದ ನಿಷ್ಠಾವಂತ ಸಾಥಿ. ಭೂಗತ ಜಗತ್ತಿನ ಕಥಾ ಹೆಣಿಗೆಯಲ್ಲಿ ಧೈರ್ಯ ಮತ್ತು ನಿಷ್ಠೆಯ ಸಂಕೇತ.",
+                    pages: "Pages 34, 78, 112, 160, 255"
+                },
+                belagere: {
+                    name_en: "Ravi Belagere",
+                    name_kn: "ರವಿ ಬೆಳಗೆರೆ",
+                    badge_en: "Author / Narrator",
+                    badge_kn: "ಲೇಖಕ / ನಿರೂಪಕ",
+                    desc_en: "The author and narrator who weaves himself directly into the story's atmosphere. He narrates with his signature intensity, suspense, and emotional attachment to his characters.",
+                    desc_kn: "ಕಾದಂಬರಿಯ ಕರ್ತೃ ಮತ್ತು ಸೂತ್ರಧಾರ. ತಮ್ಮದೇ ಆದ ವಿಶಿಷ್ಟ ಪತ್ರಿಕೋದ್ಯಮ ಮತ್ತು ಸಾಹಿತ್ಯ ಶೈಲಿಯಲ್ಲಿ ಕಥೆಯನ್ನು ಕಟ್ಟಿಕೊಡುತ್ತಾ, ಓದುಗರನ್ನು ಸೆಳೆಯುವ ನಿರೂಪಕ.",
+                    pages: "Narrates and comments throughout the entire novel"
+                }
+            };
+
+            let activeCharId = "";
+            let activeCharLang = "en";
+
+            function clickChar(charId) {
+                activeCharId = charId;
+                
+                // Highlight active node in SVG and dim others
+                const nodes = document.querySelectorAll('.node');
+                nodes.forEach(node => {
+                    const circle = node.querySelector('circle');
+                    const text = node.querySelector('text');
+                    const nodeId = node.getAttribute('id');
+                    
+                    if (nodeId === `node-${charId}`) {
+                        circle.style.r = "28";
+                        circle.style.strokeWidth = "3.5";
+                        circle.style.fill = "var(--primary-light)";
+                        text.style.fontWeight = "bold";
+                        text.style.fontSize = "13px";
+                    } else {
+                        circle.style.r = nodeId === 'node-himavant' ? '25' : '22';
+                        circle.style.strokeWidth = nodeId === 'node-himavant' ? '3' : '2';
+                        circle.style.fill = "#fff";
+                        text.style.fontWeight = nodeId === 'node-himavant' ? 'bold' : 'normal';
+                        text.style.fontSize = nodeId === 'node-himavant' ? '11px' : '10px';
+                    }
+                });
+
+                // Highlight active connections in SVG
+                const edges = document.querySelectorAll('.edge');
+                edges.forEach(edge => {
+                    const id = edge.getAttribute('id');
+                    if (id.includes(charId.substring(0, 3))) {
+                        edge.style.strokeWidth = "4";
+                        edge.style.opacity = "0.9";
+                    } else {
+                        edge.style.strokeWidth = id.includes('pra-rav') ? '1.5' : '2.5';
+                        edge.style.opacity = "0.4";
+                    }
+                });
+
+                // Show details card
+                document.getElementById('char-detail-card').style.display = 'block';
+                document.getElementById('char-detail-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                renderCharCard();
+            }
+
+            function setCharLang(lang) {
+                activeCharLang = lang;
+                document.getElementById('btn-char-en').classList.toggle('active', lang === 'en');
+                document.getElementById('btn-char-kn').classList.toggle('active', lang === 'kn');
+                renderCharCard();
+            }
+
+            function renderCharCard() {
+                if (!activeCharId) return;
+                const char = CHAR_DATA[activeCharId];
+                
+                if (activeCharLang === 'en') {
+                    document.getElementById('char-name').innerHTML = `${char.name_en} <span class="badge">${char.badge_en}</span>`;
+                    document.getElementById('char-desc').innerText = char.desc_en;
+                    document.getElementById('char-pages').innerText = char.pages;
+                } else {
+                    document.getElementById('char-name').innerHTML = `${char.name_kn} <span class="badge">${char.badge_kn}</span>`;
+                    document.getElementById('char-desc').innerText = char.desc_kn;
+                    document.getElementById('char-pages').innerText = char.pages;
+                }
+            }
+
+            // --- INSTAGRAM QUOTE CREATOR LOGIC ---
+            function applyQuotePreset(quote) {
+                if (!quote) return;
+                document.getElementById('quote-text').value = quote;
+                drawQuoteCard();
+            }
+
+            function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+                const words = text.split(' ');
+                let line = '';
+                let lines = [];
+                for (let n = 0; n < words.length; n++) {
+                    let testLine = line + words[n] + ' ';
+                    let metrics = ctx.measureText(testLine);
+                    let testWidth = metrics.width;
+                    if (testWidth > maxWidth && n > 0) {
+                        lines.push(line);
+                        line = words[n] + ' ';
+                    } else {
+                        line = testLine;
+                    }
+                }
+                lines.push(line);
+                
+                for (let k = 0; k < lines.length; k++) {
+                    ctx.fillText(lines[k].trim(), x, y + (k * lineHeight));
+                }
+                return lines.length * lineHeight;
+            }
+
+            function drawQuoteCard() {
+                const canvas = document.getElementById('quote-canvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const quoteText = document.getElementById('quote-text').value.trim() || "ಹೇಳಿ ಹೋಗು ಕಾರಣ...";
+                const style = document.getElementById('quote-style').value;
+                
+                ctx.clearRect(0, 0, 600, 600);
+                
+                // Draw template background
+                if (style === 'saffron') {
+                    let grad = ctx.createLinearGradient(0, 0, 600, 600);
+                    grad.addColorStop(0, '#c2410c');
+                    grad.addColorStop(0.5, '#ea580c');
+                    grad.addColorStop(1, '#ca8a04');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, 600, 600);
+                    
+                    ctx.strokeStyle = 'rgba(254, 243, 199, 0.4)';
+                    ctx.lineWidth = 15;
+                    ctx.strokeRect(20, 20, 560, 560);
+                    
+                    ctx.strokeStyle = 'rgba(254, 243, 199, 0.2)';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(35, 35, 530, 530);
+                    
+                    ctx.fillStyle = '#fef3c7';
+                } else if (style === 'vintage') {
+                    ctx.fillStyle = '#fffbeb';
+                    ctx.fillRect(0, 0, 600, 600);
+                    
+                    ctx.strokeStyle = '#c2410c';
+                    ctx.lineWidth = 12;
+                    ctx.strokeRect(20, 20, 560, 560);
+                    
+                    ctx.fillStyle = '#c2410c';
+                    ctx.fillRect(35, 35, 10, 10);
+                    ctx.fillRect(555, 35, 10, 10);
+                    ctx.fillRect(35, 555, 10, 10);
+                    ctx.fillRect(555, 555, 10, 10);
+                    
+                    ctx.fillStyle = '#0f172a';
+                } else {
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(0, 0, 600, 600);
+                    
+                    ctx.strokeStyle = '#ea580c';
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(25, 25, 550, 550);
+                    
+                    ctx.fillStyle = '#f8fafc';
+                }
+                
+                // Draw Quote marks
+                ctx.font = '90px Georgia, serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                if (style === 'saffron') {
+                    ctx.fillStyle = 'rgba(254, 243, 199, 0.15)';
+                } else if (style === 'vintage') {
+                    ctx.fillStyle = 'rgba(194, 65, 12, 0.08)';
+                } else {
+                    ctx.fillStyle = 'rgba(234, 88, 12, 0.12)';
+                }
+                ctx.fillText('“', 300, 130);
+                
+                // Draw Quote Content
+                if (style === 'saffron') {
+                    ctx.fillStyle = '#fffbeb';
+                } else if (style === 'vintage') {
+                    ctx.fillStyle = '#1e293b';
+                } else {
+                    ctx.fillStyle = '#f1f5f9';
+                }
+                
+                ctx.font = 'italic 25px Georgia, serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                wrapText(ctx, quoteText, 300, 250, 460, 38);
+                
+                // Draw Watermark
+                ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
+                if (style === 'saffron') {
+                    ctx.fillStyle = '#fef3c7';
+                } else if (style === 'vintage') {
+                    ctx.fillStyle = '#c2410c';
+                } else {
+                    ctx.fillStyle = '#ea580c';
+                }
+                ctx.fillText('— ಹೇಳಿ ಹೋಗು ಕಾರಣ / Heli Hogu Karana', 300, 470);
+                
+                ctx.font = '13px monospace';
+                if (style === 'saffron') {
+                    ctx.fillStyle = 'rgba(254, 243, 199, 0.7)';
+                } else if (style === 'vintage') {
+                    ctx.fillStyle = '#64748b';
+                } else {
+                    ctx.fillStyle = '#94a3b8';
+                }
+                ctx.fillText('Instagram: @heli.hogu.kaarana', 300, 510);
+            }
+
+            function downloadQuoteCard() {
+                const canvas = document.getElementById('quote-canvas');
+                const dataURL = canvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                link.download = 'heli_hogu_karana_quote.png';
+                link.href = dataURL;
+                link.click();
+            }
 
             function openDownloadModal(edition, format) {
                 selectedEdition = edition;
