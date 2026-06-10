@@ -1390,17 +1390,14 @@ async def root():
         <!-- MAIN INTERACTION CONTAINER -->
         <div class="container fade-in" style="animation-delay: 0.2s">
             <div class="card">
-                <!-- MEHRAB / ARCH SILHOUETTE CARD TOP OVERLAY -->
-                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 35px; z-index: 2; pointer-events: none; overflow: hidden; margin-top: -1px;">
-                    <svg viewBox="0 0 100 20" preserveAspectRatio="none" style="width: 100%; height: 100%; fill: var(--bg-secondary);">
-                        <path d="M0,0 L100,0 L100,20 C85,20 75,5 65,5 C58,5 55,2 50,0 C45,2 42,5 35,5 C25,5 15,20 0,20 Z" />
-                    </svg>
-                </div>
-
-
-
                 <!-- SECTION 1: AI CHAT GUIDE -->
                 <div id="section-chat" class="tab-section active">
+                    <!-- MEHRAB / ARCH SILHOUETTE -->
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 35px; z-index: 2; pointer-events: none; overflow: hidden; margin-top: -1px;">
+                        <svg viewBox="0 0 100 20" preserveAspectRatio="none" style="width: 100%; height: 100%; fill: var(--bg-secondary);">
+                            <path d="M0,0 L100,0 L100,20 C85,20 75,5 65,5 C58,5 55,2 50,0 C45,2 42,5 35,5 C25,5 15,20 0,20 Z" />
+                        </svg>
+                    </div>
                     <div class="settings">
                         <label class="toggle-label">
                             <input type="checkbox" id="auto-speak"> 🔊 Auto-play Voice Output
@@ -1552,7 +1549,23 @@ async def root():
                                 <button class="char-tab-btn active" id="btn-char-en" onclick="setCharLang('en')">English</button>
                                 <button class="char-tab-btn" id="btn-char-kn" onclick="setCharLang('kn')">ಕನ್ನಡ</button>
                             </div>
-                            <h3 id="char-name">Character Name <span class="badge" id="char-badge">Protagonist</span><                    <div class="quote-creator-box">
+                            <h3 id="char-name">Character Name <span class="badge" id="char-badge">Protagonist</span></h3>
+                            <p id="char-desc" style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6;"></p>
+                            <div style="margin-top: 0.8rem;">
+                                <strong style="font-size: 0.85rem; color: var(--primary);">📖 Key Pages:</strong>
+                                <span id="char-pages" style="font-size: 0.85rem; color: var(--text-muted);"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: QUOTE CREATOR -->
+                <div id="section-quotemaker" class="tab-section">
+                    <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.6rem; font-weight: 700;">🎨 ಕೋಟ್ ಕಾರ್ಡ್ ರಚಿಸಿ / Create Quote Card</h2>
+                    <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5;">
+                        Design beautiful Instagram-ready quote cards from the novel's most powerful lines.
+                    </p>
+                    <div class="quote-creator-box">
                         <canvas id="quote-canvas" width="600" height="600" style="width: 100%; max-width: 380px; border-radius: 16px; border: 1px solid rgba(194, 65, 12, 0.15); display: block; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06);"></canvas>
                         
                         <div class="creator-controls">
@@ -1585,7 +1598,7 @@ async def root():
                                 <!-- English Quotes -->
                                 <select id="quote-presets-en" onchange="applyQuotePreset(this.value)" style="display:none;">
                                     <option value="">-- Custom Quote --</option>
-                                    <option value="Tell me before you leave... because there's a heart here waiting for you.">Tell me before you leave... (Heli Hogu Karana Theme)</option>
+                                    <option value="Tell me before you leave... because there's a heart here waiting for you.">Tell me before you leave... (Theme)</option>
                                     <option value="Love is not just seeing each other's face — it is understanding each other's silence.">Love &amp; Silence</option>
                                     <option value="Sometimes in life, questions are more beautiful than the answers.">Beautiful Questions</option>
                                     <option value="Even silence has a language — you need a very special kind of love to hear it.">Language of Silence</option>
@@ -1621,31 +1634,8 @@ async def root():
                             </button>
                         </div>
                     </div>
-                </div>    <option value="ಮೌನಕ್ಕೂ ಒಂದು ಭಾಷೆಯಿದೆ, ಅದನ್ನ ಆಲಿಸಲು ಒಂದು ವಿಶೇಷವಾದ ಪ್ರೇಮ ಬೇಕು.">ಮೌನಕ್ಕೂ ಒಂದು ಭಾಷೆಯಿದೆ (Language of Silence)</option>
-                                    <option value="ನಾವು ಪ್ರೀತಿಸುವವರ ಕೊರತೆಗಿಂತ, ನಮ್ಮನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವವರ ಕೊರತೆಯೇ ಹೆಚ್ಚು ನೋವು ಕೊಡುತ್ತದೆ.">ನಮ್ಮನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವವರ ಕೊರತೆ (Being Understood)</option>
-                                </select>
-                            </div>
-                            
-                            <div class="control-group">
-                                <label>2. Customize Quote Text / ವಾಕ್ಯವನ್ನು ಬದಲಿಸಿ</label>
-                                <textarea id="quote-text" rows="3" oninput="drawQuoteCard()" placeholder="Type your custom quote here..."></textarea>
-                            </div>
-                            
-                            <div class="control-group">
-                                <label>3. Select Style Theme / ಶೈಲಿ ಆಯ್ಕೆ</label>
-                                <select id="quote-style" onchange="drawQuoteCard()">
-                                    <option value="saffron">Saffron Gold / ಕೇಸರಿ ಚಿನ್ನ</option>
-                                    <option value="vintage">Terracotta Vintage / ವಿಂಟೇಜ್ ಮಣ್ಣು</option>
-                                    <option value="midnight">Midnight Shadow / ಕತ್ತಲೆಯ ನೆರಳು</option>
-                                </select>
-                            </div>
-                            
-                            <button onclick="downloadQuoteCard()" class="main-btn" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <span>📥 Save Quote Card to Device</span>
-                            </button>
-                        </div>
-                    </div>
                 </div>
+
 
                 <!-- SECTION 4: E-BOOK DOWNLOADS -->
                 <div id="section-downloads" class="tab-section">
@@ -1724,8 +1714,6 @@ async def root():
                         <div id="fb-success-msg" style="color: #10b981; font-weight: 700; text-align: center; display: none; margin-top: 10px; font-size: 0.95rem;">✅ Thank you! Your feedback has been submitted. / ಧನ್ಯವಾದ!</div>
                     </form>
                 </div>
-            </div>
-        </div>
             </div>
         </div>
 
