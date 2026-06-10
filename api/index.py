@@ -11,6 +11,8 @@ load_dotenv()
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+EBOOK_PASSWORD = os.getenv("EBOOK_PASSWORD", "readkarana").strip()
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123").strip()
 
 # Configure Gemini SDK with strict key cleaning
 if GEMINI_API_KEY:
@@ -36,6 +38,11 @@ class ChatResponse(BaseModel):
 class VoiceRequest(BaseModel):
     text: str
     language: str = "English"
+
+class FeedbackRequest(BaseModel):
+    name: str
+    rating: int
+    comment: str
 
 TRANSLIT_MAP = {
     "himavant": "ಹಿಮವಂತ್",
@@ -370,12 +377,18 @@ async def voice(request: VoiceRequest):
 
 # ── E-Book Download Routes ───────────────────────────────────────────────────
 @app.get("/api/download/{edition}/{format}")
-async def download_ebook(edition: str, format: str):
+async def download_ebook(edition: str, format: str, password: Optional[str] = None):
     """
     Download a compiled e-book file.
     edition: 'kannada', 'english', or 'bilingual'
     format: 'epub', 'html', or 'md'
     """
+    if not password or password.strip() != EBOOK_PASSWORD:
+        raise HTTPException(
+            status_code=401, 
+            detail="Unauthorized: Invalid password. Please DM @heli.hogu.kaarana on Instagram to get the access password."
+        )
+
     edition = edition.lower()
     format = format.lower()
     
@@ -420,6 +433,153 @@ async def download_ebook(edition: str, format: str):
     }
     
     return FileResponse(file_path, media_type=media_types[format], headers=headers)
+
+@app.post("/api/feedback")
+async def save_feedback(request: FeedbackRequest):
+    try:
+        feedback_data = {
+            "name": request.name,
+            "rating": request.rating,
+            "comment": request.comment,
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        # Log to stdout for real-time Vercel logs
+        print(f"[FEEDBACK SUBMISSION] Name: {feedback_data['name']} | Rating: {feedback_data['rating']} stars | Comment: {feedback_data['comment']}")
+        
+        # Load existing feedback or create new
+        feedback_dir = os.path.join(os.path.dirname(__file__), "data")
+        if not os.path.exists(feedback_dir):
+            feedback_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+            if not os.path.exists(feedback_dir):
+                feedback_dir = "data"
+                
+        feedback_file = os.path.join(feedback_dir, "feedback.json")
+        os.makedirs(feedback_dir, exist_ok=True)
+        
+        feedbacks = []
+        if os.path.exists(feedback_file):
+            try:
+                with open(feedback_file, "r", encoding="utf-8") as f:
+                    feedbacks = json.load(f)
+            except Exception:
+                feedbacks = []
+                
+        feedbacks.append(feedback_data)
+        
+        try:
+            with open(feedback_file, "w", encoding="utf-8") as f:
+                json.dump(feedbacks, f, indent=2, ensure_ascii=False)
+        except Exception as file_err:
+            print(f"[WARNING]: Could not write feedback to disk (expected in serverless): {file_err}")
+            
+        return {"status": "success", "message": "Feedback submitted successfully!"}
+    except Exception as e:
+        print(f"[ERROR]: Feedback submission failed: {e}")
+        return {"status": "error", "message": str(e)}
+
+@app.get("/admin/feedback", response_class=HTMLResponse)
+async def admin_feedback(password: Optional[str] = None):
+    if not password or password.strip() != ADMIN_PASSWORD:
+        return HTMLResponse(
+            status_code=401,
+            content="""
+            <html>
+                <head>
+                    <title>401 Unauthorized</title>
+                    <style>
+                        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fffcf8; color: #0f172a; margin: 0; }
+                        .card { padding: 2rem; border: 1px solid rgba(194, 65, 12, 0.2); border-radius: 12px; background: white; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+                        input { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 10px 0; outline: none; width: 220px; text-align: center; }
+                        button { padding: 8px 16px; border: none; background: #c2410c; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <div class="card">
+                        <h2>🔒 Admin Login</h2>
+                        <p>Please enter the admin password to view feedback.</p>
+                        <form method="get">
+                            <input type="password" name="password" placeholder="Password" autofocus><br>
+                            <button type="submit">Unlock</button>
+                        </form>
+                    </div>
+                </body>
+            </html>
+            """
+        )
+        
+    # Read feedback from file
+    feedback_dir = os.path.join(os.path.dirname(__file__), "data")
+    if not os.path.exists(feedback_dir):
+        feedback_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+        if not os.path.exists(feedback_dir):
+            feedback_dir = "data"
+            
+    feedback_file = os.path.join(feedback_dir, "feedback.json")
+    
+    feedbacks = []
+    if os.path.exists(feedback_file):
+        try:
+            with open(feedback_file, "r", encoding="utf-8") as f:
+                feedbacks = json.load(f)
+        except Exception:
+            pass
+            
+    # Sort feedbacks by timestamp descending
+    try:
+        feedbacks.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+    except Exception:
+        pass
+        
+    feedback_rows = ""
+    for fb in feedbacks:
+        stars = "★" * fb.get("rating", 0) + "☆" * (5 - fb.get("rating", 0))
+        feedback_rows += f"""
+        <div class="fb-card">
+            <div class="fb-header">
+                <span class="fb-name">{fb.get('name', 'Anonymous')}</span>
+                <span class="fb-stars">{stars}</span>
+            </div>
+            <div class="fb-time">{fb.get('timestamp', '')}</div>
+            <div class="fb-comment">{fb.get('comment', '')}</div>
+        </div>
+        """
+        
+    if not feedbacks:
+        feedback_rows = "<p style='text-align:center; color:#64748b;'>No feedback submitted yet.</p>"
+        
+    admin_html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Heli Hogu Karana — Admin Feedback Panel</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body {{ font-family: system-ui, -apple-system, sans-serif; background: #fffcf8; color: #0f172a; margin: 0; padding: 2rem 1rem; }}
+            .container {{ max-width: 800px; margin: 0 auto; }}
+            h1 {{ font-family: Georgia, serif; color: #c2410c; margin-bottom: 0.5rem; }}
+            .subtitle {{ color: #64748b; margin-bottom: 2rem; }}
+            .fb-card {{ background: white; border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.02); }}
+            .fb-header {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }}
+            .fb-name {{ font-weight: bold; font-size: 1.1rem; }}
+            .fb-stars {{ color: #fb923c; font-size: 1.1rem; letter-spacing: 2px; }}
+            .fb-time {{ font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.75rem; }}
+            .fb-comment {{ line-height: 1.5; color: #334155; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>📚 User Feedback Panel</h1>
+            <p class="subtitle">Real-time reader feedback submitted on the novel AI assistant portal.</p>
+            <div class="fb-list">
+                {feedback_rows}
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=admin_html)
 
 @app.get('/favicon.ico', include_in_schema=False)
 async def favicon():
@@ -1044,7 +1204,7 @@ async def root():
         </div>
 
         <!-- E-BOOK DOWNLOAD SECTION -->
-        <div class="container fade-in" style="animation-delay: 0.3s; margin-top: 2.5rem; margin-bottom: 4rem;">
+        <div class="container fade-in" style="animation-delay: 0.3s; margin-top: 2.5rem; margin-bottom: 3rem;">
             <div class="card" style="padding: 2.5rem; border: 1px dashed rgba(194, 65, 12, 0.25); position: relative;">
                 <!-- MEHRAB / ARCH SILHOUETTE CARD TOP OVERLAY -->
                 <div style="position: absolute; top: 0; left: 0; width: 100%; height: 35px; z-index: 2; pointer-events: none; overflow: hidden; margin-top: -1px;">
@@ -1064,9 +1224,9 @@ async def root():
                         <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.35rem; font-weight: 700;">ಕನ್ನಡ ಆವೃತ್ತಿ<br><span style="font-size: 0.95rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">Kannada Edition</span></h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.5;">Original Kannada text of the novel, structured chapter-by-chapter with optimized formatting.</p>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                            <a href="/api/download/kannada/epub" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">EPUB</a>
-                            <a href="/api/download/kannada/html" class="dl-btn" style="text-decoration: none; background: white; border: 1px solid var(--primary); color: var(--primary); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">HTML</a>
-                            <a href="/api/download/kannada/md" class="dl-btn" style="text-decoration: none; background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">MD</a>
+                            <button onclick="openDownloadModal('kannada', 'epub')" class="dl-btn" style="background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; border: none; cursor: pointer; font-family: inherit; outline: none;">EPUB</button>
+                            <button onclick="openDownloadModal('kannada', 'html')" class="dl-btn" style="background: white; border: 1px solid var(--primary); color: var(--primary); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; cursor: pointer; font-family: inherit; outline: none;">HTML</button>
+                            <button onclick="openDownloadModal('kannada', 'md')" class="dl-btn" style="background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; cursor: pointer; font-family: inherit; outline: none;">MD</button>
                         </div>
                     </div>
 
@@ -1076,9 +1236,9 @@ async def root():
                         <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.35rem; font-weight: 700;">ದ್ವಿಭಾಷಾ ಆವೃತ್ತಿ<br><span style="font-size: 0.95rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">Bilingual Edition</span></h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.5;">Side-by-side Kannada and English columns. Perfect for comparative reading and language learning.</p>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                            <a href="/api/download/bilingual/epub" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">EPUB</a>
-                            <a href="/api/download/bilingual/html" class="dl-btn" style="text-decoration: none; background: white; border: 1px solid var(--primary); color: var(--primary); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">HTML</a>
-                            <a href="/api/download/bilingual/md" class="dl-btn" style="text-decoration: none; background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">MD</a>
+                            <button onclick="openDownloadModal('bilingual', 'epub')" class="dl-btn" style="background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; border: none; cursor: pointer; font-family: inherit; outline: none;">EPUB</button>
+                            <button onclick="openDownloadModal('bilingual', 'html')" class="dl-btn" style="background: white; border: 1px solid var(--primary); color: var(--primary); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; cursor: pointer; font-family: inherit; outline: none;">HTML</button>
+                            <button onclick="openDownloadModal('bilingual', 'md')" class="dl-btn" style="background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; cursor: pointer; font-family: inherit; outline: none;">MD</button>
                         </div>
                     </div>
 
@@ -1087,16 +1247,214 @@ async def root():
                         <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.35rem; font-weight: 700;">ಇಂಗ್ಲಿಷ್ ಆವೃತ್ತಿ<br><span style="font-size: 0.95rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">English Edition</span></h3>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; line-height: 1.5;">Complete English literary translation of the novel, reflecting the author's intense narrative style.</p>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                            <a href="/api/download/english/epub" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">EPUB</a>
-                            <a href="/api/download/english/html" class="dl-btn" style="text-decoration: none; background: white; border: 1px solid var(--primary); color: var(--primary); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">HTML</a>
-                            <a href="/api/download/english/md" class="dl-btn" style="text-decoration: none; background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;">MD</a>
+                            <button onclick="openDownloadModal('english', 'epub')" class="dl-btn" style="background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; border: none; cursor: pointer; font-family: inherit; outline: none;">EPUB</button>
+                            <button onclick="openDownloadModal('english', 'html')" class="dl-btn" style="background: white; border: 1px solid var(--primary); color: var(--primary); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; cursor: pointer; font-family: inherit; outline: none;">HTML</button>
+                            <button onclick="openDownloadModal('english', 'md')" class="dl-btn" style="background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; cursor: pointer; font-family: inherit; outline: none;">MD</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- FEEDBACK SECTION -->
+        <div class="container fade-in" style="animation-delay: 0.4s; margin-top: 2rem; margin-bottom: 4rem;">
+            <div class="card" style="padding: 2.5rem; border: 1px solid rgba(194, 65, 12, 0.1); position: relative;">
+                <!-- MEHRAB / ARCH SILHOUETTE CARD TOP OVERLAY -->
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 35px; z-index: 2; pointer-events: none; overflow: hidden; margin-top: -1px;">
+                    <svg viewBox="0 0 100 20" preserveAspectRatio="none" style="width: 100%; height: 100%; fill: var(--bg-secondary);">
+                        <path d="M0,0 L100,0 L100,20 C85,20 75,5 65,5 C58,5 55,2 50,0 C45,2 42,5 35,5 C25,5 15,20 0,20 Z" />
+                    </svg>
+                </div>
+                
+                <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.8rem; font-weight: 700;">✍️ ನಿಮ್ಮ ಅನಿಸಿಕೆ ತಿಳಿಸಿ / Share Your Feedback</h2>
+                <p style="text-align: center; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+                    Have suggestions or feedback about this bilingual RAG assistant? Share your experience below!
+                </p>
+
+                <form id="feedback-form" onsubmit="submitFeedback(event)" style="max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2rem;">
+                    <div style="text-align: left;">
+                        <label for="fb-name" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Your Name / ನಿಮ್ಮ ಹೆಸರು</label>
+                        <input type="text" id="fb-name" placeholder="Enter your name" required style="width: 100%; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-family: inherit; font-size: 0.95rem; outline: none; box-sizing: border-box; background: var(--bg-secondary);">
+                    </div>
+                    
+                    <div style="text-align: left;">
+                        <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px; text-align: center;">Rating / ರೇಟಿಂಗ್</label>
+                        <div class="star-rating" style="display: flex; gap: 8px; justify-content: center; font-size: 2.2rem; color: #cbd5e1; cursor: pointer;">
+                            <span class="star" onclick="setRating(1)" onmouseover="highlightStars(1)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
+                            <span class="star" onclick="setRating(2)" onmouseover="highlightStars(2)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
+                            <span class="star" onclick="setRating(3)" onmouseover="highlightStars(3)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
+                            <span class="star" onclick="setRating(4)" onmouseover="highlightStars(4)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
+                            <span class="star" onclick="setRating(5)" onmouseover="highlightStars(5)" onmouseout="resetStars()" style="transition: color 0.15s;">★</span>
+                        </div>
+                        <input type="hidden" id="fb-rating" value="5">
+                    </div>
+                    
+                    <div style="text-align: left;">
+                        <label for="fb-comment" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Comment / ಅನಿಸಿಕೆ</label>
+                        <textarea id="fb-comment" placeholder="Write your feedback here..." required style="width: 100%; height: 100px; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-family: inherit; font-size: 0.95rem; outline: none; box-sizing: border-box; resize: vertical; background: var(--bg-secondary);"></textarea>
+                    </div>
+                    
+                    <button type="submit" id="fb-submit-btn" style="width: 100%; background: var(--primary); color: white; padding: 12px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s; outline: none; box-shadow: 0 4px 12px rgba(194, 65, 12, 0.25);">Submit Feedback</button>
+                    <div id="fb-success-msg" style="color: #10b981; font-weight: 700; text-align: center; display: none; margin-top: 10px; font-size: 0.95rem;">Thank you! Your feedback has been submitted successfully.</div>
+                </form>
+            </div>
+        </div>
+
+        <!-- INSTAGRAM PASSWORD-LOCK MODAL -->
+        <div id="pw-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; opacity: 0; transition: opacity 0.3s ease;">
+            <div class="modal-card" style="background: white; border: 1px solid rgba(194, 65, 12, 0.15); border-radius: 20px; padding: 2.5rem 2rem; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; transform: scale(0.9); transition: transform 0.3s ease; text-align: center; box-sizing: border-box;">
+                <!-- Close Button -->
+                <button onclick="closeDownloadModal()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.8rem; color: var(--text-muted); cursor: pointer; outline: none; line-height: 1;">&times;</button>
+                
+                <div style="font-size: 3rem; margin-bottom: 0.8rem;">🔒</div>
+                <h3 style="font-family: var(--font-serif); color: var(--primary); font-size: 1.5rem; margin-top: 0; margin-bottom: 0.5rem; font-weight: 700;">Unlock E-Book Download</h3>
+                <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
+                    To protect copyright and support the project, downloads are password-protected. Send a direct message (DM) to our Instagram account to get the password instantly!
+                </p>
+                
+                <a href="https://instagram.com/heli.hogu.kaarana" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; padding: 12px 24px; border-radius: 99px; font-weight: 700; font-size: 0.9rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(220, 39, 67, 0.4); transition: transform 0.2s;">
+                    <svg style="width: 18px; height: 18px; fill: white;" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    DM @heli.hogu.kaarana
+                </a>
+                
+                <div style="text-align: left; margin-bottom: 1.5rem;">
+                    <label for="ebook-pw" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Enter Unlock Password</label>
+                    <input type="password" id="ebook-pw" placeholder="Enter password to download" style="width: 100%; padding: 12px; border: 1.5px solid rgba(194, 65, 12, 0.15); border-radius: 10px; font-family: inherit; font-size: 0.95rem; outline: none; box-sizing: border-box; text-align: center; transition: border-color 0.2s;">
+                    <div id="pw-error" style="color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 6px; display: none; text-align: center;">Incorrect password. Please try again.</div>
+                </div>
+                
+                <button onclick="submitDownload()" style="width: 100%; background: var(--primary); color: white; padding: 12px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s; outline: none; box-shadow: 0 4px 12px rgba(194, 65, 12, 0.25);">Unlock & Download</button>
+            </div>
+        </div>
+
         <script>
+            let selectedEdition = "";
+            let selectedFormat = "";
+
+            function openDownloadModal(edition, format) {
+                selectedEdition = edition;
+                selectedFormat = format;
+                
+                const modal = document.getElementById('pw-modal');
+                document.getElementById('ebook-pw').value = "";
+                document.getElementById('pw-error').style.display = 'none';
+                
+                modal.style.display = 'flex';
+                setTimeout(() => {
+                    modal.style.opacity = '1';
+                    modal.querySelector('.modal-card').style.transform = 'scale(1)';
+                }, 10);
+            }
+
+            function closeDownloadModal() {
+                const modal = document.getElementById('pw-modal');
+                modal.style.opacity = '0';
+                modal.querySelector('.modal-card').style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+
+            async function submitDownload() {
+                const pw = document.getElementById('ebook-pw').value.trim();
+                const err = document.getElementById('pw-error');
+                
+                if (!pw) {
+                    err.innerText = "Please enter a password.";
+                    err.style.display = 'block';
+                    return;
+                }
+                
+                try {
+                    const testUrl = `/api/download/${selectedEdition}/${selectedFormat}?password=${encodeURIComponent(pw)}`;
+                    const resp = await fetch(testUrl, { method: 'GET' });
+                    
+                    if (resp.status === 200) {
+                        window.location.href = testUrl;
+                        closeDownloadModal();
+                    } else if (resp.status === 401) {
+                        err.innerText = "Incorrect password. Please try again.";
+                        err.style.display = 'block';
+                    } else {
+                        err.innerText = "Server error. Please try again later.";
+                        err.style.display = 'block';
+                    }
+                } catch (e) {
+                    err.innerText = "Connection failed. Please check your network.";
+                    err.style.display = 'block';
+                }
+            }
+
+            // Star Rating Logic
+            let currentRating = 5;
+            
+            function setRating(val) {
+                currentRating = val;
+                document.getElementById('fb-rating').value = val;
+                renderStars(val);
+            }
+            
+            function highlightStars(val) {
+                renderStars(val);
+            }
+            
+            function resetStars() {
+                renderStars(currentRating);
+            }
+            
+            function renderStars(val) {
+                const stars = document.querySelectorAll('.star');
+                stars.forEach((star, idx) => {
+                    if (idx < val) {
+                        star.style.color = '#fb923c';
+                    } else {
+                        star.style.color = '#cbd5e1';
+                    }
+                });
+            }
+
+            async function submitFeedback(event) {
+                event.preventDefault();
+                
+                const name = document.getElementById('fb-name').value.trim();
+                const rating = parseInt(document.getElementById('fb-rating').value);
+                const comment = document.getElementById('fb-comment').value.trim();
+                const submitBtn = document.getElementById('fb-submit-btn');
+                const successMsg = document.getElementById('fb-success-msg');
+                
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Submitting...";
+                
+                try {
+                    const response = await fetch('/api/feedback', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, rating, comment })
+                    });
+                    
+                    const res = await response.json();
+                    if (res.status === 'success') {
+                        successMsg.style.display = 'block';
+                        document.getElementById('feedback-form').reset();
+                        currentRating = 5;
+                        renderStars(5);
+                        setTimeout(() => { successMsg.style.display = 'none'; }, 5000);
+                    } else {
+                        alert("Submission failed: " + res.message);
+                    }
+                } catch (e) {
+                    alert("Network error. Please try again.");
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Submit Feedback";
+                }
+            }
+
+            // Initialize ratings display on load
+            window.addEventListener('DOMContentLoaded', () => {
+                renderStars(5);
+            });
+
             let currentText = "";
             let isSpeaking = false;
             let currentAudio = null;
