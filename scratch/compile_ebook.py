@@ -422,14 +422,21 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 }});
                 totalPagesSpan.textContent = maxPage;
                 pageInput.max = maxPage;
-            }}
-            
+            }}            let isProgrammaticScroll = false;
+            let programmaticScrollTimeout = null;
+
             // Function to scroll to a page
             function scrollToPage(pageNum) {{
                 const targetCard = document.getElementById('page-' + pageNum);
                 if (targetCard) {{
+                    isProgrammaticScroll = true;
+                    clearTimeout(programmaticScrollTimeout);
                     targetCard.scrollIntoView({{ behavior: 'smooth' }});
                     updateActiveState(pageNum);
+                    
+                    programmaticScrollTimeout = setTimeout(() => {{
+                        isProgrammaticScroll = false;
+                    }}, 800);
                 }} else {{
                     // If exact page not found, find nearest
                     let nearest = null;
@@ -443,8 +450,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                         }}
                     }});
                     if(nearest) {{
+                        isProgrammaticScroll = true;
+                        clearTimeout(programmaticScrollTimeout);
                         document.getElementById('page-' + nearest).scrollIntoView({{ behavior: 'smooth' }});
                         updateActiveState(nearest);
+                        
+                        programmaticScrollTimeout = setTimeout(() => {{
+                            isProgrammaticScroll = false;
+                        }}, 800);
                     }}
                 }}
             }}
@@ -515,31 +528,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 threshold: 0
             }};
             
-            let isScrolling = false;
-            let scrollTimeout = null;
-            
-            window.addEventListener('scroll', () => {{
-                isScrolling = true;
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {{ isScrolling = false; }}, 150);
-            }});
-            
             const observer = new IntersectionObserver((entries) => {{
                 entries.forEach(entry => {{
-                    if (entry.isIntersecting && !isScrolling) {{
+                    if (entry.isIntersecting && !isProgrammaticScroll) {{
                         const pageNum = entry.target.id.replace('page-', '');
-                        // only update UI, don't trigger scroll
-                        currentPageNum = parseInt(pageNum);
-                        pageInput.value = pageNum;
-                        
-                        sidebarLinks.forEach(link => {{
-                            const linkPageNum = link.getAttribute('href').replace('#page-', '');
-                            if (linkPageNum === pageNum.toString()) {{
-                                link.classList.add('active');
-                            }} else {{
-                                link.classList.remove('active');
-                            }}
-                        }});
+                        updateActiveState(pageNum);
                     }}
                 }});
             }}, observerOptions);
