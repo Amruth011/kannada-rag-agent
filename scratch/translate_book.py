@@ -34,40 +34,39 @@ INPUT_DIR = os.path.join(BASE_DIR, "data", "normalized_text")
 OUTPUT_DIR = os.path.join(BASE_DIR, "data", "english_translated")
 
 # Translation Prompt
-SYSTEM_PROMPT = """You are a professional literary translator specializing in translating Kannada literature to English.
-Your goal is to translate the following page of the Kannada novel 'Heli Hogu Karana' (ಹೇಳಿ ಹೋಗು ಕಾರಣ) by Ravi Belagere into English.
-
-Literary Guidelines:
-1. Maintain the emotional depth, intense narrative tone, and writing style of the author.
-2. Keep character names consistent in English:
-   - ಹಿಮವಂತ -> Himavant
-   - ಪ್ರಾರ್ಥನಾ -> Prarthana
-   - ಶಿವಮೊಗ್ಗ -> Shivamogga
-   - ಚನ್ನರಾಯಪಟ್ಟಣ -> Channarayapatna
-   - ರಸೂಲ್ ಜಮಾದಾರ -> Rasool Jamadar
-3. Translate the text accurately, sentence by sentence. Do NOT summarize or skip paragraphs.
-4. Output ONLY the translated English text. Do not add any introductory or concluding comments, translator notes, or formatting markers.
-"""
+SYSTEM_PROMPT = """Translate the following Kannada novel page into English. Keep character names consistent in English:
+- Himavant
+- Prarthana
+- Shivamogga
+- Channarayapatna
+- Rasool Jamadar
+Do not add any comments or notes. Translate accurately:"""
 
 def get_best_gemini_model():
     """Helper to find the best available model for this specific API key."""
     try:
         models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        # Prefer 2.5 flash, 2.0 flash, then other flash models
+        # Prefer latest flash models
+        for model in models:
+            if "gemini-3.5-flash" in model: return model
+        for model in models:
+            if "gemini-2.5-flash-lite" in model: return model
         for model in models:
             if "gemini-2.5-flash" in model: return model
         for model in models:
             if "gemini-2.0-flash" in model: return model
+        for model in models:
+            if "gemini-flash-lite-latest" in model: return model
         for model in models:
             if "gemini-flash-latest" in model: return model
         for model in models:
             if "gemini-1.5-flash" in model: return model
         for model in models:
             if "gemini-1.5-pro" in model: return model
-        return models[0] if models else "gemini-1.5-flash"
+        return models[0] if models else "gemini-flash-lite-latest"
     except Exception as e:
-        print(f"[WARNING]: Error listing models: {e}. Defaulting to gemini-1.5-flash.")
-        return "gemini-1.5-flash"
+        print(f"[WARNING]: Error listing models: {e}. Defaulting to gemini-flash-lite-latest.")
+        return "gemini-flash-lite-latest"
 
 def translate_page_groq(page_num, text, model_name="auto"):
     """Translates a page of Kannada text using Groq API as a fallback or primary."""
@@ -87,9 +86,9 @@ def translate_page_groq(page_num, text, model_name="auto"):
     
     # Check if a specific model was requested
     if model_name != "auto" and model_name:
-        models = [model_name, "llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+        models = [model_name, "llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama-3.2-3b-preview", "llama-3.2-1b-preview"]
     else:
-        models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+        models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama-3.2-3b-preview", "llama-3.2-1b-preview"]
     
     last_err = ""
     for model in models:
@@ -121,6 +120,12 @@ def translate_page_groq(page_num, text, model_name="auto"):
                                 retry_after = 30.0
                     except Exception:
                         pass
+                    
+                    if retry_after > 60.0:
+                        print(f"[RATE-LIMIT]: Groq rate limit hit on {model}. Retry after {retry_after:.1f}s is too long. Skipping this model.")
+                        last_err = f"Rate limit retry delay {retry_after:.1f}s is too long."
+                        break # Break the attempt loop to move to the next model
+                    
                     print(f"[RATE-LIMIT]: Groq rate limit hit on {model} (Attempt {attempt+1}/4). Retrying in {retry_after:.1f} seconds...")
                     time.sleep(retry_after)
                     continue
@@ -141,7 +146,7 @@ def translate_page(page_num, text, model_name="auto", provider="auto"):
         return translate_page_groq(page_num, text, model_name)
         
     # Standard Gemini translation logic
-    prompt = f"{SYSTEM_PROMPT}\n\n--- KANNADA TEXT (PAGE {page_num}) ---\n{text}\n\n--- ENGLISH TRANSLATION ---"
+    prompt = f"{SYSTEM_PROMPT}\n\n{text}"
     
     # If Gemini key is not set, force Groq fallback immediately
     if not GEMINI_API_KEY:
@@ -155,10 +160,18 @@ def translate_page(page_num, text, model_name="auto", provider="auto"):
     max_retries = 3
     backoff = 2
     
+    # Configure safety settings to BLOCK_NONE to avoid safety block errors on literary content
+    safety_settings = [
+        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
+    ]
+    
     for attempt in range(max_retries):
         try:
             model = genai.GenerativeModel(model_name)
-            response = model.generate_content(prompt)
+            response = model.generate_content(prompt, safety_settings=safety_settings)
             translated_text = response.text.strip()
             
             # Simple validation to ensure we got a valid translation
@@ -267,21 +280,32 @@ def main():
                 out_f.write("")
             continue
             
-        try:
-            english_text = translate_page(page_num, kannada_text, model_name, provider=provider)
-            with open(out_path, "w", encoding="utf-8") as out_f:
-                out_f.write(english_text)
-            
-            translated_count += 1
-            print(f"[SUCCESS]: Page {page_num} translated and saved.")
-            
-            # Rate limit politeness delay: longer for Groq to protect TPM limits
-            delay = 5.0 if provider == "groq" or (provider == "auto" and not GEMINI_API_KEY) else 1.5
-            time.sleep(delay)
-            
-        except Exception as e:
-            print(f"[ERROR]: Failed to translate page {page_num}. Stopping pipeline.")
-            print(f"Error: {e}")
+        max_page_attempts = 5
+        page_success = False
+        for page_attempt in range(max_page_attempts):
+            try:
+                english_text = translate_page(page_num, kannada_text, model_name, provider=provider)
+                with open(out_path, "w", encoding="utf-8") as out_f:
+                    out_f.write(english_text)
+                
+                translated_count += 1
+                print(f"[SUCCESS]: Page {page_num} translated and saved.")
+                
+                # Rate limit politeness delay: longer for Groq and Gemini Free Tier to avoid rate limits
+                delay = 5.0 if provider == "groq" or (provider == "auto" and not GEMINI_API_KEY) else 4.0
+                time.sleep(delay)
+                page_success = True
+                break
+            except Exception as e:
+                print(f"[WARNING]: Failed to translate page {page_num} (Attempt {page_attempt+1}/{max_page_attempts}): {e}")
+                if page_attempt < max_page_attempts - 1:
+                    print("Sleeping 30 seconds before retrying page...")
+                    time.sleep(30)
+                else:
+                    print(f"[ERROR]: Page {page_num} failed completely after {max_page_attempts} attempts. Stopping pipeline.")
+                    break
+                    
+        if not page_success:
             break
             
     print(f"\n[DONE]: Translation run finished!")
