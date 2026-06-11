@@ -1,11 +1,12 @@
 # scratch/compile_ebook.py
-# Compiles page files and cover images into beautiful Markdown, HTML, and EPUB e-books.
+# Compiles page files and cover images into beautiful HTML e-books with Dark Indic UI.
 # Run: python scratch/compile_ebook.py
 
 import os
 import re
 import sys
-import json
+import base64
+import shutil
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -13,6 +14,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KANNADA_DIR = os.path.join(BASE_DIR, "data", "normalized_text")
 ENGLISH_DIR = os.path.join(BASE_DIR, "data", "english_translated")
 OUTPUT_DIR  = os.path.join(BASE_DIR, "data", "ebooks")
+API_DATA_DIR = os.path.join(BASE_DIR, "api", "data", "ebooks")
 
 # Check for cover image
 COVER_IMAGE_PATHS = [
@@ -41,66 +43,6 @@ def load_pages(directory):
                 pages[page_num] = f.read().strip()
     return pages
 
-# --- MARKDOWN COMPILATION ---
-def compile_markdown(kannada_pages, english_pages, cover_path, output_dir):
-    """Compiles pages into .md files."""
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # 1. Kannada Only
-    kn_path = os.path.join(output_dir, "heli_hogu_karana_kannada.md")
-    with open(kn_path, "w", encoding="utf-8") as f:
-        f.write("# ಹೇಳಿ ಹೋಗು ಕಾರಣ (Heli Hogu Karana)\n\n")
-        f.write("**ಲೇಖಕರು**: ರವಿ ಬೆಳಗೆರೆ\n\n")
-        if cover_path:
-            f.write(f"![Cover]({os.path.basename(cover_path)})\n\n")
-        f.write("---\n\n")
-        for page_num in sorted(kannada_pages.keys()):
-            f.write(f"## ಪುಟ {page_num}\n\n")
-            f.write(kannada_pages[page_num] + "\n\n")
-            f.write("---\n\n")
-            
-    # 2. English Only (if translations exist)
-    en_path = None
-    if english_pages:
-        en_path = os.path.join(output_dir, "heli_hogu_karana_english.md")
-        with open(en_path, "w", encoding="utf-8") as f:
-            f.write("# Heli Hogu Karana (Tell the Reason Before You Go)\n\n")
-            f.write("**Author**: Ravi Belagere\n\n")
-            if cover_path:
-                f.write(f"![Cover]({os.path.basename(cover_path)})\n\n")
-            f.write("---\n\n")
-            for page_num in sorted(english_pages.keys()):
-                f.write(f"## Page {page_num}\n\n")
-                f.write(english_pages[page_num] + "\n\n")
-                f.write("---\n\n")
-                
-    # 3. Bilingual (if translations exist)
-    bi_path = None
-    if english_pages:
-        bi_path = os.path.join(output_dir, "heli_hogu_karana_bilingual.md")
-        with open(bi_path, "w", encoding="utf-8") as f:
-            f.write("# ಹೇಳಿ ಹೋಗು ಕಾರಣ | Heli Hogu Karana\n\n")
-            f.write("**ಲೇಖಕರು / Author**: ರವಿ ಬೆಳಗೆರೆ / Ravi Belagere\n\n")
-            if cover_path:
-                f.write(f"![Cover]({os.path.basename(cover_path)})\n\n")
-            f.write("---\n\n")
-            
-            # Combine page-by-page
-            all_pages = sorted(list(set(kannada_pages.keys()) | set(english_pages.keys())))
-            for page_num in all_pages:
-                f.write(f"## Page {page_num} | ಪುಟ {page_num}\n\n")
-                
-                # Kannada text
-                f.write("### ಕನ್ನಡ (Kannada)\n\n")
-                f.write(kannada_pages.get(page_num, "*ಪುಟ ಖಾಲಿ ಇದೆ*") + "\n\n")
-                
-                # English text
-                f.write("### English\n\n")
-                f.write(english_pages.get(page_num, "*Translation in progress*") + "\n\n")
-                f.write("---\n\n")
-                
-    return kn_path, en_path, bi_path
-
 # --- HTML COMPILATION ---
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="{lang}">
@@ -112,23 +54,24 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;1,400&family=Noto+Serif+Kannada:wght@400;700&display=swap');
         
         :root {{
-            --bg-color: #fffcf8;
-            --text-color: #0f172a;
-            --primary: #c2410c;
-            --secondary: #4338ca;
-            --accent-pink: #cc2366;
-            --card-bg: #ffffff;
-            --border-color: rgba(194, 65, 12, 0.08);
+            --bg-color: #050a16;
+            --text-color: #e2e8f0;
+            --primary: #c084fc;
+            --secondary: #38bdf8;
+            --accent-pink: #f472b6;
+            --card-bg: rgba(20, 20, 35, 0.4);
+            --border-color: rgba(255, 255, 255, 0.05);
             --sidebar-width: 300px;
         }}
         
         body {{
-            background: radial-gradient(circle at 50% 0%, #fffefc 0%, #fdf5ee 80%);
+            background: radial-gradient(circle at 15% 50%, #130b29, #09090e 50%, #050a16 100%);
             color: var(--text-color);
             font-family: 'Plus Jakarta Sans', sans-serif;
             line-height: 1.8;
             margin: 0;
             padding: 0;
+            min-height: 100vh;
         }}
         
         .top-navbar {{
@@ -137,9 +80,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             left: 0;
             right: 0;
             height: 70px;
-            background: rgba(253, 245, 238, 0.85);
+            background: rgba(10, 10, 20, 0.7);
             backdrop-filter: blur(24px) saturate(180%);
-            border-bottom: 1px solid rgba(194, 65, 12, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -151,7 +94,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             font-family: 'Outfit', sans-serif;
             font-size: 1.3rem;
             font-weight: 800;
-            background: linear-gradient(to right, #c2410c, #4338ca);
+            background: linear-gradient(to right, #38bdf8, #c084fc, #f472b6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }}
@@ -163,42 +106,63 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }}
         
         .nav-btn {{
-            background: rgba(194, 65, 12, 0.04);
-            border: 1px solid rgba(194, 65, 12, 0.15);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 999px;
-            color: #64748b;
+            color: #94a3b8;
             padding: 0.4rem 1rem;
             font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }}
         
         .nav-btn:hover {{
-            background: rgba(194, 65, 12, 0.1);
-            border-color: #c2410c;
-            color: #c2410c;
-            box-shadow: 0 0 12px rgba(194, 65, 12, 0.1);
+            background: rgba(139,92,246,0.15);
+            border-color: rgba(139,92,246,0.4);
+            color: #c084fc;
+            box-shadow: 0 0 12px rgba(139,92,246,0.2);
+            transform: translateY(-1px);
         }}
         
-        .page-select-dropdown {{
-            background: #fffcf8;
-            border: 1px solid rgba(194, 65, 12, 0.2);
-            border-radius: 999px;
-            color: #0f172a;
-            padding: 0.4rem 1.2rem;
+        .page-input-wrapper {{
+            display: flex;
+            align-items: center;
+            background: rgba(15,15,25,0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 0.2rem 0.5rem;
+            margin: 0 0.5rem;
+            box-shadow: 0 0 20px rgba(139,92,246,0.1);
+        }}
+        
+        .page-input-wrapper span {{
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin: 0 0.4rem;
+        }}
+        
+        .page-input {{
+            background: transparent;
+            border: none;
+            color: #e2e8f0;
+            width: 40px;
+            text-align: center;
             font-size: 0.9rem;
+            font-family: inherit;
             outline: none;
-            cursor: pointer;
-            transition: all 0.2s;
+            -moz-appearance: textfield;
         }}
         
-        .page-select-dropdown:focus {{
-            border-color: var(--primary);
+        .page-input::-webkit-outer-spin-button,
+        .page-input::-webkit-inner-spin-button {{
+            -webkit-appearance: none;
+            margin: 0;
         }}
         
         .navbar-author {{
             font-size: 0.9rem;
-            color: #64748b;
+            color: #94a3b8;
             font-family: 'Outfit', sans-serif;
         }}
         
@@ -213,12 +177,27 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             top: 70px;
             bottom: 0;
             left: 0;
-            background: rgba(253, 245, 238, 0.6);
+            background: rgba(10, 10, 20, 0.4);
             backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(194, 65, 12, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
             padding: 1.5rem;
             overflow-y: auto;
             z-index: 900;
+        }}
+        
+        /* Custom Scrollbar for Sidebar */
+        .sidebar::-webkit-scrollbar {{
+            width: 6px;
+        }}
+        .sidebar::-webkit-scrollbar-track {{
+            background: transparent;
+        }}
+        .sidebar::-webkit-scrollbar-thumb {{
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }}
+        .sidebar::-webkit-scrollbar-thumb:hover {{
+            background: rgba(255,255,255,0.2);
         }}
         
         .sidebar-title {{
@@ -227,7 +206,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             color: var(--primary);
             margin-top: 0;
             margin-bottom: 1.2rem;
-            border-bottom: 1px solid rgba(194, 65, 12, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             padding-bottom: 0.5rem;
         }}
         
@@ -241,10 +220,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             display: block;
             text-align: center;
             padding: 0.5rem;
-            background: rgba(194, 65, 12, 0.02);
-            border: 1px solid rgba(194, 65, 12, 0.08);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 8px;
-            color: #64748b;
+            color: #94a3b8;
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 500;
@@ -252,16 +231,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }}
         
         .sidebar-link:hover {{
-            background: rgba(194, 65, 12, 0.08);
-            border-color: rgba(194, 65, 12, 0.3);
-            color: #c2410c;
+            background: rgba(139,92,246,0.15);
+            border-color: rgba(139,92,246,0.4);
+            color: #c084fc;
         }}
         
         .sidebar-link.active {{
-            background: linear-gradient(135deg, #ffedd5, rgba(194, 65, 12, 0.2));
-            border-color: var(--primary);
-            color: #c2410c;
-            box-shadow: 0 0 10px rgba(194, 65, 12, 0.15);
+            background: linear-gradient(145deg, rgba(168,85,247,0.15) 0%, rgba(236,72,153,0.05) 100%);
+            border-color: #d946ef;
+            color: #e2e8f0;
+            box-shadow: 0 0 10px rgba(217, 70, 239, 0.2);
         }}
         
         .main-content {{
@@ -287,8 +266,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .cover-img {{
             max-width: 320px;
             border-radius: 16px;
-            box-shadow: 0 25px 50px -12px rgba(194, 65, 12, 0.15);
-            border: 1px solid rgba(194, 65, 12, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }}
         
         .page-card {{
@@ -298,15 +277,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             padding: 2.5rem;
             margin-bottom: 3rem;
             backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px -10px rgba(194, 65, 12, 0.08);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             scroll-margin-top: 90px;
         }}
         
         .page-card:hover {{
             transform: translateY(-3px);
-            border-color: rgba(194, 65, 12, 0.2);
-            box-shadow: 0 20px 40px -10px rgba(194, 65, 12, 0.15);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
         }}
         
         .page-header {{
@@ -317,20 +296,23 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             letter-spacing: 0.1em;
             margin-top: 0;
             margin-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(194, 65, 12, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }}
         
         .kannada-text {{
             font-family: 'Noto Serif Kannada', serif;
             font-size: 1.15rem;
             letter-spacing: 0.02em;
-            color: #0f172a;
+            color: #f8fafc;
         }}
         
         .english-text {{
             font-size: 1.05rem;
-            color: #334155;
+            color: #cbd5e1;
         }}
         
         /* Bilingual Layout CSS Grid */
@@ -391,9 +373,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="navbar-title">{title}</div>
         <div class="navbar-nav">
             <button id="prev-btn" class="nav-btn">← Prev</button>
-            <select id="page-select" class="page-select-dropdown">
-                <!-- Javascript will populate options -->
-            </select>
+            <div class="page-input-wrapper">
+                <span>Page</span>
+                <input type="number" id="page-input" class="page-input" min="1" value="1">
+                <span>/ <span id="total-pages"></span></span>
+            </div>
+            <button id="go-btn" class="nav-btn">Go</button>
             <button id="next-btn" class="nav-btn">Next →</button>
         </div>
         <div class="navbar-author">{author}</div>
@@ -420,22 +405,25 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <script>
         document.addEventListener('DOMContentLoaded', () => {{
             const pageCards = document.querySelectorAll('.page-card');
-            const pageSelect = document.getElementById('page-select');
+            const pageInput = document.getElementById('page-input');
+            const totalPagesSpan = document.getElementById('total-pages');
+            const goBtn = document.getElementById('go-btn');
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
             const sidebarLinks = document.querySelectorAll('.sidebar-link');
             
             let currentPageNum = 1;
             
-            // Populate select dropdown
-            pageCards.forEach(card => {{
-                const id = card.id;
-                const pageNum = id.replace('page-', '');
-                const option = document.createElement('option');
-                option.value = pageNum;
-                option.textContent = 'Page ' + pageNum;
-                pageSelect.appendChild(option);
-            }});
+            if(pageCards.length > 0) {{
+                // Extract highest page number from cards
+                let maxPage = 0;
+                pageCards.forEach(card => {{
+                    const num = parseInt(card.id.replace('page-', ''));
+                    if(num > maxPage) maxPage = num;
+                }});
+                totalPagesSpan.textContent = maxPage;
+                pageInput.max = maxPage;
+            }}
             
             // Function to scroll to a page
             function scrollToPage(pageNum) {{
@@ -443,13 +431,29 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 if (targetCard) {{
                     targetCard.scrollIntoView({{ behavior: 'smooth' }});
                     updateActiveState(pageNum);
+                }} else {{
+                    // If exact page not found, find nearest
+                    let nearest = null;
+                    let minDiff = Infinity;
+                    pageCards.forEach(card => {{
+                        const num = parseInt(card.id.replace('page-', ''));
+                        const diff = Math.abs(num - pageNum);
+                        if(diff < minDiff) {{
+                            minDiff = diff;
+                            nearest = num;
+                        }}
+                    }});
+                    if(nearest) {{
+                        document.getElementById('page-' + nearest).scrollIntoView({{ behavior: 'smooth' }});
+                        updateActiveState(nearest);
+                    }}
                 }}
             }}
             
             // Update active states in navbar and sidebar
             function updateActiveState(pageNum) {{
                 currentPageNum = parseInt(pageNum);
-                pageSelect.value = pageNum;
+                pageInput.value = pageNum;
                 
                 // Highlight sidebar link
                 sidebarLinks.forEach(link => {{
@@ -464,9 +468,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 }});
             }}
             
-            // Dropdown change listener
-            pageSelect.addEventListener('change', (e) => {{
-                scrollToPage(e.target.value);
+            // Input Enter key listener
+            pageInput.addEventListener('keypress', (e) => {{
+                if (e.key === 'Enter') {{
+                    scrollToPage(pageInput.value);
+                }}
+            }});
+            
+            // Go button listener
+            goBtn.addEventListener('click', () => {{
+                scrollToPage(pageInput.value);
             }});
             
             // Prev button click listener
@@ -505,11 +516,31 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 threshold: 0
             }};
             
+            let isScrolling = false;
+            let scrollTimeout = null;
+            
+            window.addEventListener('scroll', () => {{
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {{ isScrolling = false; }}, 150);
+            }});
+            
             const observer = new IntersectionObserver((entries) => {{
                 entries.forEach(entry => {{
-                    if (entry.isIntersecting) {{
+                    if (entry.isIntersecting && !isScrolling) {{
                         const pageNum = entry.target.id.replace('page-', '');
-                        updateActiveState(pageNum);
+                        // only update UI, don't trigger scroll
+                        currentPageNum = parseInt(pageNum);
+                        pageInput.value = pageNum;
+                        
+                        sidebarLinks.forEach(link => {{
+                            const linkPageNum = link.getAttribute('href').replace('#page-', '');
+                            if (linkPageNum === pageNum.toString()) {{
+                                link.classList.add('active');
+                            }} else {{
+                                link.classList.remove('active');
+                            }}
+                        }});
                     }}
                 }});
             }}, observerOptions);
@@ -548,7 +579,7 @@ def compile_html(kannada_pages, english_pages, cover_base64, output_dir):
         toc_items.append(f'<a class="sidebar-link" href="#page-{page_num}">{page_num}</a>')
         content_cards.append(f"""
         <div class="page-card" id="page-{page_num}">
-            <div class="page-header">ಪುಟ {page_num}</div>
+            <div class="page-header"><span>ಪುಟ {page_num}</span></div>
             <div class="kannada-text">
                 {kannada_pages[page_num].replace(chr(10), '<br>')}
             </div>
@@ -575,7 +606,7 @@ def compile_html(kannada_pages, english_pages, cover_base64, output_dir):
             toc_items.append(f'<a class="sidebar-link" href="#page-{page_num}">{page_num}</a>')
             content_cards.append(f"""
             <div class="page-card" id="page-{page_num}">
-                <div class="page-header">Page {page_num}</div>
+                <div class="page-header"><span>Page {page_num}</span></div>
                 <div class="english-text">
                     {english_pages[page_num].replace(chr(10), '<br>')}
                 </div>
@@ -606,7 +637,7 @@ def compile_html(kannada_pages, english_pages, cover_base64, output_dir):
             
             content_cards.append(f"""
             <div class="page-card" id="page-{page_num}">
-                <div class="page-header">Page {page_num} | ಪುಟ {page_num}</div>
+                <div class="page-header"><span>Page {page_num} | ಪುಟ {page_num}</span></div>
                 <div class="bilingual-grid">
                     <div class="kannada-column">
                         <p class="column-title kn">ಕನ್ನಡ</p>
@@ -633,240 +664,55 @@ def compile_html(kannada_pages, english_pages, cover_base64, output_dir):
             
     return kn_html_path, en_html_path, bi_html_path
 
-# --- EPUB COMPILATION ---
-def compile_epub(kannada_pages, english_pages, cover_path, output_dir):
-    """Compiles pages into standard EPUB format using ebooklib."""
-    try:
-        from ebooklib import epub
-    except ImportError:
-        print("\n[WARNING]: EbookLib is not installed. Skipping EPUB creation.")
-        print("Hint: run 'pip install ebooklib' to enable EPUB file compilation.")
-        return None, None, None
-        
-    os.makedirs(output_dir, exist_ok=True)
-    
-    # Define generic style
-    epub_style = """
-    body { font-family: sans-serif; padding: 5%; line-height: 1.6; }
-    h1 { text-align: center; color: #c2410c; }
-    .page-header { font-size: 0.8em; color: #64748b; border-bottom: 1px solid #ffedd5; padding-bottom: 3px; margin-bottom: 20px; }
-    .kannada { font-family: serif; font-size: 1.1em; color: #0f172a; }
-    .english { font-size: 1.0em; color: #334155; }
-    .bi-container { margin-bottom: 30px; }
-    .bi-lang-title { font-weight: bold; font-size: 0.9em; color: #4338ca; margin-top: 15px; }
-    """
-    
-    def create_base_epub(title, lang, author):
-        book = epub.EpubBook()
-        book.set_identifier(f"kannada-rag-agent-{lang}")
-        book.set_title(title)
-        book.set_language(lang)
-        book.add_author(author)
-        
-        # Add stylesheet
-        style_item = epub.EpubItem(uid="style_default", file_name="style/default.css", media_type="text/css", content=epub_style)
-        book.add_item(style_item)
-        
-        # Add cover
-        if cover_path and os.path.exists(cover_path):
-            try:
-                # Add cover image file
-                filename = os.path.basename(cover_path)
-                with open(cover_path, "rb") as f:
-                    book.set_cover(filename, f.read())
-            except Exception as e:
-                print(f"[WARNING]: Failed to set EPUB cover: {e}")
-                
-        return book, style_item
-
-    # 1. Kannada Only
-    kn_epub = os.path.join(output_dir, "heli_hogu_karana_kannada.epub")
-    book, style_item = create_base_epub("ಹೇಳಿ ಹೋಗು ಕಾರಣ", "kn", "ರವಿ ಬೆಳಗೆರೆ")
-    
-    spine = ['nav']
-    toc = []
-    
-    for page_num in sorted(kannada_pages.keys()):
-        content = f"""
-        <html>
-        <head><link rel="stylesheet" href="style/default.css" type="text/css"/></head>
-        <body>
-            <div class="page-header">ಪುಟ {page_num}</div>
-            <div class="kannada">
-                {kannada_pages[page_num].replace(chr(10), '<br/>')}
-            </div>
-        </body>
-        </html>
-        """
-        epub_page = epub.EpubHtml(
-            title=f"Page {page_num}",
-            file_name=f"page_{page_num:04d}.xhtml",
-            lang="kn",
-            content=content
-        )
-        book.add_item(epub_page)
-        spine.append(epub_page)
-        toc.append(epub_page)
-        
-    book.toc = tuple(toc)
-    book.add_item(epub.EpubNcx())
-    book.add_item(epub.EpubNav())
-    book.spine = spine
-    epub.write_epub(kn_epub, book, {})
-    
-    # 2. English Only
-    en_epub = None
-    if english_pages:
-        en_epub = os.path.join(output_dir, "heli_hogu_karana_english.epub")
-        book, style_item = create_base_epub("Heli Hogu Karana", "en", "Ravi Belagere")
-        
-        spine = ['nav']
-        toc = []
-        for page_num in sorted(english_pages.keys()):
-            content = f"""
-            <html>
-            <head><link rel="stylesheet" href="style/default.css" type="text/css"/></head>
-            <body>
-                <div class="page-header">Page {page_num}</div>
-                <div class="english">
-                    {english_pages[page_num].replace(chr(10), '<br/>')}
-                </div>
-            </body>
-            </html>
-            """
-            epub_page = epub.EpubHtml(
-                title=f"Page {page_num}",
-                file_name=f"page_{page_num:04d}.xhtml",
-                lang="en",
-                content=content
-            )
-            book.add_item(epub_page)
-            spine.append(epub_page)
-            toc.append(epub_page)
-            
-        book.toc = tuple(toc)
-        book.add_item(epub.EpubNcx())
-        book.add_item(epub.EpubNav())
-        book.spine = spine
-        epub.write_epub(en_epub, book, {})
-        
-    # 3. Bilingual
-    bi_epub = None
-    if english_pages:
-        bi_epub = os.path.join(output_dir, "heli_hogu_karana_bilingual.epub")
-        book, style_item = create_base_epub("ಹೇಳಿ ಹೋಗು ಕಾರಣ (Bilingual)", "mul", "ರವಿ ಬೆಳಗೆರೆ / Ravi Belagere")
-        
-        spine = ['nav']
-        toc = []
-        all_pages = sorted(list(set(kannada_pages.keys()) | set(english_pages.keys())))
-        for page_num in all_pages:
-            kn_text = kannada_pages.get(page_num, "*ಪುಟ ಖಾಲಿ ಇದೆ*").replace(chr(10), '<br/>')
-            en_text = english_pages.get(page_num, "*Translation in progress*").replace(chr(10), '<br/>')
-            
-            content = f"""
-            <html>
-            <head><link rel="stylesheet" href="style/default.css" type="text/css"/></head>
-            <body>
-                <div class="page-header">Page {page_num} | ಪುಟ {page_num}</div>
-                <div class="bi-container">
-                    <div class="bi-lang-title">ಕನ್ನಡ</div>
-                    <div class="kannada">{kn_text}</div>
-                </div>
-                <div class="bi-container">
-                    <div class="bi-lang-title">English</div>
-                    <div class="english">{en_text}</div>
-                </div>
-            </body>
-            </html>
-            """
-            epub_page = epub.EpubHtml(
-                title=f"Page {page_num}",
-                file_name=f"page_{page_num:04d}.xhtml",
-                lang="en",
-                content=content
-            )
-            book.add_item(epub_page)
-            spine.append(epub_page)
-            toc.append(epub_page)
-            
-        book.toc = tuple(toc)
-        book.add_item(epub.EpubNcx())
-        book.add_item(epub.EpubNav())
-        book.spine = spine
-        epub.write_epub(bi_epub, book, {})
-        
-    return kn_epub, en_epub, bi_epub
 
 def main():
-    # Force standard output to UTF-8 on Windows
     if sys.platform == "win32":
         import io
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
         sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
-    print("[RUN]: Running E-Book Compiler...")
+    print("[RUN]: Running E-Book Compiler (HTML Only)...")
     
-    # Load Kannada and English pages
-    print(f"[LOAD]: Loading Kannada pages from: {KANNADA_DIR}")
     kn_pages = load_pages(KANNADA_DIR)
-    print(f"   Loaded {len(kn_pages)} Kannada pages.")
-    
-    print(f"[LOAD]: Loading English pages from: {ENGLISH_DIR}")
     en_pages = load_pages(ENGLISH_DIR)
-    print(f"   Loaded {len(en_pages)} translated English pages.")
     
     if not kn_pages:
-        print("[ERROR]: No Kannada page data found. Cannot compile.")
+        print("[ERROR]: No Kannada page data found.")
         sys.exit(1)
         
     cover_path = find_cover_image()
-    if cover_path:
-        print(f"[COVER]: Cover image found: {cover_path}")
-    else:
-        print("[COVER]: Cover image not found. Proceeding without a cover page.")
-        
-    # Get base64 cover if image exists
     cover_b64 = None
     if cover_path:
-        import base64
         with open(cover_path, "rb") as f:
             cover_b64 = base64.b64encode(f.read()).decode("utf-8")
             
-    # Compile MD
-    print("[COMPILE]: Generating Markdown files...")
-    kn_md, en_md, bi_md = compile_markdown(kn_pages, en_pages, cover_path, OUTPUT_DIR)
-    print(f"   Created: {kn_md}")
-    if en_md: print(f"   Created: {en_md}")
-    if bi_md: print(f"   Created: {bi_md}")
-    
-    # Compile HTML
-    print("[COMPILE]: Generating Premium HTML files...")
+    print("[COMPILE]: Generating Premium HTML files with Dark Indic Theme...")
     kn_html, en_html, bi_html = compile_html(kn_pages, en_pages, cover_b64, OUTPUT_DIR)
     print(f"   Created: {kn_html}")
     if en_html: print(f"   Created: {en_html}")
     if bi_html: print(f"   Created: {bi_html}")
     
-    # Compile EPUB
-    print("[COMPILE]: Generating EPUB files...")
-    kn_epub, en_epub, bi_epub = compile_epub(kn_pages, en_pages, cover_path, OUTPUT_DIR)
-    if kn_epub: print(f"   Created: {kn_epub}")
-    if en_epub: print(f"   Created: {en_epub}")
-    if bi_epub: print(f"   Created: {bi_epub}")
+    print("\n[DEPLOY]: Copying to Vercel API directory...")
+    os.makedirs(API_DATA_DIR, exist_ok=True)
     
-    print("\n[DONE]: E-Book compilation finished!")
-    print(f"   Output directory: {OUTPUT_DIR}")
+    # We delete old markdown/epub files from both places
+    for f in os.listdir(OUTPUT_DIR):
+        if not f.endswith('.html'):
+            try: os.remove(os.path.join(OUTPUT_DIR, f))
+            except: pass
+            
+    for f in os.listdir(API_DATA_DIR):
+        if not f.endswith('.html'):
+            try: os.remove(os.path.join(API_DATA_DIR, f))
+            except: pass
     
-    # Copy to api/data/ebooks for Vercel deployment
-    api_ebooks_dir = os.path.join(BASE_DIR, "api", "data", "ebooks")
-    print(f"[DEPLOY]: Copying compiled files to Vercel directory: {api_ebooks_dir}")
-    os.makedirs(api_ebooks_dir, exist_ok=True)
-    import shutil
+    # Copy html files
     for fname in os.listdir(OUTPUT_DIR):
-        src = os.path.join(OUTPUT_DIR, fname)
-        dst = os.path.join(api_ebooks_dir, fname)
-        if os.path.isfile(src):
-            shutil.copy(src, dst)
-            print(f"   Copied to Vercel: {fname}")
+        if fname.endswith('.html'):
+            shutil.copy(os.path.join(OUTPUT_DIR, fname), os.path.join(API_DATA_DIR, fname))
+            print(f"   Copied: {fname}")
+            
+    print("[DONE]: E-Book compilation finished!")
 
 if __name__ == "__main__":
     main()

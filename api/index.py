@@ -11,7 +11,6 @@ load_dotenv()
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
-EBOOK_PASSWORD = os.getenv("EBOOK_PASSWORD", "readkarana").strip()
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123").strip()
 
 # Configure Gemini SDK with strict key cleaning
@@ -375,30 +374,19 @@ async def voice(request: VoiceRequest):
     audio_b64 = call_sarvam_tts(request.text, language=lang_code)
     return {"audio": audio_b64}
 
-# ── E-Book Download Routes ───────────────────────────────────────────────────
-@app.get("/api/download/{edition}/{format}")
-async def download_ebook(edition: str, format: str, password: Optional[str] = None):
+# ── E-Book Read Route ───────────────────────────────────────────────────
+@app.get("/api/read/{edition}")
+async def read_ebook(edition: str):
     """
-    Download a compiled e-book file.
+    Read a compiled HTML e-book online.
     edition: 'kannada', 'english', or 'bilingual'
-    format: 'epub', 'html', or 'md'
     """
-    if not password or password.strip() != EBOOK_PASSWORD:
-        raise HTTPException(
-            status_code=401, 
-            detail="Unauthorized: Invalid password. Please DM @heli.hogu.kaarana on Instagram to get the access password."
-        )
-
     edition = edition.lower()
-    format = format.lower()
     
     if edition not in ["kannada", "english", "bilingual"]:
         raise HTTPException(status_code=400, detail="Invalid edition. Choose 'kannada', 'english', or 'bilingual'.")
         
-    if format not in ["epub", "html", "md"]:
-        raise HTTPException(status_code=400, detail="Invalid format. Choose 'epub', 'html', or 'md'.")
-        
-    filename = f"heli_hogu_karana_{edition}.{format}"
+    filename = f"heli_hogu_karana_{edition}.html"
     
     # Check possible search paths for compiled ebooks
     search_paths = [
@@ -421,18 +409,8 @@ async def download_ebook(edition: str, format: str, password: Optional[str] = No
             detail=f"E-book file '{filename}' not found. Please compile it first using local administrative scripts."
         )
         
-    media_types = {
-        "epub": "application/epub+zip",
-        "html": "text/html",
-        "md": "text/markdown"
-    }
-    
-    # Force download (Content-Disposition attachment)
-    headers = {
-        "Content-Disposition": f"attachment; filename={filename}"
-    }
-    
-    return FileResponse(file_path, media_type=media_types[format], headers=headers)
+    # Serve directly inline in browser
+    return FileResponse(file_path, media_type="text/html")
 
 @app.post("/api/feedback")
 async def save_feedback(request: FeedbackRequest):
@@ -1639,9 +1617,9 @@ async def root():
 
                 <!-- SECTION 4: E-BOOK DOWNLOADS -->
                 <div id="section-downloads" class="tab-section">
-                    <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.6rem; font-weight: 700;">📚 ಇ-ಪುಸ್ತಕಗಳನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ / Download E-Books</h2>
+                    <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.6rem; font-weight: 700;">📚 ಇ-ಪುಸ್ತಕಗಳನ್ನು ಓದಿ / Read E-Books Online</h2>
                     <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.8rem; line-height: 1.5;">
-                        To support translation costs and cover server bills, e-books are password locked. DM `@heli.hogu.kaarana` on Instagram to get the password!
+                        Read the novel directly in your browser with our new dark-themed Indic reading experience!
                     </p>
                     <div class="download-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem;">
                         <!-- KANNADA EDITION -->
@@ -1649,9 +1627,9 @@ async def root():
                             <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.25rem; font-weight: 700;">ಕನ್ನಡ ಆವೃತ್ತಿ<br><span style="font-size: 0.85rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">Kannada Edition</span></h3>
                             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; flex-grow: 1; line-height: 1.4;">Original Kannada text of the novel, structured with chapter-by-chapter formatting.</p>
                             <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                                <button onclick="openDownloadModal('kannada', 'epub')" class="dl-btn" style="background: var(--primary); color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer; outline: none;">EPUB</button>
-                                <button onclick="openDownloadModal('kannada', 'html')" class="dl-btn" style="background: white; border: 1px solid var(--primary); color: var(--primary); padding: 7px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; outline: none;">HTML</button>
-                                <button onclick="openDownloadModal('kannada', 'md')" class="dl-btn" style="background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 7px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; outline: none;">MD</button>
+                                <a href="/api/read/kannada" target="_blank" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 10px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; border: none; cursor: pointer; outline: none; display: flex; align-items: center; gap: 6px;">
+                                    📖 Read Online
+                                </a>
                             </div>
                         </div>
 
@@ -1661,9 +1639,9 @@ async def root():
                             <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.25rem; font-weight: 700;">ದ್ವಿಭಾಷಾ ಆವೃತ್ತಿ<br><span style="font-size: 0.85rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">Bilingual Edition</span></h3>
                             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; flex-grow: 1; line-height: 1.4;">Side-by-side Kannada and English columns. Ideal for comparative reading.</p>
                             <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                                <button onclick="openDownloadModal('bilingual', 'epub')" class="dl-btn" style="background: var(--primary); color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer; outline: none;">EPUB</button>
-                                <button onclick="openDownloadModal('bilingual', 'html')" class="dl-btn" style="background: white; border: 1px solid var(--primary); color: var(--primary); padding: 7px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; outline: none;">HTML</button>
-                                <button onclick="openDownloadModal('bilingual', 'md')" class="dl-btn" style="background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 7px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; outline: none;">MD</button>
+                                <a href="/api/read/bilingual" target="_blank" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 10px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; border: none; cursor: pointer; outline: none; display: flex; align-items: center; gap: 6px;">
+                                    📖 Read Online
+                                </a>
                             </div>
                         </div>
 
@@ -1672,9 +1650,9 @@ async def root():
                             <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.25rem; font-weight: 700;">ಇಂಗ್ಲಿಷ್ ಆವೃತ್ತಿ<br><span style="font-size: 0.85rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">English Edition</span></h3>
                             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; flex-grow: 1; line-height: 1.4;">Complete English literary translation reflecting the author's intense story arc.</p>
                             <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                                <button onclick="openDownloadModal('english', 'epub')" class="dl-btn" style="background: var(--primary); color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer; outline: none;">EPUB</button>
-                                <button onclick="openDownloadModal('english', 'html')" class="dl-btn" style="background: white; border: 1px solid var(--primary); color: var(--primary); padding: 7px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; outline: none;">HTML</button>
-                                <button onclick="openDownloadModal('english', 'md')" class="dl-btn" style="background: white; border: 1px solid rgba(0,0,0,0.1); color: var(--text); padding: 7px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; outline: none;">MD</button>
+                                <a href="/api/read/english" target="_blank" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 10px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; border: none; cursor: pointer; outline: none; display: flex; align-items: center; gap: 6px;">
+                                    📖 Read Online
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -1717,37 +1695,7 @@ async def root():
             </div>
         </div>
 
-        <!-- INSTAGRAM PASSWORD-LOCK MODAL -->
-        <div id="pw-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; opacity: 0; transition: opacity 0.3s ease;">
-            <div class="modal-card" style="background: white; border: 1px solid rgba(194, 65, 12, 0.15); border-radius: 20px; padding: 2.5rem 2rem; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; transform: scale(0.9); transition: transform 0.3s ease; text-align: center; box-sizing: border-box;">
-                <!-- Close Button -->
-                <button onclick="closeDownloadModal()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.8rem; color: var(--text-muted); cursor: pointer; outline: none; line-height: 1;">&times;</button>
-                
-                <div style="font-size: 3rem; margin-bottom: 0.8rem;">🔒</div>
-                <h3 style="font-family: var(--font-serif); color: var(--primary); font-size: 1.5rem; margin-top: 0; margin-bottom: 0.5rem; font-weight: 700;">Unlock E-Book Download</h3>
-                <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
-                    To protect copyright and support the project, downloads are password-protected. Send a direct message (DM) to our Instagram account to get the password instantly!
-                </p>
-                
-                <a href="https://instagram.com/heli.hogu.kaarana" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; padding: 12px 24px; border-radius: 99px; font-weight: 700; font-size: 0.9rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(220, 39, 67, 0.4); transition: transform 0.2s;">
-                    <svg style="width: 18px; height: 18px; fill: white;" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                    DM @heli.hogu.kaarana
-                </a>
-                
-                <div style="text-align: left; margin-bottom: 1.5rem;">
-                    <label for="ebook-pw" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Enter Unlock Password</label>
-                    <input type="password" id="ebook-pw" placeholder="Enter password to download" style="width: 100%; padding: 12px; border: 1.5px solid rgba(194, 65, 12, 0.15); border-radius: 10px; font-family: inherit; font-size: 0.95rem; outline: none; box-sizing: border-box; text-align: center; transition: border-color 0.2s;">
-                    <div id="pw-error" style="color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 6px; display: none; text-align: center;">Incorrect password. Please try again.</div>
-                </div>
-                
-                <button onclick="submitDownload()" style="width: 100%; background: var(--primary); color: white; padding: 12px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s; outline: none; box-shadow: 0 4px 12px rgba(194, 65, 12, 0.25);">Unlock & Download</button>
-            </div>
-        </div>
-
         <script>
-            let selectedEdition = "";
-            let selectedFormat = "";
-
             // --- TAB SWITCHER LOGIC ---
             function switchTab(tabId) {
                 // Update top navbar active state
@@ -2058,60 +2006,6 @@ async def root():
                 link.download = 'heli_hogu_karana_quote.png';
                 link.href = dataURL;
                 link.click();
-            }
-
-            function openDownloadModal(edition, format) {
-                selectedEdition = edition;
-                selectedFormat = format;
-                
-                const modal = document.getElementById('pw-modal');
-                document.getElementById('ebook-pw').value = "";
-                document.getElementById('pw-error').style.display = 'none';
-                
-                modal.style.display = 'flex';
-                setTimeout(() => {
-                    modal.style.opacity = '1';
-                    modal.querySelector('.modal-card').style.transform = 'scale(1)';
-                }, 10);
-            }
-
-            function closeDownloadModal() {
-                const modal = document.getElementById('pw-modal');
-                modal.style.opacity = '0';
-                modal.querySelector('.modal-card').style.transform = 'scale(0.9)';
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                }, 300);
-            }
-
-            async function submitDownload() {
-                const pw = document.getElementById('ebook-pw').value.trim();
-                const err = document.getElementById('pw-error');
-                
-                if (!pw) {
-                    err.innerText = "Please enter a password.";
-                    err.style.display = 'block';
-                    return;
-                }
-                
-                try {
-                    const testUrl = `/api/download/${selectedEdition}/${selectedFormat}?password=${encodeURIComponent(pw)}`;
-                    const resp = await fetch(testUrl, { method: 'GET' });
-                    
-                    if (resp.status === 200) {
-                        window.location.href = testUrl;
-                        closeDownloadModal();
-                    } else if (resp.status === 401) {
-                        err.innerText = "Incorrect password. Please try again.";
-                        err.style.display = 'block';
-                    } else {
-                        err.innerText = "Server error. Please try again later.";
-                        err.style.display = 'block';
-                    }
-                } catch (e) {
-                    err.innerText = "Connection failed. Please check your network.";
-                    err.style.display = 'block';
-                }
             }
 
             // Star Rating Logic
