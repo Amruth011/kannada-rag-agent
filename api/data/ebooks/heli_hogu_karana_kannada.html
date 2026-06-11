@@ -2890,23 +2890,30 @@
                 });
             });
             
-            // Scroll spy using IntersectionObserver
-            const observerOptions = {
-                root: null,
-                rootMargin: '-80px 0px -50% 0px', // Trigger when card enters upper-middle viewport
-                threshold: 0
-            };
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting && !isProgrammaticScroll) {
-                        const pageNum = entry.target.id.replace('page-', '');
-                        updateActiveState(pageNum);
+            // Scroll spy using scroll position
+            window.addEventListener('scroll', () => {
+                if (isProgrammaticScroll) return;
+                
+                let activeCard = null;
+                let minDiff = Infinity;
+                
+                pageCards.forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    // Check which card's top is closest to 100px from the viewport top
+                    const diff = Math.abs(rect.top - 100);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        activeCard = card;
                     }
                 });
-            }, observerOptions);
-            
-            pageCards.forEach(card => observer.observe(card));
+                
+                if (activeCard) {
+                    const pageNum = activeCard.id.replace('page-', '');
+                    if (parseInt(pageNum) !== currentPageNum) {
+                        updateActiveState(pageNum);
+                    }
+                }
+            });
             
             // Handle initial page load from hash
             const hash = window.location.hash;

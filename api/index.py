@@ -42,6 +42,7 @@ class FeedbackRequest(BaseModel):
     name: str
     rating: int
     comment: str
+    uid: Optional[str] = None
 
 TRANSLIT_MAP = {
     "himavant": "ಹಿಮವಂತ್",
@@ -450,7 +451,7 @@ def get_ip_location(ip: str) -> str:
         print(f"[WARNING] Geolocation lookup failed for IP {ip}: {e}")
     return "Unknown Location"
 
-def log_download(edition: str, is_download: bool, ip: str, user_agent: str):
+def log_download(edition: str, is_download: bool, ip: str, user_agent: str, uid: Optional[str] = None, uname: Optional[str] = None):
     try:
         location = get_ip_location(ip)
         
@@ -460,6 +461,8 @@ def log_download(edition: str, is_download: bool, ip: str, user_agent: str):
             "ip": ip,
             "location": location,
             "user_agent": user_agent,
+            "uid": uid or "Unknown",
+            "uname": uname or "",
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
         }
         
@@ -579,7 +582,7 @@ def get_download_logs():
 
 # ── E-Book Read Route ───────────────────────────────────────────────────
 @app.get("/api/read/{edition}")
-async def read_ebook(edition: str, request: Request, download: Optional[bool] = False):
+async def read_ebook(edition: str, request: Request, download: Optional[bool] = False, uid: Optional[str] = None, uname: Optional[str] = None):
     """
     Read a compiled HTML e-book online.
     edition: 'kannada', 'english', or 'bilingual'
@@ -599,7 +602,7 @@ async def read_ebook(edition: str, request: Request, download: Optional[bool] = 
     user_agent = request.headers.get("user-agent", "Unknown")
     
     # Run logging and geolocation in a background thread to prevent delay in serving ebook
-    threading.Thread(target=log_download, args=(edition, download, ip, user_agent)).start()
+    threading.Thread(target=log_download, args=(edition, download, ip, user_agent, uid, uname)).start()
     
     filename = f"heli_hogu_karana_{edition}.html"
     
@@ -649,6 +652,7 @@ async def save_feedback(request: FeedbackRequest, req_obj: Request):
             "rating": request.rating,
             "comment": request.comment,
             "ip": ip,
+            "uid": request.uid or "Unknown",
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
         }
         
@@ -808,13 +812,18 @@ async def admin_dashboard(password: Optional[str] = None):
     total_downloads = sum(1 for l in logs if "Download" in l.get("type", ""))
     total_logs = len(logs)
     
-    # Map IP addresses to names from feedback
+    # Map IP and UID addresses to names from feedback
     ip_to_name = {}
+    uid_to_name = {}
     for fb in feedbacks:
         fb_ip = fb.get("ip")
+        fb_uid = fb.get("uid")
         fb_name = fb.get("name")
-        if fb_ip and fb_name:
-            ip_to_name[fb_ip] = fb_name
+        if fb_name:
+            if fb_ip:
+                ip_to_name[fb_ip] = fb_name
+            if fb_uid and fb_uid != "Unknown":
+                uid_to_name[fb_uid] = fb_name
             
     feedback_rows = ""
     for fb in feedbacks:
@@ -834,14 +843,27 @@ async def admin_dashboard(password: Optional[str] = None):
         feedback_rows = "<div class='no-data'>No feedback submitted yet.</div>"
         
     log_rows = ""
+    user_activities = {}
     for l in logs:
         badge_class = "badge-download" if "Download" in l.get("type", "") else "badge-read"
         
         # Look up linked name
         log_ip = l.get("ip", "Unknown")
-        resolved_name = ip_to_name.get(log_ip, "Anonymous")
+        log_uid = l.get("uid", "Unknown")
+        log_uname = l.get("uname", "")
+        
+        resolved_name = "Anonymous"
+        if log_uid and log_uid in uid_to_name:
+            resolved_name = uid_to_name[log_uid]
+        elif log_ip and log_ip in ip_to_name:
+            resolved_name = ip_to_name[log_ip]
+        elif log_uname:
+            resolved_name = log_uname
+            
         if resolved_name != "Anonymous":
-            resolved_name = f"{resolved_name} (via Feedback)"
+            resolved_name_display = f"{resolved_name} (via Feedback)" if (log_uid in uid_to_name or log_ip in ip_to_name) else resolved_name
+        else:
+            resolved_name_display = "Anonymous"
             
         resolved_location = l.get("location", "Unknown Location")
         
@@ -850,11 +872,91 @@ async def admin_dashboard(password: Optional[str] = None):
             <td>{l.get('timestamp', '')}</td>
             <td><span class="{badge_class}">{l.get('type', 'Online Read')}</span></td>
             <td><strong>{l.get('edition', '').upper()}</strong></td>
-            <td><span style="font-weight: 600; color: var(--primary);">{resolved_name}</span></td>
+            <td><span style="font-weight: 600; color: var(--primary);">{resolved_name_display}</span></td>
             <td>{resolved_location}</td>
             <td><code>{log_ip}</code></td>
             <td style="font-size:0.8rem; color:var(--text-muted); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{l.get('user_agent', '')}">{l.get('user_agent', 'Unknown')}</td>
         </tr>
+        """
+        
+        # Group under user activities
+        if log_uid == "Unknown":
+            key = f"ip_{log_ip}"
+            display_id = f"IP: {log_ip}"
+        else:
+            key = f"uid_{log_uid}"
+            display_id = f"UID: {log_uid}"
+            
+        if key not in user_activities:
+            user_activities[key] = {
+                "name": resolved_name,
+                "display_id": display_id,
+                "reads": 0,
+                "downloads": 0,
+                "locations": set(),
+                "last_active": "",
+                "details": []
+            }
+            
+        is_download = "Download" in l.get("type", "")
+        if is_download:
+            user_activities[key]["downloads"] += 1
+        else:
+            user_activities[key]["reads"] += 1
+            
+        if resolved_location and resolved_location != "Unknown Location":
+            user_activities[key]["locations"].add(resolved_location)
+            
+        ts = l.get("timestamp", "")
+        if ts > user_activities[key]["last_active"]:
+            user_activities[key]["last_active"] = ts
+            
+        edition = l.get("edition", "").upper()
+        action_type = "Download" if is_download else "Read"
+        user_activities[key]["details"].append(f"{edition} ({action_type})")
+        
+    user_rows = ""
+    sorted_users = sorted(user_activities.items(), key=lambda x: x[1]["last_active"], reverse=True)
+    for key, info in sorted_users:
+        locs = ", ".join(info["locations"]) if info["locations"] else "Unknown Location"
+        history = ", ".join(info["details"][:10])
+        if len(info["details"]) > 10:
+            history += f" (+{len(info['details']) - 10} more)"
+            
+        name_style = "font-weight: 600; color: var(--primary);" if info["name"] != "Anonymous" else "color: var(--text-muted);"
+        
+        user_rows += f"""
+        <tr>
+            <td><span style="{name_style}">{info['name']}</span></td>
+            <td><code>{info['display_id']}</code></td>
+            <td><strong>{info['reads']}</strong></td>
+            <td><strong>{info['downloads']}</strong></td>
+            <td style="font-size:0.85rem;">{locs}</td>
+            <td>{info['last_active']}</td>
+            <td style="font-size:0.8rem; color:var(--text-muted);" title="{history}">{history}</td>
+        </tr>
+        """
+        
+    if not user_activities:
+        users_html = "<div class='no-data'>No active users tracked yet.</div>"
+    else:
+        users_html = f"""
+        <table>
+            <thead>
+                <tr>
+                    <th>User / Name</th>
+                    <th>Identifier</th>
+                    <th>Reads</th>
+                    <th>Downloads</th>
+                    <th>Location(s)</th>
+                    <th>Last Active</th>
+                    <th>Action History</th>
+                </tr>
+            </thead>
+            <tbody>
+                {user_rows}
+            </tbody>
+        </table>
         """
         
     if not logs:
@@ -968,6 +1070,7 @@ async def admin_dashboard(password: Optional[str] = None):
             <!-- Navigation Tabs -->
             <div class="tabs">
                 <button class="tab-btn active" onclick="showTab('tab-feedback')">Feedbacks ({total_fb})</button>
+                <button class="tab-btn" onclick="showTab('tab-users')">User Activity Summary ({len(user_activities)})</button>
                 <button class="tab-btn" onclick="showTab('tab-logs')">Read & Download Logs ({total_logs})</button>
             </div>
             
@@ -976,6 +1079,11 @@ async def admin_dashboard(password: Optional[str] = None):
                 <div class="fb-list">
                     {feedback_rows}
                 </div>
+            </div>
+            
+            <!-- User Activity Tab -->
+            <div id="tab-users" class="tab-content">
+                {users_html}
             </div>
             
             <!-- Logs Tab -->
@@ -2008,6 +2116,19 @@ async def root():
                     <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.8rem; line-height: 1.5;">
                         Read the novel directly in your browser with our new dark-themed Indic reading experience!
                     </p>
+                    
+                    <!-- Optional Profile Name Setup -->
+                    <div style="max-width: 480px; margin: 0 auto 1.8rem auto; background: var(--bg-secondary); border: 1px dashed var(--primary); border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; gap: 8px;">
+                        <label for="user-custom-name" style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; text-align: left; margin: 0;">👤 Personalize Downloads (Optional / ಐಚ್ಛಿಕ)</label>
+                        <p style="font-size: 0.72rem; color: var(--text-muted); margin: 0; text-align: left; line-height: 1.35;">
+                            Enter your name to personalize your offline ebooks and let the developers know you read it. If left blank, you will remain anonymous.
+                        </p>
+                        <div style="display: flex; gap: 8px; margin-top: 4px; position: relative;">
+                            <input type="text" id="user-custom-name" placeholder="Enter your name" style="flex-grow: 1; padding: 8px 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: inherit; font-size: 0.85rem; outline: none; background: white;" oninput="saveUserName(this.value)">
+                            <span id="name-save-status" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 0.75rem; color: #10b981; font-weight: bold; display: none;">Saved!</span>
+                        </div>
+                    </div>
+
                     <div class="download-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem;">
                         <!-- KANNADA EDITION -->
                         <div class="download-box" style="background: var(--bg-secondary); border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
@@ -2088,8 +2209,50 @@ async def root():
                         <div id="fb-success-msg" style="color: #10b981; font-weight: 700; text-align: center; display: none; margin-top: 10px; font-size: 0.95rem;">✅ Thank you! Your feedback has been submitted. / ಧನ್ಯವಾದ!</div>
                     </form>
                 </div>
-            </div>
         </div>
+        
+        <!-- FOOTER WITH CREDITS & SUPPORT -->
+        <footer style="margin-top: 3rem; border-top: 1px solid rgba(194, 65, 12, 0.15); padding-top: 2rem; padding-bottom: 3rem; text-align: center; font-family: var(--font-sans); color: var(--text-muted);">
+            <div class="footer-container" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; align-items: center; padding: 0 1.5rem;">
+                
+                <!-- Novel Writer / Publisher Credits -->
+                <div style="font-size: 0.85rem; line-height: 1.6; max-width: 600px;">
+                    <p style="margin: 0; font-weight: 700; color: var(--primary); font-family: var(--font-serif); font-size: 1.05rem; margin-bottom: 0.25rem;">📚 Novel Credits / ಕಾದಂಬರಿ ಕೃತಜ್ಞತೆಗಳು</p>
+                    <p style="margin: 0; color: var(--text-main); font-weight: 500;">
+                        Original Novel: <strong>Heli Hogu Kaarana (ಹೇಳಿ ಹೋಗು ಕಾರಣ)</strong> by late <strong>Ravi Belagere</strong>.
+                    </p>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                        Published by: <strong>Bhavana Prakashana</strong>, Bengaluru. All credits and rights of the book belong to the original author and publisher.
+                    </p>
+                </div>
+                
+                <!-- Support / Payments / Feedback links -->
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.01);">
+                    <p style="margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        ☕ Support the Developers / ಡೆವಲಪರ್‌ಗಳಿಗೆ ಬೆಂಬಲ ನೀಡಿ
+                    </p>
+                    <p style="margin: 0; font-size: 0.75rem; line-height: 1.4; color: var(--text-muted);">
+                        This RAG assistant and compiled E-Books are developed and maintained as an independent educational tribute. If you find this project helpful, you can optionally support our server and AI API expenses:
+                    </p>
+                    <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 6px;">
+                        <a href="upi://pay?pa=amruth.011-1@okaxis&pn=HeliHoguKaranaDev&tn=Support%20Project" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                            ⚡ Support via UPI
+                        </a>
+                        <a href="https://instagram.com/heli.hogu.kaarana" target="_blank" class="dl-btn" style="text-decoration: none; background: white; border: 1.5px solid var(--primary); color: var(--primary); padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                            📸 Follow & DM on Instagram
+                        </a>
+                    </div>
+                    <p style="margin: 0; font-size: 0.7rem; color: var(--text-muted); font-style: italic; margin-top: 4px;">
+                        (Support is completely optional. Enjoy reading! UPI ID: <code style="background:rgba(0,0,0,0.03); padding:1px 4px; border-radius:3px;">amruth.011-1@okaxis</code>)
+                    </p>
+                </div>
+                
+                <!-- Developer Disclaimer / Footer text -->
+                <div style="font-size: 0.75rem; margin-top: 0.5rem; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 1rem; width: 100%;">
+                    <p style="margin: 0; color: var(--text-muted);">© 2026 Heli Hogu Kaarana AI Guide. Built with ❤️ for Kannada literature lovers.</p>
+                </div>
+            </div>
+        </footer>
 
         <script>
             // --- TAB SWITCHER LOGIC ---
@@ -2454,12 +2617,51 @@ async def root():
                 });
             }
 
+            // --- USER PERSONALIZATION LOGIC ---
+            function updateEbookLinks() {
+                let currentUid = localStorage.getItem('kannada_rag_uid') || 'Unknown';
+                let currentUname = localStorage.getItem('kannada_rag_uname') || '';
+                
+                const links = document.querySelectorAll('a[href^="/api/read/"]');
+                links.forEach(link => {
+                    let originalHref = link.getAttribute('data-base-href') || link.getAttribute('href');
+                    if (!link.getAttribute('data-base-href')) {
+                        link.setAttribute('data-base-href', originalHref);
+                    }
+                    
+                    let separator = originalHref.includes('?') ? '&' : '?';
+                    let newHref = originalHref + separator + 'uid=' + encodeURIComponent(currentUid);
+                    if (currentUname) {
+                        newHref += '&uname=' + encodeURIComponent(currentUname);
+                    }
+                    link.setAttribute('href', newHref);
+                });
+            }
+
+            function saveUserName(name) {
+                localStorage.setItem('kannada_rag_uname', name.trim());
+                
+                // Sync with feedback name field
+                const fbNameInput = document.getElementById('fb-name');
+                if (fbNameInput) fbNameInput.value = name.trim();
+                
+                updateEbookLinks();
+                
+                // Show saved indicator briefly
+                const status = document.getElementById('name-save-status');
+                if (status) {
+                    status.style.display = 'inline';
+                    setTimeout(() => { status.style.display = 'none'; }, 1500);
+                }
+            }
+
             async function submitFeedback(event) {
                 event.preventDefault();
                 
                 const name = document.getElementById('fb-name').value.trim();
                 const rating = parseInt(document.getElementById('fb-rating').value);
                 const comment = document.getElementById('fb-comment').value.trim();
+                const uid = localStorage.getItem('kannada_rag_uid') || 'Unknown';
                 const submitBtn = document.getElementById('fb-submit-btn');
                 const successMsg = document.getElementById('fb-success-msg');
                 
@@ -2470,7 +2672,7 @@ async def root():
                     const response = await fetch('/api/feedback', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, rating, comment })
+                        body: JSON.stringify({ name, rating, comment, uid })
                     });
                     
                     const res = await response.json();
@@ -2491,9 +2693,26 @@ async def root():
                 }
             }
 
-            // Initialize ratings display on load
+            // Initialize ratings and user info display on load
             window.addEventListener('DOMContentLoaded', () => {
                 renderStars(5);
+                
+                // Initialize UID
+                let uid = localStorage.getItem('kannada_rag_uid');
+                if (!uid) {
+                    const randHex = Math.floor(1000 + Math.random() * 9000).toString();
+                    uid = 'Guest-' + randHex;
+                    localStorage.setItem('kannada_rag_uid', uid);
+                }
+                
+                let uname = localStorage.getItem('kannada_rag_uname') || '';
+                const nameInput = document.getElementById('user-custom-name');
+                if (nameInput) nameInput.value = uname;
+                
+                const fbName = document.getElementById('fb-name');
+                if (fbName) fbName.value = uname;
+                
+                updateEbookLinks();
             });
 
             let currentText = "";
