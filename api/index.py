@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
-import os, re, requests, json, traceback, base64, time
+import os, re, requests, json, traceback, base64, time, threading
 from typing import List, Optional
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -431,12 +431,34 @@ async def voice(request: VoiceRequest):
     audio_b64 = call_sarvam_tts(request.text, language=lang_code)
     return {"audio": audio_b64}
 
+def get_ip_location(ip: str) -> str:
+    """Fetch client location (City, Region, Country) using ip-api.com API."""
+    if not ip or ip in ["127.0.0.1", "localhost", "Unknown"] or ip.startswith("192.168.") or ip.startswith("10."):
+        return "Local Test / Unknown"
+    try:
+        resp = requests.get(f"http://ip-api.com/json/{ip}", timeout=3)
+        if resp.status_code == 200:
+            data = resp.json()
+            if data.get("status") == "success":
+                city = data.get("city", "")
+                region = data.get("regionName", "")
+                country = data.get("country", "")
+                parts = [p for p in [city, region, country] if p]
+                if parts:
+                    return ", ".join(parts)
+    except Exception as e:
+        print(f"[WARNING] Geolocation lookup failed for IP {ip}: {e}")
+    return "Unknown Location"
+
 def log_download(edition: str, is_download: bool, ip: str, user_agent: str):
     try:
+        location = get_ip_location(ip)
+        
         log_data = {
             "edition": edition,
             "type": "Offline Download" if is_download else "Online Read",
             "ip": ip,
+            "location": location,
             "user_agent": user_agent,
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
         }
@@ -576,7 +598,8 @@ async def read_ebook(edition: str, request: Request, download: Optional[bool] = 
         
     user_agent = request.headers.get("user-agent", "Unknown")
     
-    log_download(edition, download, ip, user_agent)
+    # Run logging and geolocation in a background thread to prevent delay in serving ebook
+    threading.Thread(target=log_download, args=(edition, download, ip, user_agent)).start()
     
     filename = f"heli_hogu_karana_{edition}.html"
     
@@ -612,17 +635,25 @@ async def read_ebook(edition: str, request: Request, download: Optional[bool] = 
     return FileResponse(file_path, media_type="text/html")
 
 @app.post("/api/feedback")
-async def save_feedback(request: FeedbackRequest):
+async def save_feedback(request: FeedbackRequest, req_obj: Request):
     try:
+        # Extract client IP address to link user identity on dashboard
+        forwarded = req_obj.headers.get("x-forwarded-for")
+        if forwarded:
+            ip = forwarded.split(",")[0].strip()
+        else:
+            ip = req_obj.client.host if req_obj.client else "Unknown"
+            
         feedback_data = {
             "name": request.name,
             "rating": request.rating,
             "comment": request.comment,
+            "ip": ip,
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
         }
         
         # Log to stdout for real-time Vercel logs
-        print(f"[FEEDBACK SUBMISSION] Name: {feedback_data['name']} | Rating: {feedback_data['rating']} stars | Comment: {feedback_data['comment']}")
+        print(f"[FEEDBACK SUBMISSION] Name: {feedback_data['name']} | Rating: {feedback_data['rating']} stars | Comment: {feedback_data['comment']} | IP: {ip}")
         
         # Load existing feedback from bundled path
         bundled_feedbacks = []
@@ -777,6 +808,14 @@ async def admin_dashboard(password: Optional[str] = None):
     total_downloads = sum(1 for l in logs if "Download" in l.get("type", ""))
     total_logs = len(logs)
     
+    # Map IP addresses to names from feedback
+    ip_to_name = {}
+    for fb in feedbacks:
+        fb_ip = fb.get("ip")
+        fb_name = fb.get("name")
+        if fb_ip and fb_name:
+            ip_to_name[fb_ip] = fb_name
+            
     feedback_rows = ""
     for fb in feedbacks:
         stars = "★" * fb.get("rating", 0) + "☆" * (5 - fb.get("rating", 0))
@@ -797,13 +836,24 @@ async def admin_dashboard(password: Optional[str] = None):
     log_rows = ""
     for l in logs:
         badge_class = "badge-download" if "Download" in l.get("type", "") else "badge-read"
+        
+        # Look up linked name
+        log_ip = l.get("ip", "Unknown")
+        resolved_name = ip_to_name.get(log_ip, "Anonymous")
+        if resolved_name != "Anonymous":
+            resolved_name = f"{resolved_name} (via Feedback)"
+            
+        resolved_location = l.get("location", "Unknown Location")
+        
         log_rows += f"""
         <tr>
             <td>{l.get('timestamp', '')}</td>
             <td><span class="{badge_class}">{l.get('type', 'Online Read')}</span></td>
             <td><strong>{l.get('edition', '').upper()}</strong></td>
-            <td><code>{l.get('ip', 'Unknown')}</code></td>
-            <td style="font-size:0.8rem; color:var(--text-muted); max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{l.get('user_agent', '')}">{l.get('user_agent', 'Unknown')}</td>
+            <td><span style="font-weight: 600; color: var(--primary);">{resolved_name}</span></td>
+            <td>{resolved_location}</td>
+            <td><code>{log_ip}</code></td>
+            <td style="font-size:0.8rem; color:var(--text-muted); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{l.get('user_agent', '')}">{l.get('user_agent', 'Unknown')}</td>
         </tr>
         """
         
@@ -817,6 +867,8 @@ async def admin_dashboard(password: Optional[str] = None):
                     <th>Timestamp</th>
                     <th>Action</th>
                     <th>Edition</th>
+                    <th>User / Name</th>
+                    <th>Location</th>
                     <th>IP Address</th>
                     <th>User-Agent</th>
                 </tr>
