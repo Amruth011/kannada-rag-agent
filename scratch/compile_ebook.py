@@ -112,16 +112,18 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;1,400&family=Noto+Serif+Kannada:wght@400;700&display=swap');
         
         :root {{
-            --bg-color: #0f172a;
+            --bg-color: #09090e;
             --text-color: #e2e8f0;
-            --primary: #8b5cf6;
-            --secondary: #06b6d4;
-            --card-bg: rgba(30, 41, 59, 0.5);
-            --border-color: rgba(255, 255, 255, 0.08);
+            --primary: #c084fc;
+            --secondary: #38bdf8;
+            --accent-pink: #f472b6;
+            --card-bg: rgba(20, 20, 35, 0.4);
+            --border-color: rgba(255, 255, 255, 0.05);
+            --sidebar-width: 300px;
         }}
         
         body {{
-            background-color: var(--bg-color);
+            background: radial-gradient(circle at 15% 50%, #130b29, #09090e 50%, #050a16 100%);
             color: var(--text-color);
             font-family: 'Plus Jakarta Sans', sans-serif;
             line-height: 1.8;
@@ -129,60 +131,188 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             padding: 0;
         }}
         
-        .container {{
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
+        .top-navbar {{
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(15, 15, 25, 0.85);
+            backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 1000;
         }}
         
-        header {{
-            text-align: center;
-            padding: 4rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 3rem;
-        }}
-        
-        h1 {{
+        .navbar-title {{
             font-family: 'Outfit', sans-serif;
-            font-size: 3rem;
-            margin: 0 0 1rem 0;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #38bdf8, #c084fc, #f472b6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }}
         
-        .subtitle {{
-            color: #94a3b8;
-            font-size: 1.2rem;
-            margin: 0;
+        .navbar-nav {{
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }}
         
-        .cover-container {{
+        .nav-btn {{
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            color: #94a3b8;
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }}
+        
+        .nav-btn:hover {{
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.4);
+            color: #c084fc;
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.2);
+        }}
+        
+        .page-select-dropdown {{
+            background: rgba(15, 15, 25, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            color: #e2e8f0;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }}
+        
+        .page-select-dropdown:focus {{
+            border-color: var(--primary);
+        }}
+        
+        .navbar-author {{
+            font-size: 0.9rem;
+            color: #94a3b8;
+            font-family: 'Outfit', sans-serif;
+        }}
+        
+        .reader-layout {{
+            display: flex;
+            margin-top: 70px;
+        }}
+        
+        .sidebar {{
+            width: var(--sidebar-width);
+            position: fixed;
+            top: 70px;
+            bottom: 0;
+            left: 0;
+            background: rgba(10, 10, 20, 0.6);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            overflow-y: auto;
+            z-index: 900;
+        }}
+        
+        .sidebar-title {{
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            color: var(--secondary);
+            margin-top: 0;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 0.5rem;
+        }}
+        
+        .sidebar-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 0.5rem;
+        }}
+        
+        .sidebar-link {{
+            display: block;
             text-align: center;
-            margin: 2rem 0;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }}
+        
+        .sidebar-link:hover {{
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: #c084fc;
+        }}
+        
+        .sidebar-link.active {{
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(192, 132, 252, 0.2));
+            border-color: var(--secondary);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+        }}
+        
+        .main-content {{
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }}
+        
+        .page-container-inner {{
+            max-width: 900px;
+            width: 100%;
+        }}
+        
+        .book-cover-section {{
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 2rem;
         }}
         
         .cover-img {{
             max-width: 320px;
             border-radius: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-color);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }}
         
         .page-card {{
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 2.5rem;
             margin-bottom: 3rem;
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            scroll-margin-top: 90px;
+        }}
+        
+        .page-card:hover {{
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
         }}
         
         .page-header {{
             font-family: 'Outfit', sans-serif;
             font-size: 1.1rem;
-            color: #64748b;
+            color: var(--secondary);
             text-transform: uppercase;
             letter-spacing: 0.1em;
             margin-top: 0;
@@ -195,105 +325,209 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             font-family: 'Noto Serif Kannada', serif;
             font-size: 1.15rem;
             letter-spacing: 0.02em;
+            color: #f1f5f9;
         }}
         
         .english-text {{
             font-size: 1.05rem;
+            color: #cbd5e1;
         }}
         
         /* Bilingual Layout CSS Grid */
         .bilingual-grid {{
             display: grid;
             grid-template-columns: 1fr;
-            gap: 2rem;
+            gap: 2.5rem;
         }}
         
-        @media (min-width: 768px) {{
+        @media (min-width: 1024px) {{
             .bilingual-grid {{
                 grid-template-columns: 1fr 1fr;
             }}
             .kannada-column {{
                 border-right: 1px solid rgba(255, 255, 255, 0.05);
-                padding-right: 2rem;
+                padding-right: 2.5rem;
             }}
         }}
         
         .column-title {{
             font-family: 'Outfit', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 600;
             color: var(--secondary);
             text-transform: uppercase;
             letter-spacing: 0.08em;
             margin-top: 0;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
         }}
         
         .column-title.kn {{
             color: var(--primary);
         }}
         
-        .toc {{
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 4rem;
-        }}
-        
-        .toc-title {{
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.3rem;
-            margin-top: 0;
-            margin-bottom: 1rem;
-            color: var(--secondary);
-        }}
-        
-        .toc-list {{
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 0.5rem;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }}
-        
-        .toc-link {{
-            display: block;
-            text-align: center;
-            padding: 0.4rem;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 8px;
-            color: var(--text-color);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }}
-        
-        .toc-link:hover {{
-            background: var(--primary);
-            transform: translateY(-2px);
+        /* Responsive / Mobile */
+        @media (max-width: 1023px) {{
+            .sidebar {{
+                display: none;
+            }}
+            .main-content {{
+                margin-left: 0;
+                padding: 2rem 1rem;
+            }}
+            .navbar-author {{
+                display: none;
+            }}
+            .top-navbar {{
+                padding: 0 1rem;
+            }}
+            .navbar-title {{
+                font-size: 1.1rem;
+            }}
         }}
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>{title}</h1>
-            <p class="subtitle">{author}</p>
-            {cover_html}
-        </header>
-        
-        <div class="toc">
-            <h3 class="toc-title">Table of Contents</h3>
-            <ul class="toc-list">
-                {toc_html}
-            </ul>
+    <div class="top-navbar">
+        <div class="navbar-title">{title}</div>
+        <div class="navbar-nav">
+            <button id="prev-btn" class="nav-btn">← Prev</button>
+            <select id="page-select" class="page-select-dropdown">
+                <!-- Javascript will populate options -->
+            </select>
+            <button id="next-btn" class="nav-btn">Next →</button>
         </div>
+        <div class="navbar-author">{author}</div>
+    </div>
+    
+    <div class="reader-layout">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">ಪುಟಗಳು / Pages</h3>
+            <div class="sidebar-grid">
+                {toc_html}
+            </div>
+        </aside>
         
-        <main>
-            {content_html}
+        <main class="main-content">
+            <div class="page-container-inner">
+                <div class="book-cover-section">
+                    {cover_html}
+                </div>
+                {content_html}
+            </div>
         </main>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {{
+            const pageCards = document.querySelectorAll('.page-card');
+            const pageSelect = document.getElementById('page-select');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            
+            let currentPageNum = 1;
+            
+            // Populate select dropdown
+            pageCards.forEach(card => {{
+                const id = card.id;
+                const pageNum = id.replace('page-', '');
+                const option = document.createElement('option');
+                option.value = pageNum;
+                option.textContent = 'Page ' + pageNum;
+                pageSelect.appendChild(option);
+            }});
+            
+            // Function to scroll to a page
+            function scrollToPage(pageNum) {{
+                const targetCard = document.getElementById('page-' + pageNum);
+                if (targetCard) {{
+                    targetCard.scrollIntoView({{ behavior: 'smooth' }});
+                    updateActiveState(pageNum);
+                }}
+            }}
+            
+            // Update active states in navbar and sidebar
+            function updateActiveState(pageNum) {{
+                currentPageNum = parseInt(pageNum);
+                pageSelect.value = pageNum;
+                
+                // Highlight sidebar link
+                sidebarLinks.forEach(link => {{
+                    const linkPageNum = link.getAttribute('href').replace('#page-', '');
+                    if (linkPageNum === pageNum.toString()) {{
+                        link.classList.add('active');
+                        // Scroll sidebar to keep active link in view
+                        link.scrollIntoView({{ behavior: 'nearest', block: 'nearest' }});
+                    }} else {{
+                        link.classList.remove('active');
+                    }}
+                }});
+            }}
+            
+            // Dropdown change listener
+            pageSelect.addEventListener('change', (e) => {{
+                scrollToPage(e.target.value);
+            }});
+            
+            // Prev button click listener
+            prevBtn.addEventListener('click', () => {{
+                const index = Array.from(pageCards).findIndex(card => parseInt(card.id.replace('page-', '')) === currentPageNum);
+                if (index > 0) {{
+                    const prevPageNum = pageCards[index - 1].id.replace('page-', '');
+                    scrollToPage(prevPageNum);
+                }}
+            }});
+            
+            // Next button click listener
+            nextBtn.addEventListener('click', () => {{
+                const index = Array.from(pageCards).findIndex(card => parseInt(card.id.replace('page-', '')) === currentPageNum);
+                if (index < pageCards.length - 1) {{
+                    const nextPageNum = pageCards[index + 1].id.replace('page-', '');
+                    scrollToPage(nextPageNum);
+                }}
+            }});
+            
+            // Sidebar link click listeners
+            sidebarLinks.forEach(link => {{
+                link.addEventListener('click', (e) => {{
+                    e.preventDefault();
+                    const pageNum = link.getAttribute('href').replace('#page-', '');
+                    scrollToPage(pageNum);
+                    // Update URL hash without scrolling
+                    history.pushState(null, null, '#page-' + pageNum);
+                }});
+            }});
+            
+            // Scroll spy using IntersectionObserver
+            const observerOptions = {{
+                root: null,
+                rootMargin: '-80px 0px -50% 0px', // Trigger when card enters upper-middle viewport
+                threshold: 0
+            }};
+            
+            const observer = new IntersectionObserver((entries) => {{
+                entries.forEach(entry => {{
+                    if (entry.isIntersecting) {{
+                        const pageNum = entry.target.id.replace('page-', '');
+                        updateActiveState(pageNum);
+                    }}
+                }});
+            }}, observerOptions);
+            
+            pageCards.forEach(card => observer.observe(card));
+            
+            // Handle initial page load from hash
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#page-')) {{
+                const pageNum = hash.replace('#page-', '');
+                setTimeout(() => scrollToPage(pageNum), 500);
+            }} else if (pageCards.length > 0) {{
+                // Set page 1 active by default
+                const firstPageNum = pageCards[0].id.replace('page-', '');
+                updateActiveState(firstPageNum);
+            }}
+        }});
+    </script>
 </body>
 </html>
 """
@@ -311,7 +545,7 @@ def compile_html(kannada_pages, english_pages, cover_base64, output_dir):
     toc_items = []
     content_cards = []
     for page_num in sorted(kannada_pages.keys()):
-        toc_items.append(f'<li><a class="toc-link" href="#page-{page_num}">{page_num}</a></li>')
+        toc_items.append(f'<a class="sidebar-link" href="#page-{page_num}">{page_num}</a>')
         content_cards.append(f"""
         <div class="page-card" id="page-{page_num}">
             <div class="page-header">ಪುಟ {page_num}</div>
@@ -338,7 +572,7 @@ def compile_html(kannada_pages, english_pages, cover_base64, output_dir):
         toc_items = []
         content_cards = []
         for page_num in sorted(english_pages.keys()):
-            toc_items.append(f'<li><a class="toc-link" href="#page-{page_num}">{page_num}</a></li>')
+            toc_items.append(f'<a class="sidebar-link" href="#page-{page_num}">{page_num}</a>')
             content_cards.append(f"""
             <div class="page-card" id="page-{page_num}">
                 <div class="page-header">Page {page_num}</div>
@@ -366,7 +600,7 @@ def compile_html(kannada_pages, english_pages, cover_base64, output_dir):
         content_cards = []
         all_pages = sorted(list(set(kannada_pages.keys()) | set(english_pages.keys())))
         for page_num in all_pages:
-            toc_items.append(f'<li><a class="toc-link" href="#page-{page_num}">{page_num}</a></li>')
+            toc_items.append(f'<a class="sidebar-link" href="#page-{page_num}">{page_num}</a>')
             kn_text = kannada_pages.get(page_num, "*ಪುಟ ಖಾಲಿ ಇದೆ*").replace(chr(10), '<br>')
             en_text = english_pages.get(page_num, "*Translation in progress*").replace(chr(10), '<br>')
             
@@ -621,6 +855,18 @@ def main():
     
     print("\n[DONE]: E-Book compilation finished!")
     print(f"   Output directory: {OUTPUT_DIR}")
+    
+    # Copy to api/data/ebooks for Vercel deployment
+    api_ebooks_dir = os.path.join(BASE_DIR, "api", "data", "ebooks")
+    print(f"[DEPLOY]: Copying compiled files to Vercel directory: {api_ebooks_dir}")
+    os.makedirs(api_ebooks_dir, exist_ok=True)
+    import shutil
+    for fname in os.listdir(OUTPUT_DIR):
+        src = os.path.join(OUTPUT_DIR, fname)
+        dst = os.path.join(api_ebooks_dir, fname)
+        if os.path.isfile(src):
+            shutil.copy(src, dst)
+            print(f"   Copied to Vercel: {fname}")
 
 if __name__ == "__main__":
     main()
