@@ -125,6 +125,33 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             transform: translateY(-1px);
         }}
         
+        .offline-btn {{
+            background: rgba(16, 185, 129, 0.1) !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+            color: #34d399 !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }}
+        
+        .offline-btn:hover {{
+            background: rgba(16, 185, 129, 0.2) !important;
+            border-color: rgba(16, 185, 129, 0.5) !important;
+            color: #34d399 !important;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.2) !important;
+            transform: translateY(-1px);
+        }}
+        
+        @media (max-width: 600px) {{
+            .offline-btn .btn-text {{
+                display: none;
+            }}
+            .offline-btn {{
+                padding: 0.4rem 0.6rem !important;
+            }}
+        }}
+        
         .page-input-wrapper {{
             display: flex;
             align-items: center;
@@ -380,6 +407,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </div>
             <button id="go-btn" class="nav-btn">Go</button>
             <button id="next-btn" class="nav-btn">Next →</button>
+            <a href="/api/read/{edition}?download=true" download class="nav-btn offline-btn">
+                📥 <span class="btn-text">Save Offline</span>
+            </a>
         </div>
         <div class="navbar-author">{author}</div>
     </div>
@@ -594,7 +624,8 @@ def compile_html(kannada_pages, english_pages, cover_base64, output_dir):
             author="ರವಿ ಬೆಳಗೆರೆ",
             cover_html=cover_html,
             toc_html="".join(toc_items),
-            content_html="".join(content_cards)
+            content_html="".join(content_cards),
+            edition="kannada"
         ))
         
     # 2. English Only
@@ -621,7 +652,8 @@ def compile_html(kannada_pages, english_pages, cover_base64, output_dir):
                 author="Ravi Belagere",
                 cover_html=cover_html,
                 toc_html="".join(toc_items),
-                content_html="".join(content_cards)
+                content_html="".join(content_cards),
+                edition="english"
             ))
             
     # 3. Bilingual
@@ -659,7 +691,8 @@ def compile_html(kannada_pages, english_pages, cover_base64, output_dir):
                 author="ರವಿ ಬೆಳಗೆರೆ / Ravi Belagere",
                 cover_html=cover_html,
                 toc_html="".join(toc_items),
-                content_html="".join(content_cards)
+                content_html="".join(content_cards),
+                edition="bilingual"
             ))
             
     return kn_html_path, en_html_path, bi_html_path

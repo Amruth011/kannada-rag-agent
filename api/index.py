@@ -376,7 +376,7 @@ async def voice(request: VoiceRequest):
 
 # ── E-Book Read Route ───────────────────────────────────────────────────
 @app.get("/api/read/{edition}")
-async def read_ebook(edition: str):
+async def read_ebook(edition: str, download: Optional[bool] = False):
     """
     Read a compiled HTML e-book online.
     edition: 'kannada', 'english', or 'bilingual'
@@ -407,6 +407,13 @@ async def read_ebook(edition: str):
         raise HTTPException(
             status_code=404, 
             detail=f"E-book file '{filename}' not found. Please compile it first using local administrative scripts."
+        )
+        
+    if download:
+        return FileResponse(
+            file_path,
+            media_type="text/html",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
         
     # Serve directly inline in browser

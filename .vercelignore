@@ -4,7 +4,7 @@ model_cache/
 poppler-25.12.0/
 chroma_db/
 vectorstore/
-data/
+/data/
 ingest/
 deploy_dist/
 audio/
