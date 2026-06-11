@@ -112,18 +112,18 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;1,400&family=Noto+Serif+Kannada:wght@400;700&display=swap');
         
         :root {{
-            --bg-color: #09090e;
-            --text-color: #e2e8f0;
-            --primary: #c084fc;
-            --secondary: #38bdf8;
-            --accent-pink: #f472b6;
-            --card-bg: rgba(20, 20, 35, 0.4);
-            --border-color: rgba(255, 255, 255, 0.05);
+            --bg-color: #fffcf8;
+            --text-color: #0f172a;
+            --primary: #c2410c;
+            --secondary: #4338ca;
+            --accent-pink: #cc2366;
+            --card-bg: #ffffff;
+            --border-color: rgba(194, 65, 12, 0.08);
             --sidebar-width: 300px;
         }}
         
         body {{
-            background: radial-gradient(circle at 15% 50%, #130b29, #09090e 50%, #050a16 100%);
+            background: radial-gradient(circle at 50% 0%, #fffefc 0%, #fdf5ee 80%);
             color: var(--text-color);
             font-family: 'Plus Jakarta Sans', sans-serif;
             line-height: 1.8;
@@ -137,9 +137,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             left: 0;
             right: 0;
             height: 70px;
-            background: rgba(15, 15, 25, 0.85);
+            background: rgba(253, 245, 238, 0.85);
             backdrop-filter: blur(24px) saturate(180%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(194, 65, 12, 0.1);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -151,7 +151,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             font-family: 'Outfit', sans-serif;
             font-size: 1.3rem;
             font-weight: 800;
-            background: linear-gradient(to right, #38bdf8, #c084fc, #f472b6);
+            background: linear-gradient(to right, #c2410c, #4338ca);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }}
@@ -163,10 +163,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }}
         
         .nav-btn {{
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(194, 65, 12, 0.04);
+            border: 1px solid rgba(194, 65, 12, 0.15);
             border-radius: 999px;
-            color: #94a3b8;
+            color: #64748b;
             padding: 0.4rem 1rem;
             font-size: 0.9rem;
             cursor: pointer;
@@ -174,17 +174,17 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }}
         
         .nav-btn:hover {{
-            background: rgba(139, 92, 246, 0.15);
-            border-color: rgba(139, 92, 246, 0.4);
-            color: #c084fc;
-            box-shadow: 0 0 12px rgba(139, 92, 246, 0.2);
+            background: rgba(194, 65, 12, 0.1);
+            border-color: #c2410c;
+            color: #c2410c;
+            box-shadow: 0 0 12px rgba(194, 65, 12, 0.1);
         }}
         
         .page-select-dropdown {{
-            background: rgba(15, 15, 25, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #fffcf8;
+            border: 1px solid rgba(194, 65, 12, 0.2);
             border-radius: 999px;
-            color: #e2e8f0;
+            color: #0f172a;
             padding: 0.4rem 1.2rem;
             font-size: 0.9rem;
             outline: none;
@@ -198,7 +198,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         
         .navbar-author {{
             font-size: 0.9rem;
-            color: #94a3b8;
+            color: #64748b;
             font-family: 'Outfit', sans-serif;
         }}
         
@@ -213,9 +213,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             top: 70px;
             bottom: 0;
             left: 0;
-            background: rgba(10, 10, 20, 0.6);
+            background: rgba(253, 245, 238, 0.6);
             backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(194, 65, 12, 0.1);
             padding: 1.5rem;
             overflow-y: auto;
             z-index: 900;
@@ -224,10 +224,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .sidebar-title {{
             font-family: 'Outfit', sans-serif;
             font-size: 1.1rem;
-            color: var(--secondary);
+            color: var(--primary);
             margin-top: 0;
             margin-bottom: 1.2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(194, 65, 12, 0.1);
             padding-bottom: 0.5rem;
         }}
         
@@ -241,10 +241,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             display: block;
             text-align: center;
             padding: 0.5rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(194, 65, 12, 0.02);
+            border: 1px solid rgba(194, 65, 12, 0.08);
             border-radius: 8px;
-            color: #94a3b8;
+            color: #64748b;
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 500;
@@ -252,16 +252,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }}
         
         .sidebar-link:hover {{
-            background: rgba(139, 92, 246, 0.1);
-            border-color: rgba(139, 92, 246, 0.3);
-            color: #c084fc;
+            background: rgba(194, 65, 12, 0.08);
+            border-color: rgba(194, 65, 12, 0.3);
+            color: #c2410c;
         }}
         
         .sidebar-link.active {{
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(192, 132, 252, 0.2));
-            border-color: var(--secondary);
-            color: #ffffff;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+            background: linear-gradient(135deg, #ffedd5, rgba(194, 65, 12, 0.2));
+            border-color: var(--primary);
+            color: #c2410c;
+            box-shadow: 0 0 10px rgba(194, 65, 12, 0.15);
         }}
         
         .main-content {{
@@ -287,8 +287,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .cover-img {{
             max-width: 320px;
             border-radius: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(194, 65, 12, 0.15);
+            border: 1px solid rgba(194, 65, 12, 0.1);
         }}
         
         .page-card {{
@@ -298,26 +298,26 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             padding: 2.5rem;
             margin-bottom: 3rem;
             backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(194, 65, 12, 0.08);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             scroll-margin-top: 90px;
         }}
         
         .page-card:hover {{
             transform: translateY(-3px);
-            border-color: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+            border-color: rgba(194, 65, 12, 0.2);
+            box-shadow: 0 20px 40px -10px rgba(194, 65, 12, 0.15);
         }}
         
         .page-header {{
             font-family: 'Outfit', sans-serif;
             font-size: 1.1rem;
-            color: var(--secondary);
+            color: var(--primary);
             text-transform: uppercase;
             letter-spacing: 0.1em;
             margin-top: 0;
             margin-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(194, 65, 12, 0.1);
             padding-bottom: 0.5rem;
         }}
         
@@ -325,12 +325,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             font-family: 'Noto Serif Kannada', serif;
             font-size: 1.15rem;
             letter-spacing: 0.02em;
-            color: #f1f5f9;
+            color: #0f172a;
         }}
         
         .english-text {{
             font-size: 1.05rem;
-            color: #cbd5e1;
+            color: #334155;
         }}
         
         /* Bilingual Layout CSS Grid */
@@ -648,12 +648,12 @@ def compile_epub(kannada_pages, english_pages, cover_path, output_dir):
     # Define generic style
     epub_style = """
     body { font-family: sans-serif; padding: 5%; line-height: 1.6; }
-    h1 { text-align: center; color: #8b5cf6; }
-    .page-header { font-size: 0.8em; color: #666; border-bottom: 1px solid #ddd; padding-bottom: 3px; margin-bottom: 20px; }
-    .kannada { font-family: serif; font-size: 1.1em; }
-    .english { font-size: 1.0em; }
+    h1 { text-align: center; color: #c2410c; }
+    .page-header { font-size: 0.8em; color: #64748b; border-bottom: 1px solid #ffedd5; padding-bottom: 3px; margin-bottom: 20px; }
+    .kannada { font-family: serif; font-size: 1.1em; color: #0f172a; }
+    .english { font-size: 1.0em; color: #334155; }
     .bi-container { margin-bottom: 30px; }
-    .bi-lang-title { font-weight: bold; font-size: 0.9em; color: #06b6d4; margin-top: 15px; }
+    .bi-lang-title { font-weight: bold; font-size: 0.9em; color: #4338ca; margin-top: 15px; }
     """
     
     def create_base_epub(title, lang, author):
