@@ -20,6 +20,42 @@ if GEMINI_API_KEY:
     except Exception as e:
         print(f"SDK Config Error: {e}")
 
+# ── Vercel KV / Upstash Redis REST Helpers ─────────────────────────────
+def run_kv_command(cmd_args: list):
+    url = os.environ.get("KV_REST_API_URL")
+    token = os.environ.get("KV_REST_API_TOKEN")
+    if not url or not token:
+        return None
+    try:
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+        url = url.strip()
+        resp = requests.post(url, headers=headers, json=cmd_args, timeout=5)
+        if resp.status_code == 200:
+            return resp.json().get("result")
+    except Exception as e:
+        print(f"[ERROR] KV command {cmd_args[0]} failed: {e}")
+    return None
+
+def get_kv_data(key: str, default=None):
+    res = run_kv_command(["GET", key])
+    if res is not None:
+        try:
+            return json.loads(res)
+        except Exception:
+            pass
+    return default
+
+def set_kv_data(key: str, value) -> bool:
+    try:
+        payload = json.dumps(value)
+        res = run_kv_command(["SET", key, payload])
+        return res == "OK"
+    except Exception:
+        return False
+
 BOOK_CONTEXT = "You are a professional literary assistant. Use these Kannada book passages to answer the user question in English. Provide deep analysis and always cite page numbers."
 
 app = FastAPI(title="Kannada Book AI Agent + Voice")
@@ -492,13 +528,16 @@ def log_download(edition: str, is_download: bool, ip: str, user_agent: str, uid:
             except Exception:
                 pass
 
+        # Load existing logs from Vercel KV
+        kv_logs = get_kv_data("kannada_rag_downloads", [])
+
         # Combine logs to prevent loss
         seen = set()
         logs = []
         def get_log_key(l):
             return (l.get("edition", ""), l.get("type", ""), l.get("ip", ""), l.get("user_agent", ""), l.get("timestamp", ""))
 
-        for l in bundled_logs + tmp_logs:
+        for l in kv_logs + bundled_logs + tmp_logs:
             key = get_log_key(l)
             if key not in seen:
                 seen.add(key)
@@ -511,6 +550,9 @@ def log_download(edition: str, is_download: bool, ip: str, user_agent: str, uid:
             
         if len(logs) > 500:
             logs = logs[-500:]
+
+        # Save to Vercel KV
+        set_kv_data("kannada_rag_downloads", logs)
 
         # Try to write to bundled directory
         write_success = False
@@ -533,6 +575,9 @@ def log_download(edition: str, is_download: bool, ip: str, user_agent: str, uid:
         print(f"[ERROR] Failed logging download: {e}")
 
 def get_download_logs():
+    # Read from Vercel KV first
+    kv_logs = get_kv_data("kannada_rag_downloads", [])
+
     # Read download logs from bundled data
     log_dir = os.path.join(os.path.dirname(__file__), "data")
     if not os.path.exists(log_dir):
@@ -566,7 +611,7 @@ def get_download_logs():
     def get_log_key(l):
         return (l.get("edition", ""), l.get("type", ""), l.get("ip", ""), l.get("user_agent", ""), l.get("timestamp", ""))
 
-    for l in bundled_logs + tmp_logs:
+    for l in kv_logs + bundled_logs + tmp_logs:
         key = get_log_key(l)
         if key not in seen:
             seen.add(key)
@@ -685,13 +730,16 @@ async def save_feedback(request: FeedbackRequest, req_obj: Request):
             except Exception:
                 pass
 
+        # Load existing feedback from Vercel KV
+        kv_feedbacks = get_kv_data("kannada_rag_feedback", [])
+
         # Combine feedback to prevent loss of local or remote inputs
         seen = set()
         feedbacks = []
         def get_fb_key(fb):
             return (fb.get("name", ""), fb.get("rating", 0), fb.get("comment", ""), fb.get("timestamp", ""))
 
-        for fb in bundled_feedbacks + tmp_feedbacks:
+        for fb in kv_feedbacks + bundled_feedbacks + tmp_feedbacks:
             key = get_fb_key(fb)
             if key not in seen:
                 seen.add(key)
@@ -701,6 +749,9 @@ async def save_feedback(request: FeedbackRequest, req_obj: Request):
         new_key = get_fb_key(feedback_data)
         if new_key not in seen:
             feedbacks.append(feedback_data)
+        
+        # Save to Vercel KV
+        set_kv_data("kannada_rag_feedback", feedbacks)
         
         # Try to write to bundled directory (local testing environments)
         write_success = False
@@ -720,7 +771,6 @@ async def save_feedback(request: FeedbackRequest, req_obj: Request):
                 print("[INFO]: Successfully wrote feedback to /tmp/feedback.json")
             except Exception as tmp_err:
                 print(f"[ERROR]: Could not write feedback to /tmp fallback: {tmp_err}")
-                return {"status": "error", "message": f"Could not write feedback to /tmp: {tmp_err}"}
                 
         return {"status": "success", "message": "Feedback submitted successfully!"}
     except Exception as e:
@@ -790,7 +840,9 @@ async def admin_dashboard(password: Optional[str] = None):
     def get_fb_key(fb):
         return (fb.get("name", ""), fb.get("rating", 0), fb.get("comment", ""), fb.get("timestamp", ""))
 
-    for fb in bundled_feedbacks + tmp_feedbacks:
+    kv_feedbacks = get_kv_data("kannada_rag_feedback", [])
+
+    for fb in kv_feedbacks + bundled_feedbacks + tmp_feedbacks:
         key = get_fb_key(fb)
         if key not in seen:
             seen.add(key)
