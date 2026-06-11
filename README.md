@@ -122,18 +122,19 @@ Most RAG demos:   PDF → Chunks → LLM → Answer
 This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
                   → Smart Router → 4 Retrieval Strategies → Sarvam LLM
                   → Bilingual Answer + TTS Audio + Page Citations
-                  → Deployed · Feedback System · Admin Viewer
+                  → Deployed · Durable Cloud DB · Admin Session Viewer
 ```
 
-| | Typical RAG Demo | This Project (v2.1) |
+| | Typical RAG Demo | This Project (v2.2) |
 |:--|:--|:--|
 | Language | English only | **Kannada + English** |
 | Input | Clean text PDF | **Scanned Kannada novel (full OCR pipeline)** |
 | Intelligence | Single Model | **Dual-Brain (Gemini + Groq Llama/Scout Fallbacks)** |
 | Stability | Basic | **Auto-Discovery + Rate Limit Armor (Retries)** |
-| Output | Text only | **Formatted Markdown (Bolds, Italics, Badges) + Custom Audio Player** |
-| Usage Tracking | None | **Queries Today: X / 100 (Daily Counter)** |
-| Deployment | Local only | **Vercel Edge UI/API + Streamlit Cloud App** |
+| Output | Text only | **Formatted Markdown + Custom Audio Player + Compiled E-Books (Bilingual side-by-side with Viewport Scroll-Spy)** |
+| Persistence | None (or Memory) | **Durable Cloud DB (Vercel KV / Upstash Redis REST Integration)** |
+| Analytics | None | **Admin Dashboard with Geolocation Tracking (Background Threads) & User Session Tracking** |
+| Deployment | Local only | **Vercel Serverless UI/API + Streamlit Cloud App** |
 
 ---
 
@@ -146,9 +147,7 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 ![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97_Hugging_Face-FFD21E?style=for-the-badge&logoColor=black)
 ![LLM](https://img.shields.io/badge/LLM_Integration-7c3aed?style=for-the-badge)
 ![OCR](https://img.shields.io/badge/OCR_Pipeline-0891b2?style=for-the-badge)
-![NLP](https://img.shields.io/badge/Indic_NLP-10b981?style=for-the-badge)
-![ChromaDB](https://img.shields.io/badge/Vector_DB-7c3aed?style=for-the-badge)
-![Streamlit](https://img.shields.io/badge/Streamlit_UI-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
+![Databases](https://img.shields.io/badge/Databases-ChromaDB%20%7C%20Upstash%20Redis-7c3aed?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![TTS](https://img.shields.io/badge/Text_to_Speech-db2777?style=for-the-badge)
 ![Deployment](https://img.shields.io/badge/Cloud_Deployment-16a34a?style=for-the-badge)
@@ -164,40 +163,44 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 <tr>
 <td width="50%">
 
-**🧠 AI Capabilities**
+**🧠 AI & Database Capabilities**
 - Smart query routing — 4 retrieval strategies
 - Character-specific RAG (top-10, θ=0.20)
 - Page-level direct lookup
 - Conversational memory (last 4 messages)
 - Bilingual answers — English & Kannada
+- **Durable Persistence**: Natively integrates with Vercel KV / Upstash Redis to log feedback and user activities across serverless container reloads.
 
 </td>
 <td width="50%">
 
-**🎨 UI & Experience**
+**🎨 UI & E-Book Experience**
 - Glassmorphism dark mode UI
 - 6 clickable suggestion chips
 - Live progress bar (Search → Generate)
 - Page citations on every answer
 - Source chunks toggle
+- **Interactive E-Book Suite**: Automated compilation of Kannada, English, and side-by-side Bilingual HTML ebooks. Readers include custom viewport-based scroll-spy logic that updates header/sidebar page numbers in real-time.
 
 </td>
 </tr>
 <tr>
 <td width="50%">
 
-**🔊 Audio**
+**🔊 Audio Performance**
 - TTS via Sarvam bulbul:v3
 - kn-IN (Kannada) + en-IN (English)
 - Long answers auto-chunked + WAV stitched
+- **Parallel Fallback Engine**: ThreadPoolExecutor-based fallback gTTS downloads (<2s latency) preventing Gateway timeouts.
 
 </td>
 <td width="50%">
 
-**📊 Feedback & Admin**
-- Star rating + text feedback form
-- Saves to `feedback.json`
-- Password-protected admin viewer in sidebar
+**📊 Analytics & Admin Dashboard**
+- Password-protected tabbed dashboard at `/admin`.
+- **User Activity Tab**: Groups user logs using persistent browser UUIDs (`localStorage`), displaying reads, downloads, and locations.
+- **Asynchronous Geolocation**: Logs client location (City, Region, Country) resolved inside a background thread.
+- **User Resolution**: Matches anonymous download logs to user names if they submitted feedback.
 
 </td>
 </tr>
@@ -281,6 +284,7 @@ This project is deployed across two environments with customized retrieval mecha
 | 🦜 Orchestration | Agent & LCEL Chain | **LangChain (Tools, ReAct Agent, Custom Fallback Model)** |
 | 🤗 Embeddings | Multilingual Vectorization | **Hugging Face (`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`)** |
 | 🗄️ Vector DB | Semantic search | ChromaDB (cosine similarity) |
+| 💾 Cloud DB | Permanent storage | **Vercel KV / Upstash Redis (Logs & Feedback persistence)** |
 | 🤖 Routing | Stability Architecture | **Auto-Discovery + Rate Limit Armor** |
 | 🔊 TTS | Audio synthesis | Sarvam bulbul:v3 · priya speaker |
 | 🎨 UI & API | Product | Streamlit + FastAPI (Deployed on Vercel) |
@@ -295,33 +299,40 @@ This project is deployed across two environments with customized retrieval mecha
 ```
 kannada-rag-agent/
 │
-├── 📂 data/
-│   ├── raw_images/           # PDF pages as PNG — not in repo
-│   ├── processed_images/     # OpenCV output — not in repo
-│   ├── cleaned_text/         # Raw OCR text — not in repo
-│   ├── normalized_text/      # Unicode fixed — not in repo
-│   └── chunks.json           # ✅ 687 semantic chunks
+├── 📂 api/
+│   └── index.py                 # ✅ FastAPI server — Vercel Serverless entry point
+│                                #    └─ RAG engine · E-Book reader · Admin dashboard
+│                                #    └─ Vercel KV (Upstash Redis) persistence layer
+│                                #    └─ IP geolocation · User session tracking
 │
-├── 📂 chroma_db/             # ✅ Vector store (shipped for deployment)
+├── 📂 data/
+│   ├── raw_images/              # PDF pages as PNG — not in repo
+│   ├── processed_images/        # OpenCV output — not in repo
+│   ├── cleaned_text/            # Raw OCR text — not in repo
+│   ├── normalized_text/         # Unicode fixed — not in repo
+│   └── chunks.json              # ✅ 687 semantic chunks
+│
+├── 📂 chroma_db/                # ✅ Vector store (shipped for deployment)
 │
 ├── 📂 ingest/
-│   ├── pdf_to_images.py      # Phase 1 — PDF → PNG
-│   ├── preprocess_images.py  # Phase 2 — OpenCV
-│   ├── ocr_surya.py          # Phase 3 — Surya OCR
-│   ├── clean_text.py         # Phase 4 — Normalization
-│   └── chunker.py            # Phase 5 — Chunking
+│   ├── pdf_to_images.py         # Phase 1 — PDF → PNG
+│   ├── preprocess_images.py     # Phase 2 — OpenCV
+│   ├── ocr_surya.py             # Phase 3 — Surya OCR
+│   ├── clean_text.py            # Phase 4 — Normalization
+│   └── chunker.py               # Phase 5 — Chunking
 │
 ├── 📂 vectorstore/
-│   └── embed_and_store.py    # Embeddings → ChromaDB
+│   └── embed_and_store.py       # Embeddings → ChromaDB
 │
 ├── 📂 rag/
-│   └── rag_agent.py          # CLI RAG pipeline
+│   └── rag_agent.py             # CLI RAG pipeline
 │
-├── app.py                    # ✅ Main Streamlit app
-├── banner.svg                # ✅ Banner image
-├── architecture.svg          # ✅ Architecture diagram
-├── LICENSE                   # ✅ MIT License
-├── .env                      # API keys (not committed)
+├── app.py                       # ✅ Main Streamlit app
+├── banner.svg                   # ✅ Banner image
+├── architecture.svg             # ✅ Architecture diagram
+├── vercel.json                  # ✅ Vercel routing config
+├── LICENSE                      # ✅ MIT License
+├── .env                         # API keys (not committed)
 ├── .gitignore
 ├── requirements.txt
 └── README.md
@@ -351,15 +362,29 @@ kannada-rag-env\Scripts\activate        # Windows
 # 3. Install
 pip install -r requirements.txt
 
-# 4. Create .env file
-SARVAM_API_KEY=your_key_here
+# 4. Create .env file with your API keys
+SARVAM_API_KEY=your_sarvam_api_key
+GEMINI_API_KEY=your_gemini_api_key
+GROQ_API_KEY=your_groq_api_key
 ADMIN_PASSWORD=your_admin_password
 
-# 5. Run
+# 5. Run locally (Streamlit)
 kannada-rag-env\Scripts\python.exe -m streamlit run app.py
 ```
 
 Open **[http://localhost:8501](http://localhost:8501)** 🎉
+
+### Vercel Deployment (FastAPI)
+
+```bash
+# Deploy to Vercel
+npm i -g vercel
+vercel --prod
+
+# Add the following Environment Variables in Vercel Dashboard → Settings → Environment Variables:
+# SARVAM_API_KEY, GEMINI_API_KEY, GROQ_API_KEY, ADMIN_PASSWORD
+# Then connect Vercel KV (Storage tab) for persistent data storage
+```
 
 ---
 
@@ -428,9 +453,13 @@ A complete, production-deployed AI system — built from scratch with no starter
 | ✅ | Vector search engine | 687 chunks · ChromaDB · cosine similarity |
 | ✅ | Smart RAG agent | 4-strategy router · Sarvam-M LLM · memory |
 | ✅ | Bilingual TTS | WAV stitching · kn-IN + en-IN · bulbul:v3 |
-| ✅ | Production UI | Glassmorphism · chips · progress bar · feedback |
-| ✅ | Live deployment | Public URL · Streamlit Cloud · secrets managed |
-| ✅ | Admin system | Password-protected feedback viewer |
+| ✅ | Production UI | Glassmorphism dark mode · chips · progress bar · feedback |
+| ✅ | Interactive E-Book Suite | Compiled Kannada, English & Bilingual HTML readers with scroll-spy page tracking |
+| ✅ | Durable Cloud DB | Vercel KV / Upstash Redis REST — persists logs & feedback across cold starts |
+| ✅ | Geolocation Analytics | Background-thread IP-to-location resolver (city, region, country) |
+| ✅ | User Session Tracking | Persistent browser UUID (`localStorage`) + optional name — no sign-up required |
+| ✅ | Admin Dashboard | Password-protected · 3 tabs: Users, Activity Log, Feedback |
+| ✅ | Live deployment | Vercel Serverless + Streamlit Cloud · fully managed secrets |
 
 ---
 
