@@ -1633,9 +1633,12 @@ async def root():
                         <div class="download-box" style="background: var(--bg-secondary); border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
                             <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.25rem; font-weight: 700;">ಕನ್ನಡ ಆವೃತ್ತಿ<br><span style="font-size: 0.85rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">Kannada Edition</span></h3>
                             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; flex-grow: 1; line-height: 1.4;">Original Kannada text of the novel, structured with chapter-by-chapter formatting.</p>
-                            <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                                <a href="/api/read/kannada" target="_blank" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 10px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; border: none; cursor: pointer; outline: none; display: flex; align-items: center; gap: 6px;">
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                                <a href="/api/read/kannada" target="_blank" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; border: none; cursor: pointer; outline: none; display: flex; align-items: center; gap: 4px;">
                                     📖 Read Online
+                                </a>
+                                <a href="/api/read/kannada?download=true" download class="dl-btn" style="text-decoration: none; background: white; border: 1.5px solid var(--primary); color: var(--primary); padding: 7px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; outline: none; display: flex; align-items: center; gap: 4px;">
+                                    📥 Read Offline
                                 </a>
                             </div>
                         </div>
@@ -1645,9 +1648,12 @@ async def root():
                             <div style="position: absolute; top: 0; right: 0; background: var(--primary); color: white; font-size: 0.6rem; font-weight: 800; padding: 4px 8px; border-bottom-left-radius: 6px; text-transform: uppercase;">Best</div>
                             <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.25rem; font-weight: 700;">ದ್ವಿಭಾಷಾ ಆವೃತ್ತಿ<br><span style="font-size: 0.85rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">Bilingual Edition</span></h3>
                             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; flex-grow: 1; line-height: 1.4;">Side-by-side Kannada and English columns. Ideal for comparative reading.</p>
-                            <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                                <a href="/api/read/bilingual" target="_blank" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 10px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; border: none; cursor: pointer; outline: none; display: flex; align-items: center; gap: 6px;">
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                                <a href="/api/read/bilingual" target="_blank" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; border: none; cursor: pointer; outline: none; display: flex; align-items: center; gap: 4px;">
                                     📖 Read Online
+                                </a>
+                                <a href="/api/read/bilingual?download=true" download class="dl-btn" style="text-decoration: none; background: white; border: 1.5px solid var(--primary); color: var(--primary); padding: 7px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; outline: none; display: flex; align-items: center; gap: 4px;">
+                                    📥 Read Offline
                                 </a>
                             </div>
                         </div>
@@ -1656,9 +1662,12 @@ async def root():
                         <div class="download-box" style="background: var(--bg-secondary); border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
                             <h3 style="font-family: var(--font-serif); margin-top: 0; margin-bottom: 0.5rem; color: var(--primary); font-size: 1.25rem; font-weight: 700;">ಇಂಗ್ಲಿಷ್ ಆವೃತ್ತಿ<br><span style="font-size: 0.85rem; font-family: var(--font-sans); color: var(--text-muted); font-weight: 500;">English Edition</span></h3>
                             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; flex-grow: 1; line-height: 1.4;">Complete English literary translation reflecting the author's intense story arc.</p>
-                            <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; width: 100%;">
-                                <a href="/api/read/english" target="_blank" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 10px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; border: none; cursor: pointer; outline: none; display: flex; align-items: center; gap: 6px;">
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                                <a href="/api/read/english" target="_blank" class="dl-btn" style="text-decoration: none; background: var(--primary); color: white; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; border: none; cursor: pointer; outline: none; display: flex; align-items: center; gap: 4px;">
                                     📖 Read Online
+                                </a>
+                                <a href="/api/read/english?download=true" download class="dl-btn" style="text-decoration: none; background: white; border: 1.5px solid var(--primary); color: var(--primary); padding: 7px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; outline: none; display: flex; align-items: center; gap: 4px;">
+                                    📥 Read Offline
                                 </a>
                             </div>
                         </div>
