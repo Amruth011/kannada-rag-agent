@@ -337,7 +337,7 @@ async def chat(request: ChatRequest):
         
         # Build prompt based on requested language
         if request.language == "English":
-            full_prompt = f"""You are an AI assistant for the Kannada novel "Heli Hogu Karana".
+            full_prompt = f"""You are an AI assistant for the Kannada novel "Heli Hogu Kaarana".
 
 BOOK INFORMATION:
 {BOOK_CONTEXT}
@@ -611,7 +611,7 @@ async def admin_feedback(password: Optional[str] = None):
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Heli Hogu Karana — Admin Feedback Panel</title>
+        <title>Heli Hogu Kaarana — Admin Feedback Panel</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
@@ -1384,7 +1384,7 @@ async def root():
         <!-- HERO SECTION -->
         <div class="hero">
             <h1 class="fade-in">ಹೇಳಿ ಹೋಗು ಕಾರಣ</h1>
-            <p class="fade-in" style="animation-delay: 0.1s">Your AI-powered guide through the literary world of Heli Hogu Karana. Ask anything about characters, themes, or the story.</p>
+            <p class="fade-in" style="animation-delay: 0.1s">Your AI-powered guide through the literary world of Heli Hogu Kaarana. Ask anything about characters, themes, or the story.</p>
         </div>
 
         <!-- MAIN INTERACTION CONTAINER -->
@@ -1775,7 +1775,7 @@ async def root():
                     name_kn: "ಹಿಮವಂತ್",
                     badge_en: "Protagonist",
                     badge_kn: "ಕಥಾನಾಯಕ",
-                    desc_en: "The passionate, intense protagonist of Heli Hogu Karana. He is a man of deep emotions, conflicted by his love for Prarthana and his complex life choices in a gritty underworld environment.",
+                    desc_en: "The passionate, intense protagonist of Heli Hogu Kaarana. He is a man of deep emotions, conflicted by his love for Prarthana and his complex life choices in a gritty underworld environment.",
                     desc_kn: "ಕಾದಂಬರಿಯ ಕಥಾನಾಯಕ. ತೀವ್ರವಾದ ಭಾವನೆಗಳುಳ್ಳ, ಪ್ರಾರ್ಥನಾಳ ಮೇಲಿನ ಪ್ರೀತಿ ಹಾಗೂ ತನ್ನ ಜೀವನದ ಸಂಕೀರ್ಣ ನಿರ್ಧಾರಗಳ ನಡುವೆ ಒದ್ದಾಡುವ ತೇಜಸ್ವಿ ವ್ಯಕ್ತಿತ್ವ.",
                     pages: "Major presence throughout the novel (e.g. Pages 1, 10, 45, 120, 240, 310)"
                 },
@@ -2038,7 +2038,7 @@ async def root():
                 } else {
                     ctx.fillStyle = '#ea580c';
                 }
-                ctx.fillText('— ಹೇಳಿ ಹೋಗು ಕಾರಣ / Heli Hogu Karana', 300, 470);
+                ctx.fillText('— ಹೇಳಿ ಹೋಗು ಕಾರಣ / Heli Hogu Kaarana', 300, 470);
                 
                 ctx.font = '13px monospace';
                 if (style === 'saffron') {
