@@ -1,5 +1,5 @@
 # api/index.py - FastAPI version for Vercel deployment Final v5 (Stable)
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
 import os, re, requests, json, traceback, base64, time
@@ -227,19 +227,75 @@ def call_gemini(prompt, history=None, retries=1):
                 
     return call_groq(prompt, history=history)
 
+def call_gtts_parallel(text, language="kn-IN"):
+    """Fetch Google TTS chunks in parallel, concatenate as raw MP3 bytes."""
+    try:
+        is_kannada = "kn" in language.lower()
+        lang = "kn" if is_kannada else "en"
+        
+        # Split text into chunks < 200 characters to comply with Google TTS limits
+        sentences = re.split(r'(?<=[.!?।])\s+', text)
+        chunks = []
+        current_chunk = ""
+        for s in sentences:
+            if len(current_chunk) + len(s) + 1 < 200:
+                current_chunk += (" " if current_chunk else "") + s
+            else:
+                if current_chunk:
+                    chunks.append(current_chunk)
+                current_chunk = s
+        if current_chunk:
+            chunks.append(current_chunk)
+            
+        def fetch_chunk(chunk_info):
+            idx, chunk = chunk_info
+            if not chunk.strip():
+                return idx, b""
+            url = "https://translate.google.com/translate_tts"
+            params = {
+                "ie": "UTF-8",
+                "tl": lang,
+                "client": "tw-ob",
+                "q": chunk.strip()
+            }
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            }
+            for attempt in range(3):
+                try:
+                    resp = requests.get(url, params=params, headers=headers, timeout=8)
+                    if resp.status_code == 200:
+                        return idx, resp.content
+                    time.sleep(0.3)
+                except Exception:
+                    time.sleep(0.3)
+            return idx, b""
+
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=min(len(chunks) or 1, 10)) as executor:
+            results = list(executor.map(fetch_chunk, enumerate(chunks)))
+            
+        results.sort(key=lambda x: x[0])
+        audio_bytes = b"".join(r[1] for r in results if r[1])
+        if audio_bytes:
+            return base64.b64encode(audio_bytes).decode("utf-8")
+    except Exception as e:
+        print(f"Parallel gTTS fallback failed: {e}")
+    return ""
+
 def call_sarvam_tts(text, language="kn-IN"):
-    """Call Sarvam TTS 'Meera' voice (bulbul:v3) with fallback to Google TTS (gTTS)."""
+    """Call Sarvam TTS 'Meera' voice (bulbul:v3) in parallel with fallback to Google TTS (gTTS)."""
     # Clean citations and errors
     clean = re.sub(r'\[Page \d+\]:', '', text).strip()
     clean = re.sub(r'📄 Sources:.*', '', clean).strip()
-    clean = re.sub(r'\[(?:GEMINI FAILED|GROQ FAILED|BACKEND ERROR|ERROR)[^\]]*\]', '', clean).strip()
+    clean = re.sub(r'\[\(?:GEMINI FAILED|GROQ FAILED|BACKEND ERROR|ERROR\)[^\]]*\]', '', clean).strip()
 
-    # Limit text length to avoid serverless timeouts (10s limit) on Vercel
-    if len(clean) > 500:
-        truncated = clean[:500]
+    # Limit text length to avoid excessive API usage
+    if len(clean) > 4000:
+        truncated = clean[:4000]
         # Find last sentence boundary
         last_boundary = max(truncated.rfind('.'), truncated.rfind('।'), truncated.rfind('?'), truncated.rfind('!'))
-        if last_boundary > 200:
+        if last_boundary > 3500:
             clean = truncated[:last_boundary + 1]
         else:
             clean = truncated.strip() + "..."
@@ -261,12 +317,12 @@ def call_sarvam_tts(text, language="kn-IN"):
                     current = word
             if current: chunks_list.append(current)
             
-            audio_bytes_list = []
             headers = {"Authorization": f"Bearer {SARVAM_API_KEY}", "Content-Type": "application/json"}
             headers_key = {"api-subscription-key": SARVAM_API_KEY, "Content-Type": "application/json"}
             
-            for chunk in chunks_list:
-                if not chunk.strip(): continue
+            def fetch_chunk_audio(chunk):
+                if not chunk.strip():
+                    return None
                 payload = {
                     "inputs": [chunk.strip()],
                     "target_language_code": target_lang,
@@ -274,17 +330,28 @@ def call_sarvam_tts(text, language="kn-IN"):
                     "model": "bulbul:v3",
                     "pace": 1.0
                 }
-                # Try standard Bearer header
-                resp = requests.post("https://api.sarvam.ai/text-to-speech", headers=headers, json=payload, timeout=20)
-                if resp.status_code != 200:
-                    # Try subscription key header
-                    resp = requests.post("https://api.sarvam.ai/text-to-speech", headers=headers_key, json=payload, timeout=20)
+                try:
+                    resp = requests.post("https://api.sarvam.ai/text-to-speech", headers=headers, json=payload, timeout=15)
+                    if resp.status_code != 200:
+                        resp = requests.post("https://api.sarvam.ai/text-to-speech", headers=headers_key, json=payload, timeout=15)
+                    if resp.status_code == 200:
+                        res_json = resp.json()
+                        aud_b64 = res_json.get("audios", [""])[0] if "audios" in res_json else res_json.get("audio", "")
+                        if aud_b64:
+                            return base64.b64decode(aud_b64)
+                except Exception as e:
+                    print(f"Error fetching chunk: {e}")
+                return None
+
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=min(len(chunks_list) or 1, 6)) as executor:
+                audio_bytes_list = list(executor.map(fetch_chunk_audio, chunks_list))
                 
-                if resp.status_code == 200:
-                    res_json = resp.json()
-                    aud_b64 = res_json.get("audios", [""])[0] if "audios" in res_json else res_json.get("audio", "")
-                    if aud_b64:
-                        audio_bytes_list.append(base64.b64decode(aud_b64))
+            audio_bytes_list = [ab for ab in audio_bytes_list if ab is not None]
+            
+            if len(audio_bytes_list) < len(chunks_list) or not audio_bytes_list:
+                print("One or more chunks failed in Sarvam TTS. Falling back to parallel gTTS.")
+                return call_gtts_parallel(clean, language=language)
             
             if audio_bytes_list:
                 import wave, io
@@ -300,20 +367,10 @@ def call_sarvam_tts(text, language="kn-IN"):
                             continue
                 return base64.b64encode(output_wav.getvalue()).decode("utf-8")
         except Exception as e:
-            print(f"Sarvam TTS failed, falling back to gTTS: {e}")
+            print(f"Sarvam TTS failed, falling back to parallel gTTS: {e}")
 
     # 2. Fallback to Google TTS (gTTS)
-    try:
-        from gtts import gTTS
-        import io
-        gtts_lang = "kn" if is_kannada else "en"
-        tts = gTTS(text=clean, lang=gtts_lang)
-        fp = io.BytesIO()
-        tts.write_to_fp(fp)
-        return base64.b64encode(fp.getvalue()).decode("utf-8")
-    except Exception as e:
-        print(f"Google TTS fallback failed: {e}")
-        return ""
+    return call_gtts_parallel(clean, language=language)
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
@@ -374,9 +431,133 @@ async def voice(request: VoiceRequest):
     audio_b64 = call_sarvam_tts(request.text, language=lang_code)
     return {"audio": audio_b64}
 
+def log_download(edition: str, is_download: bool, ip: str, user_agent: str):
+    try:
+        log_data = {
+            "edition": edition,
+            "type": "Offline Download" if is_download else "Online Read",
+            "ip": ip,
+            "user_agent": user_agent,
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        # Load existing download logs from bundled path
+        bundled_logs = []
+        log_dir = os.path.join(os.path.dirname(__file__), "data")
+        if not os.path.exists(log_dir):
+            log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+            if not os.path.exists(log_dir):
+                log_dir = "data"
+        log_file = os.path.join(log_dir, "downloads.json")
+        
+        if os.path.exists(log_file):
+            try:
+                with open(log_file, "r", encoding="utf-8") as f:
+                    bundled_logs = json.load(f)
+            except Exception:
+                pass
+
+        # Load existing logs from /tmp for Vercel persistence
+        tmp_log_file = "/tmp/downloads.json"
+        tmp_logs = []
+        if os.path.exists(tmp_log_file):
+            try:
+                with open(tmp_log_file, "r", encoding="utf-8") as f:
+                    tmp_logs = json.load(f)
+            except Exception:
+                pass
+
+        # Combine logs to prevent loss
+        seen = set()
+        logs = []
+        def get_log_key(l):
+            return (l.get("edition", ""), l.get("type", ""), l.get("ip", ""), l.get("user_agent", ""), l.get("timestamp", ""))
+
+        for l in bundled_logs + tmp_logs:
+            key = get_log_key(l)
+            if key not in seen:
+                seen.add(key)
+                logs.append(l)
+
+        # Append new log
+        new_key = get_log_key(log_data)
+        if new_key not in seen:
+            logs.append(log_data)
+            
+        if len(logs) > 500:
+            logs = logs[-500:]
+
+        # Try to write to bundled directory
+        write_success = False
+        try:
+            os.makedirs(log_dir, exist_ok=True)
+            with open(log_file, "w", encoding="utf-8") as f:
+                json.dump(logs, f, indent=2, ensure_ascii=False)
+            write_success = True
+        except Exception as file_err:
+            print(f"[WARNING]: Could not write download logs to bundled folder: {file_err}")
+            
+        # Fallback to write to /tmp on serverless environments
+        if not write_success:
+            try:
+                with open(tmp_log_file, "w", encoding="utf-8") as f:
+                    json.dump(logs, f, indent=2, ensure_ascii=False)
+            except Exception as tmp_err:
+                print(f"[ERROR]: Could not write download logs to /tmp fallback: {tmp_err}")
+    except Exception as e:
+        print(f"[ERROR] Failed logging download: {e}")
+
+def get_download_logs():
+    # Read download logs from bundled data
+    log_dir = os.path.join(os.path.dirname(__file__), "data")
+    if not os.path.exists(log_dir):
+        log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+        if not os.path.exists(log_dir):
+            log_dir = "data"
+            
+    log_file = os.path.join(log_dir, "downloads.json")
+    
+    bundled_logs = []
+    if os.path.exists(log_file):
+        try:
+            with open(log_file, "r", encoding="utf-8") as f:
+                bundled_logs = json.load(f)
+        except Exception:
+            pass
+
+    # Read logs from /tmp for Vercel persistence
+    tmp_log_file = "/tmp/downloads.json"
+    tmp_logs = []
+    if os.path.exists(tmp_log_file):
+        try:
+            with open(tmp_log_file, "r", encoding="utf-8") as f:
+                tmp_logs = json.load(f)
+        except Exception:
+            pass
+
+    # Combine feeds to avoid duplication
+    seen = set()
+    logs = []
+    def get_log_key(l):
+        return (l.get("edition", ""), l.get("type", ""), l.get("ip", ""), l.get("user_agent", ""), l.get("timestamp", ""))
+
+    for l in bundled_logs + tmp_logs:
+        key = get_log_key(l)
+        if key not in seen:
+            seen.add(key)
+            logs.append(l)
+            
+    # Sort logs by timestamp descending
+    try:
+        logs.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+    except Exception:
+        pass
+        
+    return logs
+
 # ── E-Book Read Route ───────────────────────────────────────────────────
 @app.get("/api/read/{edition}")
-async def read_ebook(edition: str, download: Optional[bool] = False):
+async def read_ebook(edition: str, request: Request, download: Optional[bool] = False):
     """
     Read a compiled HTML e-book online.
     edition: 'kannada', 'english', or 'bilingual'
@@ -386,6 +567,17 @@ async def read_ebook(edition: str, download: Optional[bool] = False):
     if edition not in ["kannada", "english", "bilingual"]:
         raise HTTPException(status_code=400, detail="Invalid edition. Choose 'kannada', 'english', or 'bilingual'.")
         
+    # Extract client IP address
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        ip = forwarded.split(",")[0].strip()
+    else:
+        ip = request.client.host if request.client else "Unknown"
+        
+    user_agent = request.headers.get("user-agent", "Unknown")
+    
+    log_download(edition, download, ip, user_agent)
+    
     filename = f"heli_hogu_karana_{edition}.html"
     
     # Check possible search paths for compiled ebooks
@@ -500,26 +692,26 @@ async def save_feedback(request: FeedbackRequest):
         print(f"[ERROR]: Feedback submission failed: {e}")
         return {"status": "error", "message": str(e)}
 
-@app.get("/admin/feedback", response_class=HTMLResponse)
-async def admin_feedback(password: Optional[str] = None):
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_dashboard(password: Optional[str] = None):
     if not password or password.strip() != ADMIN_PASSWORD:
         return HTMLResponse(
             status_code=401,
-            content="""
+            content=f"""
             <html>
                 <head>
                     <title>401 Unauthorized</title>
                     <style>
-                        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fffcf8; color: #0f172a; margin: 0; }
-                        .card { padding: 2rem; border: 1px solid rgba(194, 65, 12, 0.2); border-radius: 12px; background: white; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-                        input { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 10px 0; outline: none; width: 220px; text-align: center; }
-                        button { padding: 8px 16px; border: none; background: #c2410c; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
+                        body {{ font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fffcf8; color: #0f172a; margin: 0; }}
+                        .card {{ padding: 2rem; border: 1px solid rgba(194, 65, 12, 0.2); border-radius: 12px; background: white; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }}
+                        input {{ padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 10px 0; outline: none; width: 220px; text-align: center; }}
+                        button {{ padding: 8px 16px; border: none; background: #c2410c; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }}
                     </style>
                 </head>
                 <body>
                     <div class="card">
                         <h2>🔒 Admin Login</h2>
-                        <p>Please enter the admin password to view feedback.</p>
+                        <p>Please enter the admin password.</p>
                         <form method="get">
                             <input type="password" name="password" placeholder="Password" autofocus><br>
                             <button type="submit">Unlock</button>
@@ -575,6 +767,16 @@ async def admin_feedback(password: Optional[str] = None):
     except Exception:
         pass
         
+    # Read download logs
+    logs = get_download_logs()
+    
+    # Calculate stats
+    total_fb = len(feedbacks)
+    avg_rating = sum(fb.get("rating", 0) for fb in feedbacks) / total_fb if total_fb > 0 else 0
+    total_reads = sum(1 for l in logs if "Read" in l.get("type", ""))
+    total_downloads = sum(1 for l in logs if "Download" in l.get("type", ""))
+    total_logs = len(logs)
+    
     feedback_rows = ""
     for fb in feedbacks:
         stars = "★" * fb.get("rating", 0) + "☆" * (5 - fb.get("rating", 0))
@@ -590,40 +792,157 @@ async def admin_feedback(password: Optional[str] = None):
         """
         
     if not feedbacks:
-        feedback_rows = "<p style='text-align:center; color:#64748b;'>No feedback submitted yet.</p>"
+        feedback_rows = "<div class='no-data'>No feedback submitted yet.</div>"
+        
+    log_rows = ""
+    for l in logs:
+        badge_class = "badge-download" if "Download" in l.get("type", "") else "badge-read"
+        log_rows += f"""
+        <tr>
+            <td>{l.get('timestamp', '')}</td>
+            <td><span class="{badge_class}">{l.get('type', 'Online Read')}</span></td>
+            <td><strong>{l.get('edition', '').upper()}</strong></td>
+            <td><code>{l.get('ip', 'Unknown')}</code></td>
+            <td style="font-size:0.8rem; color:var(--text-muted); max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{l.get('user_agent', '')}">{l.get('user_agent', 'Unknown')}</td>
+        </tr>
+        """
+        
+    if not logs:
+        logs_html = "<div class='no-data'>No access logs found.</div>"
+    else:
+        logs_html = f"""
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Action</th>
+                    <th>Edition</th>
+                    <th>IP Address</th>
+                    <th>User-Agent</th>
+                </tr>
+            </thead>
+            <tbody>
+                {log_rows}
+            </tbody>
+        </table>
+        """
         
     admin_html = f"""
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Heli Hogu Kaarana — Admin Feedback Panel</title>
+        <title>Heli Hogu Kaarana — Admin Dashboard</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
-            body {{ font-family: system-ui, -apple-system, sans-serif; background: #fffcf8; color: #0f172a; margin: 0; padding: 2rem 1rem; }}
-            .container {{ max-width: 800px; margin: 0 auto; }}
-            h1 {{ font-family: Georgia, serif; color: #c2410c; margin-bottom: 0.5rem; }}
-            .subtitle {{ color: #64748b; margin-bottom: 2rem; }}
-            .fb-card {{ background: white; border: 1px solid rgba(194, 65, 12, 0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.02); }}
+            :root {{
+                --primary: #c2410c;
+                --primary-light: rgba(194, 65, 12, 0.08);
+                --bg-main: #fffcf8;
+                --bg-card: #ffffff;
+                --text-main: #0f172a;
+                --text-muted: #64748b;
+                --border: rgba(194, 65, 12, 0.15);
+            }}
+            body {{ font-family: system-ui, -apple-system, sans-serif; background: var(--bg-main); color: var(--text-main); margin: 0; padding: 2rem 1rem; }}
+            .container {{ max-width: 1000px; margin: 0 auto; }}
+            h1 {{ font-family: Georgia, serif; color: var(--primary); margin-bottom: 0.5rem; }}
+            .subtitle {{ color: var(--text-muted); margin-bottom: 2rem; }}
+            
+            /* Stats Grid */
+            .stats-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }}
+            .stat-card {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.02); }}
+            .stat-val {{ font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 0.25rem; }}
+            .stat-label {{ font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }}
+            
+            /* Tabs */
+            .tabs {{ display: flex; gap: 8px; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; }}
+            .tab-btn {{ padding: 10px 20px; border: none; background: none; font-size: 0.95rem; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }}
+            .tab-btn.active {{ color: var(--primary); border-bottom-color: var(--primary); }}
+            .tab-content {{ display: none; }}
+            .tab-content.active {{ display: block; }}
+            
+            /* Lists & Tables */
+            .fb-card {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.02); }}
             .fb-header {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }}
             .fb-name {{ font-weight: bold; font-size: 1.1rem; }}
             .fb-stars {{ color: #fb923c; font-size: 1.1rem; letter-spacing: 2px; }}
             .fb-time {{ font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.75rem; }}
             .fb-comment {{ line-height: 1.5; color: #334155; }}
+            
+            table {{ width: 100%; border-collapse: collapse; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.02); margin-bottom: 2rem; }}
+            th, td {{ padding: 12px 16px; text-align: left; border-bottom: 1px solid rgba(0,0,0,0.05); }}
+            th {{ background: var(--primary-light); color: var(--primary); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }}
+            tr:hover {{ background: rgba(0,0,0,0.01); }}
+            .badge-read {{ background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; }}
+            .badge-download {{ background: #eff6ff; color: #1d4ed8; padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; }}
+            
+            .no-data {{ text-align: center; color: var(--text-muted); padding: 3rem; }}
         </style>
+        <script>
+            function showTab(tabId) {{
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+                event.target.classList.add('active');
+            }}
+        </script>
     </head>
     <body>
         <div class="container">
-            <h1>📚 User Feedback Panel</h1>
-            <p class="subtitle">Real-time reader feedback submitted on the novel AI assistant portal.</p>
-            <div class="fb-list">
-                {feedback_rows}
+            <h1>📚 Admin Dashboard</h1>
+            <p class="subtitle">Bilingual RAG Assistant feedback, e-book usage metrics, and logs.</p>
+            
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-val">{total_fb}</div>
+                    <div class="stat-label">Feedbacks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val">{avg_rating:.1f} ★</div>
+                    <div class="stat-label">Avg Rating</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val">{total_reads}</div>
+                    <div class="stat-label">Online Reads</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val">{total_downloads}</div>
+                    <div class="stat-label">Downloads</div>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('tab-feedback')">Feedbacks ({total_fb})</button>
+                <button class="tab-btn" onclick="showTab('tab-logs')">Read & Download Logs ({total_logs})</button>
+            </div>
+            
+            <!-- Feedback Tab -->
+            <div id="tab-feedback" class="tab-content active">
+                <div class="fb-list">
+                    {feedback_rows}
+                </div>
+            </div>
+            
+            <!-- Logs Tab -->
+            <div id="tab-logs" class="tab-content">
+                {logs_html}
             </div>
         </div>
     </body>
     </html>
     """
     return HTMLResponse(content=admin_html)
+
+@app.get("/admin/feedback")
+async def admin_feedback_redirect(password: Optional[str] = None):
+    from fastapi.responses import RedirectResponse
+    url = "/admin"
+    if password:
+        url += f"?password={password}"
+    return RedirectResponse(url=url)
 
 @app.get('/favicon.ico', include_in_schema=False)
 async def favicon():
@@ -1551,7 +1870,7 @@ async def root():
                         Design beautiful Instagram-ready quote cards from the novel's most powerful lines.
                     </p>
                     <div class="quote-creator-box">
-                        <canvas id="quote-canvas" width="600" height="600" style="width: 100%; max-width: 380px; border-radius: 16px; border: 1px solid rgba(194, 65, 12, 0.15); display: block; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06);"></canvas>
+                        <canvas id="quote-canvas" width="1080" height="1080" style="width: 100%; max-width: 380px; border-radius: 16px; border: 1px solid rgba(194, 65, 12, 0.15); display: block; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06);"></canvas>
                         
                         <div class="creator-controls">
                             <!-- Language Toggle -->
@@ -1564,7 +1883,16 @@ async def root():
                             </div>
 
                             <div class="control-group">
-                                <label>2. Pick a Famous Quote / ಕೋಟ್ ಆಯ್ಕೆ ಮಾಡಿ</label>
+                                <label>2. Aspect Ratio / ಅನುಪಾತ</label>
+                                <select id="quote-ratio" onchange="drawQuoteCard()">
+                                    <option value="1:1">1:1 (Square / ಚೌಕ)</option>
+                                    <option value="4:5">4:5 (Instagram Portrait Feed / ಇನ್‌ಸ್ಟಾಗ್ರಾಮ್ ಫೀಡ್)</option>
+                                    <option value="9:16">9:16 (Stories/Reels / ಸ್ಟೋರಿಗಳು)</option>
+                                </select>
+                            </div>
+
+                            <div class="control-group">
+                                <label>3. Pick a Famous Quote / ಕೋಟ್ ಆಯ್ಕೆ ಮಾಡಿ</label>
                                 <!-- Kannada Quotes -->
                                 <select id="quote-presets-kn" onchange="applyQuotePreset(this.value)">
                                     <option value="">-- Custom Quote / ನಿಮ್ಮದೇ ಆದ ವಾಕ್ಯ --</option>
@@ -1599,12 +1927,12 @@ async def root():
                             </div>
                             
                             <div class="control-group">
-                                <label>3. Customize Quote Text / ವಾಕ್ಯವನ್ನು ಬದಲಿಸಿ</label>
+                                <label>4. Customize Quote Text / ವಾಕ್ಯವನ್ನು ಬದಲಿಸಿ</label>
                                 <textarea id="quote-text" rows="3" oninput="drawQuoteCard()" placeholder="Type your custom quote here..."></textarea>
                             </div>
                             
                             <div class="control-group">
-                                <label>4. Select Style Theme / ಶೈಲಿ ಆಯ್ಕೆ</label>
+                                <label>5. Select Style Theme / ಶೈಲಿ ಆಯ್ಕೆ</label>
                                 <select id="quote-style" onchange="drawQuoteCard()">
                                     <option value="saffron">Saffron Gold / ಕೇಸರಿ ಚಿನ್ನ</option>
                                     <option value="vintage">Terracotta Vintage / ವಿಂಟೇಜ್ ಮಣ್ಣು</option>
@@ -1871,7 +2199,7 @@ async def root():
                 drawQuoteCard();
             }
 
-            function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            function getWrappedLines(ctx, text, maxWidth) {
                 const words = text.split(' ');
                 let line = '';
                 let lines = [];
@@ -1880,18 +2208,14 @@ async def root():
                     let metrics = ctx.measureText(testLine);
                     let testWidth = metrics.width;
                     if (testWidth > maxWidth && n > 0) {
-                        lines.push(line);
+                        lines.push(line.trim());
                         line = words[n] + ' ';
                     } else {
                         line = testLine;
                     }
                 }
-                lines.push(line);
-                
-                for (let k = 0; k < lines.length; k++) {
-                    ctx.fillText(lines[k].trim(), x, y + (k * lineHeight));
-                }
-                return lines.length * lineHeight;
+                lines.push(line.trim());
+                return lines;
             }
 
             function drawQuoteCard() {
@@ -1900,73 +2224,96 @@ async def root():
                 const ctx = canvas.getContext('2d');
                 const quoteText = document.getElementById('quote-text').value.trim() || "ಹೇಳಿ ಹೋಗು ಕಾರಣ...";
                 const style = document.getElementById('quote-style').value;
+                const ratio = document.getElementById('quote-ratio') ? document.getElementById('quote-ratio').value : '1:1';
                 
-                ctx.clearRect(0, 0, 600, 600);
+                let W = 1080;
+                let H = 1080;
+                if (ratio === '4:5') {
+                    H = 1350;
+                } else if (ratio === '9:16') {
+                    H = 1920;
+                }
+                
+                if (canvas.width !== W || canvas.height !== H) {
+                    canvas.width = W;
+                    canvas.height = H;
+                }
+                
+                ctx.clearRect(0, 0, W, H);
                 
                 // Draw template background
                 if (style === 'saffron') {
-                    let grad = ctx.createLinearGradient(0, 0, 600, 600);
+                    let grad = ctx.createLinearGradient(0, 0, W, H);
                     grad.addColorStop(0, '#c2410c');
                     grad.addColorStop(0.5, '#ea580c');
                     grad.addColorStop(1, '#ca8a04');
                     ctx.fillStyle = grad;
-                    ctx.fillRect(0, 0, 600, 600);
+                    ctx.fillRect(0, 0, W, H);
                     
                     ctx.strokeStyle = 'rgba(254, 243, 199, 0.4)';
-                    ctx.lineWidth = 15;
-                    ctx.strokeRect(20, 20, 560, 560);
+                    ctx.lineWidth = 27;
+                    ctx.strokeRect(36, 36, W - 72, H - 72);
                     
                     ctx.strokeStyle = 'rgba(254, 243, 199, 0.2)';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(35, 35, 530, 530);
+                    ctx.lineWidth = 3.6;
+                    ctx.strokeRect(63, 63, W - 126, H - 126);
                     
                     ctx.fillStyle = '#fef3c7';
                 } else if (style === 'vintage') {
                     ctx.fillStyle = '#fffbeb';
-                    ctx.fillRect(0, 0, 600, 600);
+                    ctx.fillRect(0, 0, W, H);
                     
                     ctx.strokeStyle = '#c2410c';
-                    ctx.lineWidth = 12;
-                    ctx.strokeRect(20, 20, 560, 560);
+                    ctx.lineWidth = 22;
+                    ctx.strokeRect(36, 36, W - 72, H - 72);
                     
                     ctx.fillStyle = '#c2410c';
-                    ctx.fillRect(35, 35, 10, 10);
-                    ctx.fillRect(555, 35, 10, 10);
-                    ctx.fillRect(35, 555, 10, 10);
-                    ctx.fillRect(555, 555, 10, 10);
+                    let sq = 18;
+                    ctx.fillRect(63, 63, sq, sq);
+                    ctx.fillRect(W - 63 - sq, 63, sq, sq);
+                    ctx.fillRect(63, H - 63 - sq, sq, sq);
+                    ctx.fillRect(W - 63 - sq, H - 63 - sq, sq, sq);
                     
                     ctx.fillStyle = '#0f172a';
                 } else if (style === 'rose') {
-                    let grad = ctx.createLinearGradient(0, 0, 600, 600);
+                    let grad = ctx.createLinearGradient(0, 0, W, H);
                     grad.addColorStop(0, '#fce7f3');
                     grad.addColorStop(1, '#fbcfe8');
                     ctx.fillStyle = grad;
-                    ctx.fillRect(0, 0, 600, 600);
+                    ctx.fillRect(0, 0, W, H);
                     ctx.strokeStyle = '#db2777';
-                    ctx.lineWidth = 8;
-                    ctx.strokeRect(20, 20, 560, 560);
+                    ctx.lineWidth = 14;
+                    ctx.strokeRect(36, 36, W - 72, H - 72);
                     ctx.fillStyle = '#831843';
                 } else if (style === 'forest') {
-                    let grad = ctx.createLinearGradient(0, 0, 0, 600);
+                    let grad = ctx.createLinearGradient(0, 0, 0, H);
                     grad.addColorStop(0, '#052e16');
                     grad.addColorStop(1, '#14532d');
                     ctx.fillStyle = grad;
-                    ctx.fillRect(0, 0, 600, 600);
+                    ctx.fillRect(0, 0, W, H);
                     ctx.strokeStyle = '#4ade80';
-                    ctx.lineWidth = 4;
-                    ctx.strokeRect(20, 20, 560, 560);
+                    ctx.lineWidth = 7.2;
+                    ctx.strokeRect(36, 36, W - 72, H - 72);
                     ctx.fillStyle = '#dcfce7';
                 } else {
                     ctx.fillStyle = '#0f172a';
-                    ctx.fillRect(0, 0, 600, 600);
+                    ctx.fillRect(0, 0, W, H);
                     ctx.strokeStyle = '#ea580c';
-                    ctx.lineWidth = 4;
-                    ctx.strokeRect(25, 25, 550, 550);
+                    ctx.lineWidth = 7.2;
+                    ctx.strokeRect(45, 45, W - 90, H - 90);
                     ctx.fillStyle = '#f8fafc';
                 }
                 
+                // Set font for quote text so we can measure it
+                ctx.font = 'italic 45px Georgia, serif';
+                const lines = getWrappedLines(ctx, quoteText, W - 220);
+                const lineHeight = 68;
+                const textHeight = lines.length * lineHeight;
+                const cY = H / 2;
+                const startY = cY - (textHeight / 2);
+                
                 // Draw Quote marks
-                ctx.font = '90px Georgia, serif';
+                ctx.font = '160px Georgia, serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 
@@ -1977,7 +2324,7 @@ async def root():
                 } else {
                     ctx.fillStyle = 'rgba(234, 88, 12, 0.12)';
                 }
-                ctx.fillText('“', 300, 130);
+                ctx.fillText('“', W / 2, startY - 60);
                 
                 // Draw Quote Content
                 if (style === 'saffron') {
@@ -1988,13 +2335,16 @@ async def root():
                     ctx.fillStyle = '#f1f5f9';
                 }
                 
-                ctx.font = 'italic 25px Georgia, serif';
+                ctx.font = 'italic 45px Georgia, serif';
                 ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                wrapText(ctx, quoteText, 300, 250, 460, 38);
+                ctx.textBaseline = 'top';
+                for (let k = 0; k < lines.length; k++) {
+                    ctx.fillText(lines[k], W / 2, startY + (k * lineHeight));
+                }
                 
                 // Draw Watermark
-                ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
+                ctx.textBaseline = 'middle';
+                ctx.font = 'bold 28px "Plus Jakarta Sans", sans-serif';
                 if (style === 'saffron') {
                     ctx.fillStyle = '#fef3c7';
                 } else if (style === 'vintage') {
@@ -2002,9 +2352,9 @@ async def root():
                 } else {
                     ctx.fillStyle = '#ea580c';
                 }
-                ctx.fillText('— ಹೇಳಿ ಹೋಗು ಕಾರಣ / Heli Hogu Kaarana', 300, 470);
+                ctx.fillText('— ಹೇಳಿ ಹೋಗು ಕಾರಣ / Heli Hogu Kaarana', W / 2, H - 140);
                 
-                ctx.font = '13px monospace';
+                ctx.font = '22px monospace';
                 if (style === 'saffron') {
                     ctx.fillStyle = 'rgba(254, 243, 199, 0.7)';
                 } else if (style === 'vintage') {
@@ -2012,7 +2362,7 @@ async def root():
                 } else {
                     ctx.fillStyle = '#94a3b8';
                 }
-                ctx.fillText('Instagram: @heli.hogu.kaarana', 300, 510);
+                ctx.fillText('Instagram: @heli.hogu.kaarana', W / 2, H - 80);
             }
 
             function downloadQuoteCard() {
