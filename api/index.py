@@ -338,6 +338,20 @@ def call_sarvam_tts(text, language="kn-IN"):
     clean = re.sub(r'📄 Sources:.*', '', clean).strip()
     clean = re.sub(r'\[\(?:GEMINI FAILED|GROQ FAILED|BACKEND ERROR|ERROR\)[^\]]*\]', '', clean).strip()
 
+    # Strip Markdown syntax for cleaner TTS audio reading (e.g. asterisks, code blocks, headers, bullet symbols)
+    clean = re.sub(r'```[\s\S]*?```', '', clean)
+    clean = re.sub(r'`([^`]+)`', r'\1', clean)
+    clean = re.sub(r'#+\s*(.*)', r'\1', clean)
+    clean = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', clean)
+    clean = re.sub(r'\*\*([^*]+)\*\*', r'\1', clean)
+    clean = re.sub(r'\*([^*]+)\*', r'\1', clean)
+    clean = re.sub(r'__([^_]+)__', r'\1', clean)
+    clean = re.sub(r'_([^_]+)_', r'\1', clean)
+    clean = re.sub(r'^\s*[-*+]\s+', '', clean, flags=re.MULTILINE)
+    clean = re.sub(r'^\s*>\s+', '', clean, flags=re.MULTILINE)
+    clean = re.sub(r'\n+', ' ', clean)
+    clean = re.sub(r'\s+', ' ', clean)
+
     # Limit text length to avoid excessive API usage
     if len(clean) > 4000:
         truncated = clean[:4000]
