@@ -5,7 +5,7 @@
 <br/>
 
 <p>
-<a href="https://kannada-rag-agent.vercel.app/">
+<a href="https://heli-hogu-kaarana.vercel.app/">
   <img src="https://img.shields.io/badge/🚀 Live App-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white"/>
 </a>
 <a href="https://kannada-rag-agent-hqvwhfejguymb9ijrvz4hd.streamlit.app/">
@@ -61,7 +61,7 @@
 
 > 🎥 **Demo shows:** English Q&A with citations · Kannada Q&A · Kannada TTS audio playback
 >
-> **[▶ Try the Live Vercel App →](https://kannada-rag-agent.vercel.app/)**
+> **[▶ Try the Live Vercel App →](https://heli-hogu-kaarana.vercel.app/)**
 >
 > **[📊 Open Streamlit Dashboard →](https://kannada-rag-agent-hqvwhfejguymb9ijrvz4hd.streamlit.app/)**
 
