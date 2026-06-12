@@ -944,6 +944,15 @@ async def admin_dashboard(password: Optional[str] = None):
             payments.append(p)
     payments.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
     total_payments = len(payments)
+    
+    # Compute total payments amount
+    total_amount = 0.0
+    for p in payments:
+        amt_str = p.get("amount", "0").replace("₹", "").replace(",", "").strip()
+        try:
+            total_amount += float(amt_str)
+        except Exception:
+            pass
 
     # Read download logs
     logs = get_download_logs()
@@ -954,6 +963,30 @@ async def admin_dashboard(password: Optional[str] = None):
     total_reads = sum(1 for l in logs if "Read" in l.get("type", ""))
     total_downloads = sum(1 for l in logs if "Download" in l.get("type", ""))
     total_logs = len(logs)
+
+    # Calculate star rating frequency
+    star_counts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
+    for fb in feedbacks:
+        r = fb.get("rating", 0)
+        if r in star_counts:
+            star_counts[r] += 1
+            
+    rating_rows = ""
+    for star in [5, 4, 3, 2, 1]:
+        count = star_counts[star]
+        pct = (count / total_fb * 100) if total_fb > 0 else 0
+        rating_rows += f"""
+        <div style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; margin-bottom: 6px;">
+            <span style="width: 32px; font-weight: bold; color: var(--primary);">{star} ★</span>
+            <div style="flex-grow: 1; height: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; width: {pct}%; background: linear-gradient(90deg, var(--primary), #fb923c); border-radius: 4px;"></div>
+            </div>
+            <span style="width: 25px; text-align: right; color: var(--text-muted); font-weight: 600;">{count}</span>
+        </div>
+        """
+        
+    feedbacks_json = json.dumps(feedbacks, ensure_ascii=False)
+    payments_json = json.dumps(payments, ensure_ascii=False)
     
     # Map IP and UID addresses to names from feedback
     ip_to_name = {}
@@ -1172,15 +1205,18 @@ async def admin_dashboard(password: Optional[str] = None):
             h1 {{ font-family: Georgia, serif; color: var(--primary); margin-bottom: 0.5rem; }}
             .subtitle {{ color: var(--text-muted); margin-bottom: 2rem; }}
             
-            /* Stats Grid */
-            .stats-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }}
-            .stat-card {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.02); }}
+            /* Stats Grid Layout */
+            .stats-container {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.2rem; }}
+            .stats-subgrid {{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }}
+            
+            .stat-card {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; text-align: center; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; }}
             .stat-val {{ font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 0.25rem; }}
-            .stat-label {{ font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }}
+            .stat-label {{ font-size: 0.82rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }}
             
             /* Tabs */
-            .tabs {{ display: flex; gap: 8px; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; }}
+            .tabs {{ display: flex; gap: 8px; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; flex-wrap: wrap; }}
             .tab-btn {{ padding: 10px 20px; border: none; background: none; font-size: 0.95rem; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }}
+            .tab-btn:hover {{ color: var(--primary); }}
             .tab-btn.active {{ color: var(--primary); border-bottom-color: var(--primary); }}
             .tab-content {{ display: none; }}
             .tab-content.active {{ display: block; }}
@@ -1201,13 +1237,56 @@ async def admin_dashboard(password: Optional[str] = None):
             .badge-download {{ background: #eff6ff; color: #1d4ed8; padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; }}
             
             .no-data {{ text-align: center; color: var(--text-muted); padding: 3rem; }}
+            @media (max-width: 600px) {{
+                .stats-container {{ grid-template-columns: 1fr; }}
+            }}
         </style>
         <script>
-            function showTab(tabId) {{
+            function showTab(btnEl, tabId) {{
                 document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
                 document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
                 document.getElementById(tabId).classList.add('active');
-                event.target.classList.add('active');
+                btnEl.classList.add('active');
+            }}
+            
+            const feedbacksData = {feedbacks_json};
+            const paymentsData = {payments_json};
+            
+            function exportJSON(type) {{
+                const data = type === 'feedback' ? feedbacksData : paymentsData;
+                const jsonStr = JSON.stringify(data, null, 2);
+                const blob = new Blob([jsonStr], {{ type: 'application/json' }});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `kannada_rag_${{type}}_export_${{Date.now()}}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }}
+            
+            function filterTable() {{
+                const query = document.getElementById('admin-search').value.toLowerCase();
+                
+                // Filter feedbacks
+                const fbCards = document.querySelectorAll('.fb-card');
+                fbCards.forEach(card => {{
+                    const text = card.innerText.toLowerCase();
+                    card.style.display = text.includes(query) ? '' : 'none';
+                }});
+                
+                // Filter user activity table, log table, and payments table rows
+                const rows = document.querySelectorAll('table tbody tr');
+                rows.forEach(row => {{
+                    const text = row.innerText.toLowerCase();
+                    row.style.display = text.includes(query) ? '' : 'none';
+                }});
+            }}
+            
+            function clearSearch() {{
+                document.getElementById('admin-search').value = '';
+                filterTable();
             }}
         </script>
     </head>
@@ -1216,40 +1295,59 @@ async def admin_dashboard(password: Optional[str] = None):
             <h1>📚 Admin Dashboard</h1>
             <p class="subtitle">Bilingual RAG Assistant feedback, e-book usage metrics, and logs.</p>
             
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-val">{total_fb}</div>
-                    <div class="stat-label">Feedbacks</div>
+            <!-- Stats Grid & Ratings Distribution Chart Layout -->
+            <div class="stats-container">
+                <!-- Grid Stats (Left) -->
+                <div class="stats-subgrid">
+                    <div class="stat-card">
+                        <div class="stat-val">{total_fb}</div>
+                        <div class="stat-label">Feedbacks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val">{avg_rating:.1f} ★</div>
+                        <div class="stat-label">Avg Rating</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val">{total_reads}</div>
+                        <div class="stat-label">Online Reads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val">{total_downloads}</div>
+                        <div class="stat-label">Downloads</div>
+                    </div>
+                    <div class="stat-card" style="border-color:#16a34a33; grid-column: span 2;">
+                        <div class="stat-val" style="color:#16a34a;">{total_payments} (&#8377;{total_amount:,.2f})</div>
+                        <div class="stat-label">💰 Total Payments</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-val">{avg_rating:.1f} ★</div>
-                    <div class="stat-label">Avg Rating</div>
+                
+                <!-- Ratings Distribution (Right) -->
+                <div class="stat-card" style="text-align: left; padding: 1.5rem 1.8rem; display: flex; flex-direction: column; justify-content: flex-start;">
+                    <h3 style="margin-top: 0; margin-bottom: 1rem; color: var(--primary); font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.5px;">⭐ Rating Distribution</h3>
+                    {rating_rows}
                 </div>
-                <div class="stat-card">
-                    <div class="stat-val">{total_reads}</div>
-                    <div class="stat-label">Online Reads</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-val">{total_downloads}</div>
-                    <div class="stat-label">Downloads</div>
-                </div>
-                <div class="stat-card" style="border-color:#16a34a33;">
-                    <div class="stat-val" style="color:#16a34a;">{total_payments}</div>
-                    <div class="stat-label">💰 Payments</div>
-                </div>
+            </div>
+
+            <!-- Search / Filter Bar -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 0.8rem 1.2rem; margin-bottom: 1.8rem; display: flex; gap: 12px; align-items: center; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.02);">
+                <span style="font-size: 1.2rem; color: var(--primary);">🔍</span>
+                <input type="text" id="admin-search" oninput="filterTable()" placeholder="Search feedbacks, activities, logs, or payments..." style="flex-grow: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-size: 0.95rem; background: var(--bg-main); color: var(--text-main); font-family: inherit; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
+                <button onclick="clearSearch()" style="background: var(--primary-light); color: var(--primary); border: 1px solid rgba(194, 65, 12, 0.15); padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;">Clear</button>
             </div>
             
             <!-- Navigation Tabs -->
             <div class="tabs">
-                <button class="tab-btn active" onclick="showTab('tab-feedback')">Feedbacks ({total_fb})</button>
-                <button class="tab-btn" onclick="showTab('tab-users')">User Activity ({len(user_activities)})</button>
-                <button class="tab-btn" onclick="showTab('tab-logs')">Read & Download ({total_logs})</button>
-                <button class="tab-btn" onclick="showTab('tab-payments')" style="color:#16a34a;">💰 Payments ({total_payments})</button>
+                <button class="tab-btn active" onclick="showTab(this, 'tab-feedback')">Feedbacks ({total_fb})</button>
+                <button class="tab-btn" onclick="showTab(this, 'tab-users')">User Activity ({len(user_activities)})</button>
+                <button class="tab-btn" onclick="showTab(this, 'tab-logs')">Read & Download ({total_logs})</button>
+                <button class="tab-btn" onclick="showTab(this, 'tab-payments')" style="color:#16a34a;">💰 Payments ({total_payments})</button>
             </div>
             
             <!-- Feedback Tab -->
             <div id="tab-feedback" class="tab-content active">
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+                    <button onclick="exportJSON('feedback')" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(194,65,12,0.15); transition: all 0.2s; outline: none;">📥 Export Feedbacks JSON</button>
+                </div>
                 <div class="fb-list">
                     {feedback_rows}
                 </div>
@@ -1267,6 +1365,9 @@ async def admin_dashboard(password: Optional[str] = None):
 
             <!-- Payments Tab -->
             <div id="tab-payments" class="tab-content">
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+                    <button onclick="exportJSON('payments')" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(194,65,12,0.15); transition: all 0.2s; outline: none;">📥 Export Payments JSON</button>
+                </div>
                 {payments_html}
             </div>
         </div>
@@ -1854,28 +1955,31 @@ async def root():
                 display: flex;
                 align-items: center;
                 gap: 3px;
-                height: 20px;
+                height: 24px;
                 padding: 0 4px;
             }
             .audio-visualizer .bar {
                 width: 3px;
                 height: 4px;
-                background-color: var(--primary);
+                background: linear-gradient(180deg, var(--primary) 0%, #fb923c 100%);
                 border-radius: 2px;
                 transition: height 0.15s ease;
             }
             .audio-visualizer.playing .bar {
                 animation: bounce-bar 0.8s ease-in-out infinite alternate;
             }
-            .audio-visualizer.playing .bar:nth-child(1) { animation-delay: 0.1s; animation-duration: 0.65s; }
-            .audio-visualizer.playing .bar:nth-child(2) { animation-delay: 0.25s; animation-duration: 0.8s; }
-            .audio-visualizer.playing .bar:nth-child(3) { animation-delay: 0.15s; animation-duration: 0.7s; }
-            .audio-visualizer.playing .bar:nth-child(4) { animation-delay: 0.3s; animation-duration: 0.9s; }
-            .audio-visualizer.playing .bar:nth-child(5) { animation-delay: 0.05s; animation-duration: 0.6s; }
+            .audio-visualizer.playing .bar:nth-child(1), .audio-visualizer.playing .bar:nth-child(15) { animation-delay: 0.1s; animation-duration: 0.5s; }
+            .audio-visualizer.playing .bar:nth-child(2), .audio-visualizer.playing .bar:nth-child(14) { animation-delay: 0.25s; animation-duration: 0.75s; }
+            .audio-visualizer.playing .bar:nth-child(3), .audio-visualizer.playing .bar:nth-child(13) { animation-delay: 0.15s; animation-duration: 0.6s; }
+            .audio-visualizer.playing .bar:nth-child(4), .audio-visualizer.playing .bar:nth-child(12) { animation-delay: 0.3s; animation-duration: 0.85s; }
+            .audio-visualizer.playing .bar:nth-child(5), .audio-visualizer.playing .bar:nth-child(11) { animation-delay: 0.05s; animation-duration: 0.55s; }
+            .audio-visualizer.playing .bar:nth-child(6), .audio-visualizer.playing .bar:nth-child(10) { animation-delay: 0.2s; animation-duration: 0.7s; }
+            .audio-visualizer.playing .bar:nth-child(7), .audio-visualizer.playing .bar:nth-child(9) { animation-delay: 0.35s; animation-duration: 0.8s; }
+            .audio-visualizer.playing .bar:nth-child(8) { animation-delay: 0.12s; animation-duration: 0.95s; }
 
             @keyframes bounce-bar {
                 0% { height: 4px; }
-                100% { height: 20px; }
+                100% { height: 24px; }
             }
             
             .fade-in { animation: fadeIn 0.8s forwards; }
@@ -2193,6 +2297,9 @@ async def root():
 
                     <input type="text" id="q" placeholder="What would you like to know?" required autoComplete="off">
                     <button id="btn" class="main-btn" onclick="ask()">Analyze the Book</button>
+                    <div style="text-align: center; margin-top: 0.6rem;">
+                        <button onclick="clearChatHistory()" style="background: none; border: none; color: var(--text-muted); font-size: 0.82rem; cursor: pointer; text-decoration: underline; display: none;" id="clear-history-btn">🗑️ Reset Conversation</button>
+                    </div>
                     
                     <div id="loading" class="lotus-container" style="display:none;">
                         <svg viewBox="0 0 100 100" class="lotus-svg" style="width: 80px; height: 80px;">
@@ -2230,6 +2337,9 @@ async def root():
                                 <button id="v-btn" class="voice-btn" onclick="speak()">
                                     <span>🔊 Hear in English</span>
                                 </button>
+                                <button id="copy-btn" class="voice-btn" onclick="copyAnswer()" style="background: rgba(194, 65, 12, 0.05); border: 1px solid rgba(194, 65, 12, 0.12); color: var(--primary);">
+                                    <span>📋 Copy Text</span>
+                                </button>
                                 <div id="v-loading" style="display:none;"><div class="loader"></div></div>
                                 
                                 <!-- CUSTOM VOICE PLAYER WIDGET -->
@@ -2238,6 +2348,14 @@ async def root():
                                         <button id="play-pause-btn" class="player-btn" onclick="togglePlayPause()" style="background: var(--primary); border: none; width: 32px; height: 32px; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; outline: none;">▶</button>
                                         <button class="player-btn" onclick="skipAudio(-5)" style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 0.85rem; font-weight: bold; outline: none; padding: 2px;">↩ 5s</button>
                                         <button class="player-btn" onclick="skipAudio(5)" style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 0.85rem; font-weight: bold; outline: none; padding: 2px;">5s ↪</button>
+                                        
+                                        <!-- PLAYBACK SPEED SELECTOR -->
+                                        <select id="audio-speed" onchange="setPlaybackSpeed(this.value)" style="background: transparent; border: 1.5px solid rgba(194, 65, 12, 0.2); color: var(--primary); border-radius: 8px; padding: 4px 6px; font-size: 0.72rem; font-weight: 700; cursor: pointer; outline: none; font-family: inherit;">
+                                            <option value="1.0">1.0x</option>
+                                            <option value="1.25">1.25x</option>
+                                            <option value="1.5">1.5x</option>
+                                            <option value="2.0">2.0x</option>
+                                        </select>
                                     </div>
                                     <div style="display: flex; align-items: center; gap: 8px; flex-grow: 1;">
                                         <span id="audio-current-time" style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">0:00</span>
@@ -2245,13 +2363,13 @@ async def root():
                                         <span id="audio-duration" style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">0:00</span>
                                     </div>
                                     
-                                    <!-- DYNAMIC AUDIO WAVEFORM VISUALIZER -->
+                                    <!-- DYNAMIC AUDIO WAVEFORM VISUALIZER (15 BARS) -->
                                     <div id="audio-visualizer" class="audio-visualizer">
-                                        <div class="bar"></div>
-                                        <div class="bar"></div>
-                                        <div class="bar"></div>
-                                        <div class="bar"></div>
-                                        <div class="bar"></div>
+                                        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                                        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                                        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                                        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                                        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
                                     </div>
                                 </div>
                             </div>
@@ -3132,6 +3250,53 @@ async def root():
             let currentAudio = null;
             let isSeeking = false;
             let chatHistory = [];
+            try {
+                chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+            } catch(e) {
+                chatHistory = [];
+            }
+
+            function clearChatHistory() {
+                chatHistory = [];
+                localStorage.removeItem('chatHistory');
+                localStorage.removeItem('lastQuestion');
+                localStorage.removeItem('lastAnswer');
+                document.getElementById('q').value = '';
+                document.getElementById('ans-container').style.display = 'none';
+                document.getElementById('clear-history-btn').style.display = 'none';
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio = null;
+                }
+                isSpeaking = false;
+                document.getElementById('media-player').style.display = 'none';
+            }
+
+            function copyAnswer() {
+                const btn = document.getElementById('copy-btn');
+                const btnSpan = btn.querySelector('span');
+                navigator.clipboard.writeText(currentText).then(() => {
+                    const origText = btnSpan.innerText;
+                    btnSpan.innerText = "✅ Copied!";
+                    btn.style.background = "#dcfce7";
+                    btn.style.color = "#15803d";
+                    btn.style.borderColor = "rgba(21, 128, 61, 0.2)";
+                    setTimeout(() => {
+                        btnSpan.innerText = origText;
+                        btn.style.background = "rgba(194, 65, 12, 0.05)";
+                        btn.style.color = "var(--primary)";
+                        btn.style.borderColor = "rgba(194, 65, 12, 0.12)";
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            }
+
+            function setPlaybackSpeed(speed) {
+                if (currentAudio) {
+                    currentAudio.playbackRate = parseFloat(speed);
+                }
+            }
 
             // Usage Counter Functions
             function updateUsageCounter() {
@@ -3159,6 +3324,30 @@ async def root():
             // Page Load Initialization
             window.addEventListener('DOMContentLoaded', () => {
                 updateUsageCounter();
+                
+                // Restore previous query if exists
+                const lastQ = localStorage.getItem('lastQuestion');
+                const lastAns = localStorage.getItem('lastAnswer');
+                if (lastQ && lastAns) {
+                    document.getElementById('q').value = lastQ;
+                    currentText = lastAns;
+                    document.getElementById('text-res').innerHTML = formatMarkdown(lastAns);
+                    document.getElementById('ans-container').style.display = 'block';
+                    const clearBtn = document.getElementById('clear-history-btn');
+                    if (clearBtn) clearBtn.style.display = 'inline-block';
+                }
+                
+                // Auto-focus input box and handle Enter key
+                const qInput = document.getElementById('q');
+                if (qInput) {
+                    qInput.focus();
+                    qInput.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            ask();
+                        }
+                    });
+                }
             });
 
             // Time Formatter
@@ -3235,6 +3424,7 @@ async def root():
                 currentAudio.addEventListener('loadedmetadata', () => {
                     durationEl.innerText = formatTime(currentAudio.duration);
                     slider.value = 0;
+                    currentAudio.playbackRate = parseFloat(document.getElementById('audio-speed').value || '1.0');
                 });
 
                 currentAudio.addEventListener('play', () => {
@@ -3335,7 +3525,15 @@ async def root():
                 const lang = document.getElementById('lang-select').value;
                 if (!q) return;
                 
-                btn.disabled = true; load.style.display = 'flex'; cont.style.display = 'none';
+                btn.disabled = true;
+                const origBtnText = btn.innerText;
+                btn.innerText = "Analyzing...";
+                const qField = document.getElementById('q');
+                qField.readOnly = true;
+                
+                load.style.display = 'flex'; 
+                cont.style.display = 'none';
+                
                 try {
                     const r = await fetch('/chat', { 
                         method: 'POST', 
@@ -3359,10 +3557,22 @@ async def root():
                         if (chatHistory.length > 10) {
                             chatHistory = chatHistory.slice(chatHistory.length - 10);
                         }
+                        try {
+                            localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+                            localStorage.setItem('lastQuestion', q);
+                            localStorage.setItem('lastAnswer', d.answer);
+                            const clearBtn = document.getElementById('clear-history-btn');
+                            if (clearBtn) clearBtn.style.display = 'inline-block';
+                        } catch(e) {}
                     }
                     
                     cont.style.display = 'block';
                     cont.classList.add('fade-in');
+                    
+                    // Smooth scroll to answer
+                    setTimeout(() => {
+                        cont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 50);
                     
                     // Reset voice buttons state
                     document.getElementById('v-btn').style.display = 'inline-flex';
@@ -3372,8 +3582,14 @@ async def root():
                     if (document.getElementById('auto-speak').checked) {
                         speak();
                     }
-                } catch (e) { alert("Error: " + e.message); }
-                btn.disabled = false; load.style.display = 'none';
+                } catch (e) { 
+                    alert("Error: " + e.message); 
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = origBtnText;
+                    qField.readOnly = false;
+                    load.style.display = 'none';
+                }
             }
 
             async function speak() {
