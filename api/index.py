@@ -457,33 +457,48 @@ async def chat(request: ChatRequest):
         if request.language == "English":
             sys_instruction = (
                 "You are a professional literary assistant for the Kannada novel 'Heli Hogu Kaarana'. "
-                "Use the retrieved passages to answer the user's question. "
+                "The novel was written by the famous Kannada author and journalist Ravi Belagere (ರವಿ ಬೆಳಗೆರೆ). "
+                "Note that Ravi Belagere is the author and narrator of the story; he is not a character inside the novel itself. "
+                "If the user asks about 'Ravi' or 'Ravi Belagere' or 'Ravi\'s role', explain that he is the author and narrator of the novel, and describe his narrative style and connection as the author. "
+                "Use the retrieved passages and this context to answer the user's question. "
                 "CRITICAL RULE: You must answer ONLY in English. Do NOT write in Kannada, and do NOT mix Kannada and English in your reply. "
                 "All explanations, analysis, and text must be in English. "
                 "If the conversation history contains messages in Kannada, ignore their language and reply only in English. "
-                "Always cite the exact page numbers from the passages in your answer."
+                "Always cite the exact page numbers from the passages in your answer when referencing the text."
             )
-            full_prompt = f"""RETRIEVED NOVEL PASSAGES:
+            full_prompt = f"""NOVEL METADATA:
+- Title: Heli Hogu Kaarana (ಹೇಳಿ ಹೋಗು ಕಾರಣ)
+- Author: Ravi Belagere (ರವಿ ಬೆಳಗೆರೆ) (Note: Ravi Belagere is the author and narrator of the novel, not a character in the story.)
+- Main Characters: Himavant (ಹಿಮವಂತ್), Prarthana (ಪ್ರಾರ್ಥನಾ)
+
+RETRIEVED NOVEL PASSAGES:
 {pagetext}
 
-Answer the user's question in detail using the retrieved passages. Follow the instructions to write the entire answer in English.
+Answer the user's question in detail using the retrieved passages and the novel metadata context. Follow the instructions to write the entire answer in English.
 
 QUESTION: {request.question}
 ANSWER in English:"""
         else:
             sys_instruction = (
-                "ನೀವು 'ಹೇಳಿ ಹೋಗು ಕಾರಣ' ಕಾದಂಬರಿಯ ವೃತ್ತಿಪರ ಸಾಹಿತ್ಯ ಸಹಾಯಕರು. "
-                "ಹಿಂಪಡೆದ ಪುಸ್ತಕದ ಭಾಗಗಳನ್ನು ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರಿಸಿ. "
+                "ನೀವು ರವಿ ಬೆಳಗೆರೆ ಅವರು ಬರೆದ 'ಹೇಳಿ ಹೋಗು ಕಾರಣ' ಕಾದಂಬರಿಯ ವೃತ್ತಿಪರ ಸಾಹಿತ್ಯ ಸಹಾಯಕರು. "
+                "ರವಿ ಬೆಳಗೆರೆ ಅವರು ಈ ಕಾದಂಬರಿಯ ಕರ್ತೃ ಮತ್ತು ಸೂತ್ರಧಾರ/ನಿರೂಪಕರಾಗಿದ್ದಾರೆ; ಅವರು ಕಥೆಯ ಒಳಗಿನ ಪಾತ್ರವಲ್ಲ ಎಂಬುದನ್ನು ಗಮನಿಸಿ. "
+                "ಬಳಕೆದಾರರು 'ರವಿ' ಅಥವಾ 'ರವಿ ಬೆಳಗೆರೆ' ಅಥವಾ ಅವರ ಪಾತ್ರದ ಬಗ್ಗೆ ಕೇಳಿದರೆ, ಅವರು ಕಾದಂಬರಿಯ ಕರ್ತೃ/ನಿರೂಪಕರು ಎಂದು ವಿವರಿಸಿ. "
+                "ಹಿಂಪಡೆದ ಪುಸ್ತಕದ ಭಾಗಗಳನ್ನು ಮತ್ತು ಈ ಹಿನ್ನೆಲೆಯನ್ನು ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರಿಸಿ. "
                 "ಪ್ರಮುಖ ನಿಯಮ: ನೀವು ಕಡ್ಡಾಯವಾಗಿ ಮತ್ತು ಸಂಪೂರ್ಣವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಉತ್ತರಿಸಬೇಕು. "
                 "ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ಇಂಗ್ಲಿಷ್ ಬಳಸಬೇಡಿ, ಮತ್ತು ಇಂಗ್ಲಿಷ್ ಮತ್ತು ಕನ್ನಡದ ಮಿಶ್ರಣವನ್ನು ಬಳಸಬೇಡಿ. "
                 "ಎಲ್ಲಾ ವಿವರಣೆಗಳು, ವಿಶ್ಲೇಷಣೆಗಳು ಮತ್ತು ಪಠ್ಯಗಳು ಕಡ್ಡಾಯವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಇರಬೇಕು. "
                 "ಸಂಭಾಷಣೆಯ ಇತಿಹಾಸದಲ್ಲಿ (history) ಇಂಗ್ಲಿಷ್ ಸಂದೇಶಗಳಿದ್ದರೂ ಸಹ, ಅವುಗಳನ್ನು ನಿರ್ಲಕ್ಷಿಸಿ ಮತ್ತು ಈ ಪ್ರಸ್ತುತ ಪ್ರಶ್ನೆಗೆ ಸಂಪೂರ್ಣವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಉತ್ತರಿಸಿ. "
                 "ಉತ್ತರದಲ್ಲಿ ಕಡ್ಡಾಯವಾಗಿ ಸೂಕ್ತ ಪುಟ ಸಂಖ್ಯೆಗಳನ್ನು ಉಲ್ಲೇಖಿಸಿ."
             )
-            full_prompt = f"""ಪುಸ್ತಕದಿಂದ ತೆಗೆದ ವಿಷಯ (RETRIEVED NOVEL PASSAGES):
+            full_prompt = f"""ಕಾದಂಬರಿಯ ಮಾಹಿತಿ (NOVEL METADATA):
+- ಶೀರ್ಷಿಕೆ: ಹೇಳಿ ಹೋಗು ಕಾರಣ
+- ಲೇಖಕರು: ರವಿ ಬೆಳಗೆರೆ (ಗಮನಿಸಿ: ರವಿ ಬೆಳಗೆರೆ ಅವರು ಕಾದಂಬರಿಯ ಲೇಖಕ ಮತ್ತು ನಿರೂಪಕರಾಗಿದ್ದಾರೆ; ಅವರು ಕಥೆಯ ಒಳಗಿನ ಪಾತ್ರವಲ್ಲ.)
+- ಮುಖ್ಯ ಪಾತ್ರಗಳು: ಹಿಮವಂತ್ (ಹಿಮವಂತ), ಪ್ರಾರ್ಥನಾ
+
+ಪುಸ್ತಕದಿಂದ ತೆಗೆದ ವಿಷಯ (RETRIEVED NOVEL PASSAGES):
 {pagetext}
 
-ಹಿಂಪಡೆದ ಭಾಗಗಳನ್ನು ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ. ಸಂಪೂರ್ಣ ಉತ್ತರವನ್ನು ಕನ್ನಡದಲ್ಲೇ ಬರೆಯುವ ನಿಯಮವನ್ನು ಪಾಲಿಸಿ.
+ಹಿಂಪಡೆದ ಭಾಗಗಳನ್ನು ಮತ್ತು ಕಾದಂಬರಿಯ ಮಾಹಿತಿಯನ್ನು ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ. ಸಂಪೂರ್ಣ ಉತ್ತರವನ್ನು ಕನ್ನಡದಲ್ಲೇ ಬರೆಯುವ ನಿಯಮವನ್ನು ಪಾಲಿಸಿ.
 
 ಪ್ರಶ್ನೆ (QUESTION): {request.question}
 ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ (ANSWER in Kannada):"""
@@ -2292,7 +2307,7 @@ async def root():
                         <button class="sug-btn" onclick="setQ('Who is Himavant?')">Who is Himavant?</button>
                         <button class="sug-btn" onclick="setQ('Describe Prarthana')">About Prarthana</button>
                         <button class="sug-btn" onclick="setQ('What are the main themes?')">Main Themes</button>
-                        <button class="sug-btn" onclick="setQ('How is Ravi related?')">Ravi's Role</button>
+                        <button class="sug-btn" onclick="setQ('How is Ravi Belagere related to the book?')">Ravi's Role</button>
                     </div>
 
                     <input type="text" id="q" placeholder="What would you like to know?" required autoComplete="off">
