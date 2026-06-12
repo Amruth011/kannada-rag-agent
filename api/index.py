@@ -1316,7 +1316,80 @@ async def root():
                 --shadow: 0 20px 50px -15px rgba(194, 65, 12, 0.08);
                 --font-serif: 'Playfair Display', Georgia, serif;
                 --font-sans: 'Plus Jakarta Sans', sans-serif;
+                --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             }
+            
+            /* DARK MODE VARIATIONS */
+            body.dark-mode {
+                --bg: #090d16;
+                --bg-secondary: #0f172a;
+                --card: #1e293b;
+                --text: #f8fafc;
+                --text-muted: #94a3b8;
+                --border: rgba(249, 115, 22, 0.15);
+                --shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.5);
+                --primary-light: rgba(249, 115, 22, 0.12);
+                --accent-light: rgba(99, 102, 241, 0.15);
+            }
+            body.dark-mode .nav-header {
+                background: rgba(15, 23, 42, 0.85);
+            }
+            body.dark-mode .logo-title {
+                color: #f8fafc;
+            }
+            body.dark-mode .settings {
+                background: #131d31;
+                border-color: rgba(249, 115, 22, 0.1);
+            }
+            body.dark-mode #ans {
+                background: #111a2e;
+                border-color: rgba(249, 115, 22, 0.15);
+            }
+            body.dark-mode #media-player {
+                background: #131d31;
+                border-color: rgba(249, 115, 22, 0.12);
+            }
+            body.dark-mode .sug-btn {
+                background: linear-gradient(145deg, #1e293b 0%, #131d31 100%);
+                border-color: rgba(249, 115, 22, 0.12);
+            }
+            body.dark-mode .sug-btn:hover {
+                background: var(--primary-light);
+                border-color: var(--primary);
+            }
+            body.dark-mode input[type="text"] {
+                background: #1e293b;
+                border-color: rgba(249, 115, 22, 0.2);
+            }
+            body.dark-mode input[type="text"]:focus {
+                border-color: var(--primary);
+            }
+            body.dark-mode .network-svg {
+                background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+                border-color: rgba(249, 115, 22, 0.15);
+            }
+            body.dark-mode .node circle {
+                fill: #1e293b;
+            }
+            body.dark-mode .node text {
+                fill: #f8fafc;
+            }
+            body.dark-mode .char-card {
+                background: #1e293b;
+                border-color: rgba(249, 115, 22, 0.15);
+            }
+            body.dark-mode .feedback-card {
+                background: #1e293b;
+                border-color: rgba(249, 115, 22, 0.15);
+            }
+            body.dark-mode .download-box {
+                background: #1e293b;
+                border-color: rgba(249, 115, 22, 0.15);
+            }
+            body.dark-mode .nav-item:hover {
+                background: rgba(249, 115, 22, 0.1);
+            }
+            
             body {
                 background: radial-gradient(circle at 50% 0%, #fffefc 0%, var(--bg-secondary) 80%);
                 color: var(--text);
@@ -1328,6 +1401,10 @@ async def root():
                 align-items: center;
                 overflow-x: hidden;
                 position: relative;
+                transition: background 0.3s, color 0.3s;
+            }
+            body.dark-mode {
+                background: radial-gradient(circle at 50% 0%, #0f172a 0%, #090d16 100%);
             }
             
             /* DYNAMIC BACKGROUND SHAPES & WATERMARKS */
@@ -1705,6 +1782,24 @@ async def root():
                 color: var(--text);
                 font-family: var(--font-sans);
             }
+            #text-res blockquote {
+                border-left: 4px solid var(--primary);
+                background: var(--primary-light);
+                padding: 0.8rem 1.2rem;
+                margin: 1.2rem 0;
+                border-radius: 0 12px 12px 0;
+                font-style: italic;
+                color: var(--text);
+                opacity: 0.95;
+            }
+            #text-res ul, #text-res ol {
+                margin: 1rem 0;
+                padding-left: 1.8rem;
+            }
+            #text-res li {
+                margin-bottom: 0.5rem;
+                line-height: 1.7;
+            }
             
             /* VOICE BUTTON */
             .voice-btn {
@@ -1739,7 +1834,7 @@ async def root():
                 height: 44px;
             }
             
-            /* CUSTOM MEDIA PLAYER */
+            /* CUSTOM MEDIA PLAYER & VISUALIZER */
             .player-btn {
                 transition: all 0.2s;
             }
@@ -1748,6 +1843,34 @@ async def root():
             }
             .player-btn:active {
                 transform: scale(0.95);
+            }
+            
+            .audio-visualizer {
+                display: flex;
+                align-items: center;
+                gap: 3px;
+                height: 20px;
+                padding: 0 4px;
+            }
+            .audio-visualizer .bar {
+                width: 3px;
+                height: 4px;
+                background-color: var(--primary);
+                border-radius: 2px;
+                transition: height 0.15s ease;
+            }
+            .audio-visualizer.playing .bar {
+                animation: bounce-bar 0.8s ease-in-out infinite alternate;
+            }
+            .audio-visualizer.playing .bar:nth-child(1) { animation-delay: 0.1s; animation-duration: 0.65s; }
+            .audio-visualizer.playing .bar:nth-child(2) { animation-delay: 0.25s; animation-duration: 0.8s; }
+            .audio-visualizer.playing .bar:nth-child(3) { animation-delay: 0.15s; animation-duration: 0.7s; }
+            .audio-visualizer.playing .bar:nth-child(4) { animation-delay: 0.3s; animation-duration: 0.9s; }
+            .audio-visualizer.playing .bar:nth-child(5) { animation-delay: 0.05s; animation-duration: 0.6s; }
+
+            @keyframes bounce-bar {
+                0% { height: 4px; }
+                100% { height: 20px; }
             }
             
             .fade-in { animation: fadeIn 0.8s forwards; }
@@ -2020,6 +2143,7 @@ async def root():
                     <button class="nav-item" id="nav-quotemaker" onclick="switchTab('quotemaker')">🎨 Quotes</button>
                     <button class="nav-item" id="nav-downloads" onclick="switchTab('downloads')">📚 E-Books</button>
                     <button class="nav-item" id="nav-feedback" onclick="switchTab('feedback')">✍️ Feedback</button>
+                    <button id="theme-toggle-btn" class="nav-item" onclick="toggleTheme()" aria-label="Toggle Theme" style="cursor: pointer; padding: 0.35rem 0.6rem; border-radius: 8px; font-size: 1.05rem;">🌓</button>
                 </nav>
             </div>
         </header>
@@ -2114,6 +2238,15 @@ async def root():
                                         <span id="audio-current-time" style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">0:00</span>
                                         <input type="range" id="audio-slider" value="0" style="flex-grow: 1; height: 5px; border-radius: 3px; cursor: pointer; accent-color: var(--primary); outline: none;">
                                         <span id="audio-duration" style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">0:00</span>
+                                    </div>
+                                    
+                                    <!-- DYNAMIC AUDIO WAVEFORM VISUALIZER -->
+                                    <div id="audio-visualizer" class="audio-visualizer">
+                                        <div class="bar"></div>
+                                        <div class="bar"></div>
+                                        <div class="bar"></div>
+                                        <div class="bar"></div>
+                                        <div class="bar"></div>
                                     </div>
                                 </div>
                             </div>
@@ -2283,6 +2416,9 @@ async def root():
                             
                             <button onclick="downloadQuoteCard()" class="main-btn" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
                                 <span>📥 Save Quote Card to Device</span>
+                            </button>
+                            <button onclick="shareQuoteCard()" class="main-btn" style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--accent), #4f46e5); box-shadow: 0 10px 25px -5px rgba(67, 56, 202, 0.25);">
+                                <span>📤 Share Quote Card</span>
                             </button>
                         </div>
                     </div>
@@ -2807,6 +2943,33 @@ async def root():
                 link.click();
             }
 
+            async function shareQuoteCard() {
+                const canvas = document.getElementById('quote-canvas');
+                if (!canvas) return;
+                try {
+                    canvas.toBlob(async (blob) => {
+                        if (!blob) {
+                            alert("Failed to generate image.");
+                            return;
+                        }
+                        const file = new File([blob], 'heli_hogu_karana_quote.png', { type: 'image/png' });
+                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                files: [file],
+                                title: 'Heli Hogu Kaarana Novel Quote',
+                                text: 'Designed this beautiful quote card from the Kannada novel "Heli Hogu Kaarana"!'
+                            });
+                        } else {
+                            // Fallback if sharing is not supported
+                            downloadQuoteCard();
+                        }
+                    }, 'image/png');
+                } catch (err) {
+                    console.error("Error sharing:", err);
+                    downloadQuoteCard(); // Fallback
+                }
+            }
+
             // Star Rating Logic
             let currentRating = 5;
             
@@ -2992,13 +3155,19 @@ async def root():
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;");
 
+                // Blockquotes: lines starting with &gt;
+                html = html.replace(/^\s*&gt;\s+(.*?)$/gm, '<blockquote>$1</blockquote>');
+
                 // Headers: ###, ##, #
                 html = html.replace(/^### (.*?)$/gm, '<h3 style="color: var(--primary); margin-top: 1rem; margin-bottom: 0.5rem; font-family: var(--font-serif);">$1</h3>');
                 html = html.replace(/^## (.*?)$/gm, '<h2 style="color: var(--primary); margin-top: 1.2rem; margin-bottom: 0.6rem; font-family: var(--font-serif);">$1</h2>');
                 html = html.replace(/^# (.*?)$/gm, '<h1 style="color: var(--primary); margin-top: 1.5rem; margin-bottom: 0.8rem; font-family: var(--font-serif);">$1</h1>');
 
                 // Lists: lines starting with * or - followed by a space
-                html = html.replace(/^\s*[\*\-]\s+(.*?)$/gm, '<li style="margin-left: 1.5rem; margin-bottom: 0.25rem;">$1</li>');
+                html = html.replace(/^\s*[\*\-]\s+(.*?)$/gm, '<li style="margin-bottom: 0.25rem;">$1</li>');
+                
+                // Wrap contiguous <li> tags with <ul>...</ul>
+                html = html.replace(/(<li.*?>.*?<\/li>)+/g, '<ul>$&</ul>');
 
                 // Bold: **text** -> <strong>text</strong>
                 html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -3014,7 +3183,7 @@ async def root():
                 html = html.replace(/\(ಪುಟ ([೦-೯]+)\)/g, '<span style="background:var(--primary-light); color:var(--primary); font-size:0.75rem; font-weight:700; padding:2px 6px; border-radius:4px; margin-left:4px; display:inline-block;">ಪುಟ $1</span>');
                 html = html.replace(/\(ಪುಟ ([೦-೯]+)-([೦-೯]+)\)/g, '<span style="background:var(--primary-light); color:var(--primary); font-size:0.75rem; font-weight:700; padding:2px 6px; border-radius:4px; margin-left:4px; display:inline-block;">ಪುಟ $1-$2</span>');
 
-                // Convert remaining newlines to <br>
+                // Convert remaining newlines to <br> (excluding ones inside lists/blockquotes if we want, but simple replace is fine)
                 html = html.replace(/\n/g, '<br>');
 
                 return html;
@@ -3037,6 +3206,16 @@ async def root():
                     slider.value = 0;
                 });
 
+                currentAudio.addEventListener('play', () => {
+                    const viz = document.getElementById('audio-visualizer');
+                    if (viz) viz.classList.add('playing');
+                });
+
+                currentAudio.addEventListener('pause', () => {
+                    const viz = document.getElementById('audio-visualizer');
+                    if (viz) viz.classList.remove('playing');
+                });
+
                 currentAudio.addEventListener('timeupdate', () => {
                     if (!isSeeking && currentAudio) {
                         slider.value = (currentAudio.currentTime / currentAudio.duration) * 100 || 0;
@@ -3053,6 +3232,8 @@ async def root():
                     slider.value = 0;
                     currentTimeEl.innerText = "0:00";
                     currentAudio = null;
+                    const viz = document.getElementById('audio-visualizer');
+                    if (viz) viz.classList.remove('playing');
                 });
                 
                 slider.addEventListener('mousedown', () => { isSeeking = true; });
@@ -3235,6 +3416,29 @@ async def root():
                 document.getElementById('v-loading').style.display = 'none';
                 document.getElementById('media-player').style.display = 'none';
             });
+
+            // Theme Management (Light / Dark Mode)
+            function toggleTheme() {
+                const body = document.body;
+                const btn = document.getElementById('theme-toggle-btn');
+                body.classList.toggle('dark-mode');
+                const isDark = body.classList.contains('dark-mode');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                if (btn) btn.innerHTML = isDark ? '☀️' : '🌓';
+            }
+
+            // Restore theme preferences on initialization
+            (function() {
+                const savedTheme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                    document.body.classList.add('dark-mode');
+                    window.addEventListener('DOMContentLoaded', () => {
+                        const btn = document.getElementById('theme-toggle-btn');
+                        if (btn) btn.innerHTML = '☀️';
+                    });
+                }
+            })();
         </script>
     </body>
     </html>
