@@ -1389,6 +1389,11 @@ async def root():
             body.dark-mode .nav-item:hover {
                 background: rgba(249, 115, 22, 0.1);
             }
+            body.dark-mode .hero h1 {
+                background: linear-gradient(135deg, #ffedd5 30%, #f97316);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
             
             body {
                 background: radial-gradient(circle at 50% 0%, #fffefc 0%, var(--bg-secondary) 80%);
@@ -2527,20 +2532,46 @@ async def root():
         </div>
         
         <!-- FOOTER WITH CREDITS & SUPPORT -->
-        <footer style="margin-top: 3rem; border-top: 1px solid rgba(194, 65, 12, 0.15); padding-top: 2rem; padding-bottom: 3rem; text-align: center; font-family: var(--font-sans); color: var(--text-muted);">
-            <div style="max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2rem; align-items: center; padding: 0 1.5rem;">
+        <footer style="margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 3rem; padding-bottom: 4rem; text-align: center; font-family: var(--font-sans); width: 100%;">
+            <div style="max-width: 680px; margin: 0 auto; padding: 0 1.5rem; display: flex; flex-direction: column; gap: 2rem; align-items: center;">
+                
+                <!-- Support & Follow Hub Card -->
+                <div class="footer-hub-card" style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 20px; padding: 1.8rem 2rem; width: 100%; box-sizing: border-box; text-align: left; display: flex; flex-direction: column; gap: 1.2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.02); transition: transform 0.25s;">
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <span style="font-size: 0.75rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1.5px;">Support & Community</span>
+                        <h4 style="font-family: var(--font-serif); font-size: 1.25rem; font-weight: 800; margin: 0; color: var(--text);">Loved the AI Book Guide? Here is how you can help:</h4>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; width: 100%;">
+                        <!-- Support block -->
+                        <div style="display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; padding: 1rem; background: var(--card); border: 1px solid var(--border); border-radius: 12px;">
+                            <div>
+                                <h5 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px;">☕ Keep the AI Online</h5>
+                                <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.45;">Contributions keep the Gemini & Sarvam voice servers active. Even ₹20 makes a big difference!</p>
+                            </div>
+                            <button onclick="document.getElementById('pay-modal').style.display='flex'" style="background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(194, 65, 12, 0.2); outline: none;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 15px rgba(194, 65, 12, 0.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(194, 65, 12, 0.2)'">
+                                ☕ Support Developer
+                            </button>
+                        </div>
+                        
+                        <!-- Follow block -->
+                        <div style="display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; padding: 1rem; background: var(--card); border: 1px solid var(--border); border-radius: 12px;">
+                            <div>
+                                <h5 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px;">📢 Join the Community</h5>
+                                <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.45;">Follow us on Instagram for regular quotes, character analysis, and updates on new book guides.</p>
+                            </div>
+                            <a href="https://instagram.com/heli.hogu.kaarana" target="_blank" style="text-decoration: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; padding: 10px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; box-sizing: border-box; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(220, 39, 67, 0.2);" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 15px rgba(220, 39, 67, 0.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(220, 39, 67, 0.2)'">
+                                📸 Follow on Instagram
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Credits line -->
                 <p style="margin: 0; font-size: 0.82rem; line-height: 1.6; color: var(--text-muted);">
-                    📚 <em>ಹೇಳಿ ಹೋಗು ಕಾರಣ</em> by <strong style="color:var(--text-main);">Ravi Belagere</strong> · Published by <strong style="color:var(--text-main);">Bhavana Prakashana</strong>, Bengaluru.<br>
+                    📚 <em>ಹೇಳಿ ಹೋಗು ಕಾರಣ</em> by <strong style="color:var(--text); font-weight:700;">Ravi Belagere</strong> · Published by <strong style="color:var(--text); font-weight:700;">Bhavana Prakashana</strong>, Bengaluru.<br>
                     All book rights belong to the original author &amp; publisher. This AI guide is an independent educational tribute.
                 </p>
-
-                <!-- Support buttons -->
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center;">
-                    <button onclick="document.getElementById('pay-modal').style.display='flex'" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">☕ Support the Developer</button>
-                    <a href="https://instagram.com/heli.hogu.kaarana" target="_blank" style="text-decoration: none; background: white; border: 1.5px solid var(--primary); color: var(--primary); padding: 7px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 6px;">📸 Instagram</a>
-                </div>
 
                 <p style="margin: 0; font-size: 0.72rem; color: var(--text-muted);">© 2026 Heli Hogu Kaarana AI Guide · Built with ❤️ for Kannada literature</p>
             </div>
@@ -3427,11 +3458,10 @@ async def root():
                 if (btn) btn.innerHTML = isDark ? '☀️' : '🌓';
             }
 
-            // Restore theme preferences on initialization
+            // Restore theme preferences on initialization (Default to Light Mode)
             (function() {
                 const savedTheme = localStorage.getItem('theme');
-                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                if (savedTheme === 'dark') {
                     document.body.classList.add('dark-mode');
                     window.addEventListener('DOMContentLoaded', () => {
                         const btn = document.getElementById('theme-toggle-btn');
