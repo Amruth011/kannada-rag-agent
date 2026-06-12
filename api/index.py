@@ -152,7 +152,7 @@ def search_text(query, data, top_k=5):
     results.sort(key=lambda x: x['score'], reverse=True)
     return results[:top_k]
 
-def call_groq(prompt, history=None, retries=1):
+def call_groq(prompt, history=None, system_instruction=None, retries=1):
     """Fallback to Groq with active model fallbacks (Llama 3.3 -> Llama 3.1 -> Llama 4 Scout)."""
     if not GROQ_API_KEY:
         return "[ERROR]: GROQ_API_KEY is missing."
@@ -165,10 +165,12 @@ def call_groq(prompt, history=None, retries=1):
     
     models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "meta-llama/llama-4-scout-17b-16e-instruct"]
     
+    sys_instruction = system_instruction if system_instruction else BOOK_CONTEXT
+    
     last_err = ""
     for model in models:
         for attempt in range(retries + 1):
-            messages = [{"role": "system", "content": BOOK_CONTEXT}]
+            messages = [{"role": "system", "content": sys_instruction}]
             if history:
                 for msg in history:
                     role = "user" if msg.get("role") == "user" else "assistant"
@@ -221,10 +223,10 @@ def get_best_gemini_model():
     except Exception:
         return "gemini-2.5-flash"
 
-def call_gemini(prompt, history=None, retries=1):
+def call_gemini(prompt, history=None, system_instruction=None, retries=1):
     """Deepest Gemini Safety Bypass + System Prompting."""
     if not GEMINI_API_KEY: 
-        return call_groq(prompt, history=history)
+        return call_groq(prompt, history=history, system_instruction=system_instruction)
     
     last_error = ""
     model_name = get_best_gemini_model()
@@ -236,11 +238,13 @@ def call_gemini(prompt, history=None, retries=1):
         {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
     ]
     
+    sys_instruction = system_instruction if system_instruction else BOOK_CONTEXT
+    
     for attempt in range(retries + 1):
         try:
             model = genai.GenerativeModel(
                 model_name=model_name,
-                system_instruction=BOOK_CONTEXT
+                system_instruction=sys_instruction
             )
             if history:
                 contents = []
@@ -269,7 +273,7 @@ def call_gemini(prompt, history=None, retries=1):
                     continue
             break 
                 
-    return call_groq(prompt, history=history)
+    return call_groq(prompt, history=history, system_instruction=system_instruction)
 
 def call_gtts_parallel(text, language="kn-IN"):
     """Fetch Google TTS chunks in parallel, concatenate as raw MP3 bytes."""
@@ -437,33 +441,40 @@ async def chat(request: ChatRequest):
         
         # Build prompt based on requested language
         if request.language == "English":
-            full_prompt = f"""You are an AI assistant for the Kannada novel "Heli Hogu Kaarana".
-
-BOOK INFORMATION:
-{BOOK_CONTEXT}
-
-RETRIEVED PASSAGES:
+            sys_instruction = (
+                "You are a professional literary assistant for the Kannada novel 'Heli Hogu Kaarana'. "
+                "Use the retrieved passages to answer the user's question. "
+                "CRITICAL RULE: You must answer ONLY in English. Do NOT write in Kannada, and do NOT mix Kannada and English in your reply. "
+                "All explanations, analysis, and text must be in English. "
+                "If the conversation history contains messages in Kannada, ignore their language and reply only in English. "
+                "Always cite the exact page numbers from the passages in your answer."
+            )
+            full_prompt = f"""RETRIEVED NOVEL PASSAGES:
 {pagetext}
 
-Answer the question in detail using the information above. Be highly informative, provide thorough explanations, explore context from the passages, and cite page numbers when using passages. Do not give short or brief summaries.
+Answer the user's question in detail using the retrieved passages. Follow the instructions to write the entire answer in English.
 
 QUESTION: {request.question}
 ANSWER in English:"""
         else:
-            full_prompt = f"""ನೀವು "ಹೇಳಿ ಹೋಗು ಕಾರಣ" ಕನ್ನಡ ಕಾದಂಬರಿಯ AI ಸಹಾಯಕರು.
-
-ಪುಸ್ತಕದ ಮಾಹಿತಿ / Book Info:
-{BOOK_CONTEXT}
-
-ಪುಸ್ತಕದಿಂದ ತೆಗೆದ ವಿಷಯ:
+            sys_instruction = (
+                "ನೀವು 'ಹೇಳಿ ಹೋಗು ಕಾರಣ' ಕಾದಂಬರಿಯ ವೃತ್ತಿಪರ ಸಾಹಿತ್ಯ ಸಹಾಯಕರು. "
+                "ಹಿಂಪಡೆದ ಪುಸ್ತಕದ ಭಾಗಗಳನ್ನು ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರಿಸಿ. "
+                "ಪ್ರಮುಖ ನಿಯಮ: ನೀವು ಕಡ್ಡಾಯವಾಗಿ ಮತ್ತು ಸಂಪೂರ್ಣವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಉತ್ತರಿಸಬೇಕು. "
+                "ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ಇಂಗ್ಲಿಷ್ ಬಳಸಬೇಡಿ, ಮತ್ತು ಇಂಗ್ಲಿಷ್ ಮತ್ತು ಕನ್ನಡದ ಮಿಶ್ರಣವನ್ನು ಬಳಸಬೇಡಿ. "
+                "ಎಲ್ಲಾ ವಿವರಣೆಗಳು, ವಿಶ್ಲೇಷಣೆಗಳು ಮತ್ತು ಪಠ್ಯಗಳು ಕಡ್ಡಾಯವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಇರಬೇಕು. "
+                "ಸಂಭಾಷಣೆಯ ಇತಿಹಾಸದಲ್ಲಿ (history) ಇಂಗ್ಲಿಷ್ ಸಂದೇಶಗಳಿದ್ದರೂ ಸಹ, ಅವುಗಳನ್ನು ನಿರ್ಲಕ್ಷಿಸಿ ಮತ್ತು ಈ ಪ್ರಸ್ತುತ ಪ್ರಶ್ನೆಗೆ ಸಂಪೂರ್ಣವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಉತ್ತರಿಸಿ. "
+                "ಉತ್ತರದಲ್ಲಿ ಕಡ್ಡಾಯವಾಗಿ ಸೂಕ್ತ ಪುಟ ಸಂಖ್ಯೆಗಳನ್ನು ಉಲ್ಲೇಖಿಸಿ."
+            )
+            full_prompt = f"""ಪುಸ್ತಕದಿಂದ ತೆಗೆದ ವಿಷಯ (RETRIEVED NOVEL PASSAGES):
 {pagetext}
 
-ಮೇಲಿನ ಮಾಹಿತಿಯನ್ನು ಬಳಸಿಕೊಂಡು ಪ್ರಶ್ನೆಗೆ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ. ಸಮಗ್ರವಾದ ಮತ್ತು ಆಳವಾದ ವಿವರಣೆಯನ್ನು ನೀಡಿ, ಕಾದಂಬರಿಯ ಸಂದರ್ಭಗಳನ್ನು ವಿವರಿಸಿ ಮತ್ತು ಸೂಕ್ತ ಪುಟಗಳ ಸಂಖ್ಯೆಯನ್ನು ಕಡ್ಡಾಯವಾಗಿ ನಮೂದಿಸಿ. ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ಸಂಕ್ಷಿಪ್ತ ಅಥವಾ ಸಣ್ಣ ಉತ್ತರಗಳನ್ನು ನೀಡಬೇಡಿ.
+ಹಿಂಪಡೆದ ಭಾಗಗಳನ್ನು ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ. ಸಂಪೂರ್ಣ ಉತ್ತರವನ್ನು ಕನ್ನಡದಲ್ಲೇ ಬರೆಯುವ ನಿಯಮವನ್ನು ಪಾಲಿಸಿ.
 
-ಪ್ರಶ್ನೆ: {request.question}
-ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ:"""
+ಪ್ರಶ್ನೆ (QUESTION): {request.question}
+ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ (ANSWER in Kannada):"""
         
-        answer = call_gemini(full_prompt, history=request.history)
+        answer = call_gemini(full_prompt, history=request.history, system_instruction=sys_instruction)
         return ChatResponse(answer=answer, sources=retrieved_pages)
     except Exception:
         return ChatResponse(answer=f"[BACKEND ERROR]: {traceback.format_exc()[:500]}", sources=[])
