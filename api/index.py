@@ -1435,7 +1435,7 @@ async def sitemap_xml():
 async def root():
     # Load Google Analytics & Search Console from environment variables
     ga_id = os.getenv("GOOGLE_ANALYTICS_ID", "").strip()
-    gsv_id = os.getenv("GOOGLE_SITE_VERIFICATION", "").strip()
+    gsv_id = os.getenv("GOOGLE_SITE_VERIFICATION", "0_vVD90Xv95sFLOEhxmSuiopJFfZAPkp25ZSXSrseBk").strip()
     
     ga_script = f"""<!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={ga_id}"></script>
