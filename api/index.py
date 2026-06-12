@@ -3284,6 +3284,7 @@ async def root():
                     
                     const res = await response.json();
                     if (res.status === 'success') {
+                        logGAEvent('submit_feedback', { rating: rating, comment_length: comment.length });
                         successMsg.style.display = 'block';
                         document.getElementById('feedback-form').reset();
                         currentRating = 5;
@@ -3297,6 +3298,12 @@ async def root():
                 } finally {
                     submitBtn.disabled = false;
                     submitBtn.innerText = "Submit Feedback";
+                }
+            }
+
+            function logGAEvent(eventName, params) {
+                if (typeof gtag === 'function') {
+                    gtag('event', eventName, params);
                 }
             }
 
@@ -3353,6 +3360,7 @@ async def root():
                 const btn = document.getElementById('copy-btn');
                 const btnSpan = btn.querySelector('span');
                 navigator.clipboard.writeText(currentText).then(() => {
+                    logGAEvent('copy_answer', { text_length: currentText.length });
                     const origText = btnSpan.innerText;
                     btnSpan.innerText = "✅ Copied!";
                     btn.style.background = "#dcfce7";
@@ -3623,6 +3631,7 @@ async def root():
                     incrementUsage();
                     
                     currentText = d.answer;
+                    logGAEvent('ask_query', { question: q, language: lang });
                     res.innerHTML = formatMarkdown(d.answer);
                     
                     // Update conversational memory if it is a successful non-error response
@@ -3706,6 +3715,7 @@ async def root():
                     const d = await r.json();
                     vLoad.style.display = 'none';
                     if (d.audio) {
+                        logGAEvent('speak_voice', { language: lang });
                         document.getElementById('media-player').style.display = 'flex';
                         initAudio(d.audio);
                         togglePlayPause(); // Auto play
