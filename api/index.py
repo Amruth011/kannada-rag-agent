@@ -1427,8 +1427,7 @@ async def sitemap_xml():
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
-</urlset>
-"""
+</urlset>""".strip()
     return Response(content=content, media_type="application/xml")
 
 @app.get("/", response_class=HTMLResponse)
