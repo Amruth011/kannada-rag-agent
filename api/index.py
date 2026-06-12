@@ -1404,11 +1404,74 @@ async def favicon():
     icon_b64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAC2klEQVR4nO2WzWtcVRjGf885d2YySaY6lmibSiG0xS8QUXDRnVBxVXAhSPeuXAru+y+o4MJF/wClq9KFIFTNSkHBryIUS6tFK2mCmWk+Zu4953GRyUczM0kUsih6uJzFfS/P7zznfc99j9Z7f3KYIxyq+v+A/wag2CvojDMSaDDviGEPZgU0dqHjAc7Up1EdMi6peqQ+IQLkRKxTa6AaBNynf38cYxzA1Fvc+kyLN33kOK0nac8xMUPVBai3WV/g3s/q3qF71+055s5R3n/Q4t6AVLlail+/p++vMQVF8JGTPn3eZ9/B6POL8cZVd26TMqv4+VfSsRcVAqF2EICJDTq/8c2HnmiHyUijcO5r+ZaufZDTClB8cYlHUAiE6CaeaGv+Ii+9TfsUqbfLxxDAgMilcikyOdkAKuqaTO4tYWhGZOWcJo9qfVHO5ApXILx7n4YysxGW0FbdKADO5KRQSNEBt57IbuSz73LslMoVQsQjEjAK4N0wgcFy3gimvqceTS+8lS5cZnVRS79TTOA8KsEjAUMwgTHeVhCJ1qwWfqB1wiSPF9gPAIYsDw7aJkGpdH2a7z721IxytZP8DwACFB0iikiADdkUdXVX4rcfceZc/Op9ShEamMEzNIaqaHMVRu53tJpQAqhnQiQIk2tRN+fj9XlHKKG3TG0KjXYwskwB4exn36R4jLRM5w6dX/VXh/4KFmspP97OJ07SmkUtP/Uqt78c1OhBHUis3OWZN/z06+REuUb3D//yKXIGZl/W6deYPk6tSQhWwfVPdiZpPwe5ojkjRS5fIAQABWpNcvbMc0gs/Mi9n6jWcQaUMyrcPEoqhxkadaswigDV2uYxAEWtLnDjCsCZ856cwWnTrymawI43+wC2gjtrzIQasQWQuuTyAS3ncRp7NBzjtIUCqHqUqxtuNsXHHN+DAYa3U2jr+6G/2pjxr3vy3urbBXtITX8b//BfWx5+wN+tZC4TtUtAXgAAAABJRU5ErkJggg=="
     return Response(content=base64.b64decode(icon_b64), media_type="image/x-icon")
 
+@app.get("/robots.txt")
+async def robots_txt():
+    from fastapi.responses import PlainTextResponse
+    content = """User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/feedback
+
+Sitemap: https://heli-hogu-kaarana.vercel.app/sitemap.xml
+"""
+    return PlainTextResponse(content=content)
+
+@app.get("/sitemap.xml")
+async def sitemap_xml():
+    from fastapi.responses import Response
+    content = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://heli-hogu-kaarana.vercel.app/</loc>
+        <lastmod>2026-06-12</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+</urlset>
+"""
+    return Response(content=content, media_type="application/xml")
+
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    return r"""    <!DOCTYPE html>
+    # Load Google Analytics & Search Console from environment variables
+    ga_id = os.getenv("GOOGLE_ANALYTICS_ID", "").strip()
+    gsv_id = os.getenv("GOOGLE_SITE_VERIFICATION", "").strip()
+    
+    ga_script = f"""<!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={ga_id}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){{dataLayer.push(arguments);}}
+      gtag('js', new Date());
+      gtag('config', '{ga_id}');
+    </script>""" if ga_id else ""
+    
+    gsv_meta = f'<meta name="google-site-verification" content="{gsv_id}" />' if gsv_id else ""
+
+    html_content = r"""    <!DOCTYPE html>
     <html lang="kn">
     <head>
+        <!-- {{GOOGLE_SITE_VERIFICATION}} -->
+        <!-- {{GOOGLE_ANALYTICS_SCRIPT}} -->
+        
+        <!-- Primary Meta Tags -->
+        <meta name="title" content="ಹೇಳಿ ಹೋಗು ಕಾರಣ — Bilingual AI Book Guide" />
+        <meta name="description" content="Explore Ravi Belagere's classic Kannada novel 'Heli Hogu Kaarana' with an interactive AI-powered bilingual guide. Search, listen in English or Kannada, and analyze characters." />
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://heli-hogu-kaarana.vercel.app/" />
+        <meta property="og:title" content="ಹೇಳಿ ಹೋಗು ಕಾರಣ — Bilingual AI Book Guide" />
+        <meta property="og:description" content="Explore Ravi Belagere's classic Kannada novel 'Heli Hogu Kaarana' with an interactive AI-powered bilingual guide. Search, listen in English or Kannada, and analyze characters." />
+        <meta property="og:image" content="https://raw.githubusercontent.com/Amruth011/kannada-rag-agent/main/banner.svg" />
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://heli-hogu-kaarana.vercel.app/" />
+        <meta property="twitter:title" content="ಹೇಳಿ ಹೋಗು ಕಾರಣ — Bilingual AI Book Guide" />
+        <meta property="twitter:description" content="Explore Ravi Belagere's classic Kannada novel 'Heli Hogu Kaarana' with an interactive AI-powered bilingual guide. Search, listen in English or Kannada, and analyze characters." />
+        <meta property="twitter:image" content="https://raw.githubusercontent.com/Amruth011/kannada-rag-agent/main/banner.svg" />
+
         <title>ಹೇಳಿ ಹೋಗು ಕಾರಣ — Bilingual AI Book Guide</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -3705,4 +3768,8 @@ async def root():
     </html>
 
     """
+    html_content = html_content.replace("<!-- {{GOOGLE_SITE_VERIFICATION}} -->", gsv_meta)
+    html_content = html_content.replace("<!-- {{GOOGLE_ANALYTICS_SCRIPT}} -->", ga_script)
+    return HTMLResponse(content=html_content)
+
 handler = app
