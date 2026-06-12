@@ -2680,7 +2680,7 @@ async def root():
                         <div style="display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; padding: 1rem; background: var(--card); border: 1px solid var(--border); border-radius: 12px;">
                             <div>
                                 <h5 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px;">☕ Keep the AI Online</h5>
-                                <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.45;">Contributions keep the Gemini & Sarvam voice servers active. Even ₹20 makes a big difference!</p>
+                                <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.45;">Contributions keep the AI voice & search servers active. Even ₹20 makes a big difference!</p>
                             </div>
                             <button onclick="document.getElementById('pay-modal').style.display='flex'" style="background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(194, 65, 12, 0.2); outline: none;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 15px rgba(194, 65, 12, 0.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(194, 65, 12, 0.2)'">
                                 ☕ Support Developer
