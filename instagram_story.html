@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heli Hogu Kaarana — 10 AM Instagram Story Templates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Serif+Kannada:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- html2canvas Library for high-res PNG export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+/* ─── RESET & LAYOUT ─── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0f172a; /* Dark developer-style background for previewing */
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 20px 64px;
+  gap: 0;
+}
+
+/* ─── EXPORTER DASHBOARD PANEL ─── */
+.exporter-panel {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  max-width: 1080px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+
+.exporter-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.exporter-title span {
+  color: #c2410c;
+}
+
+.exporter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  width: 100%;
+}
+
+.export-btn {
+  background: #c2410c;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(194, 65, 12, 0.25);
+  font-family: inherit;
+  outline: none;
+}
+
+.export-btn:hover {
+  background: #ea580c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(194, 65, 12, 0.35);
+}
+
+.export-btn:active {
+  transform: translateY(0);
+}
+
+.export-btn.secondary {
+  background: #475569;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.export-btn.secondary:hover {
+  background: #64748b;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.export-btn.all {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.export-btn.all:hover {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+}
+
+.status-msg {
+  font-size: 13px;
+  color: #94a3b8;
+  font-style: italic;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ─── EACH STORY SLIDE (1080x1920 - 9:16 Aspect Ratio) ─── */
+.story-slide {
+  width: 1080px;
+  height: 1920px;
+  position: relative;
+  overflow: hidden;
+  background: #fdf5ee;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.story-slide + .story-slide {
+  margin-top: 48px;
+}
+
+/* ─── GLOBAL TOKEN VARIABLES ─── */
+:root {
+  --bg: #fdf5ee;
+  --white: #ffffff;
+  --orange: #c2410c;
+  --orange-light: #ea580c;
+  --orange-pale: #fff4ef;
+  --orange-border: rgba(194, 65, 12, 0.15);
+  --text-dark: #0f172a;
+  --text-mid: #334155;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --card-shadow: 0 25px 50px -12px rgba(194, 65, 12, 0.1);
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-kannada: 'Noto Serif Kannada', serif;
+}
+
+/* ─── WATERMARK / BACKGROUND GRAPHICS ─── */
+.sun-rays {
+  position: absolute;
+  top: -150px;
+  right: -150px;
+  width: 900px;
+  height: 900px;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.sunray-line {
+  stroke: var(--orange);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 12;
+}
+
+.doodle-left {
+  position: absolute;
+  bottom: 150px;
+  left: -50px;
+  width: 300px;
+  height: 300px;
+  opacity: 0.12;
+  color: var(--orange);
+  pointer-events: none;
+}
+
+/* ─── STORY HEADER & FOOTER ─── */
+.story-header {
+  padding: 80px 60px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.story-logo {
+  font-family: var(--font-kannada);
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.story-logo span {
+  color: var(--orange);
+  font-family: var(--font-sans);
+  font-weight: 800;
+  margin-left: 6px;
+}
+
+.story-badge {
+  background: var(--orange-pale);
+  color: var(--orange);
+  border: 1px solid var(--orange-border);
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.story-footer {
+  margin-top: auto;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  border-top: 1px solid rgba(194, 65, 12, 0.06);
+  background: linear-gradient(180deg, rgba(253, 245, 238, 0) 0%, rgba(253, 245, 238, 1) 100%);
+  z-index: 10;
+}
+
+.story-handle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-dark);
+  letter-spacing: 0.5px;
+}
+
+.story-domain {
+  font-size: 16px;
+  color: var(--orange);
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+/* ─── STICKER WRAPPERS & STYLES ─── */
+.sticker-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 40px 0;
+  perspective: 1000px;
+}
+
+/* NATIVE INSTAGRAM POLL STICKER MOCKUP */
+.insta-poll-sticker {
+  background: var(--white);
+  border-radius: 30px;
+  padding: 30px;
+  width: 600px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transform: rotate(-3deg);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.poll-question {
+  font-family: var(--font-sans);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-dark);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.poll-options {
+  display: flex;
+  gap: 16px;
+}
+
+.poll-option {
+  flex: 1;
+  background: var(--orange-pale);
+  border: 2px solid rgba(194, 65, 12, 0.15);
+  color: var(--orange);
+  border-radius: 20px;
+  padding: 24px 10px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: var(--font-kannada);
+}
+
+.poll-option.highlight {
+  background: var(--orange);
+  color: var(--white);
+  border-color: var(--orange);
+}
+
+/* NATIVE INSTAGRAM LINK STICKER MOCKUP */
+.insta-link-sticker {
+  background: var(--white);
+  color: var(--orange);
+  padding: 22px 48px;
+  border-radius: 50px;
+  font-size: 32px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 15px 35px rgba(194, 65, 12, 0.18);
+  border: 2px solid rgba(194, 65, 12, 0.2);
+  transform: rotate(4deg);
+  font-family: var(--font-sans);
+}
+
+/* NATIVE INSTAGRAM Q&A STICKER MOCKUP */
+.insta-qna-sticker {
+  background: var(--white);
+  border-radius: 35px;
+  padding: 35px;
+  width: 650px;
+  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  border: 1px solid rgba(0,0,0,0.04);
+  transform: rotate(-1.5deg);
+}
+
+.qna-header-badge {
+  background: var(--orange);
+  color: var(--white);
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.qna-title {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-dark);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.qna-input-placeholder {
+  width: 100%;
+  background: #f1f5f9;
+  color: var(--text-light);
+  padding: 24px;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+/* ─── WEB INTERFACE MOCKUP (INSIDE STORY) ─── */
+.story-web-mockup {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 32px;
+  border: 1px solid rgba(194, 65, 12, 0.08);
+  width: 880px;
+  margin: 0 auto;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  text-align: left;
+}
+
+.mock-chat-bubble {
+  background: var(--orange-pale);
+  border-radius: 20px;
+  padding: 24px;
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--text-dark);
+  border: 1.5px solid rgba(194, 65, 12, 0.08);
+}
+
+.mock-chat-bubble.user {
+  background: var(--white);
+  border-color: #cbd5e1;
+  align-self: flex-start;
+  max-width: 90%;
+  font-weight: 600;
+}
+
+.mock-chat-bubble.ai {
+  border-left: 6px solid var(--orange);
+}
+
+.mock-audio-player {
+  background: var(--orange-pale);
+  border-radius: 16px;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.player-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.wave-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(194, 65, 12, 0.15);
+  border-radius: 2px;
+  position: relative;
+}
+
+.wave-progress {
+  width: 45%;
+  height: 100%;
+  background: var(--orange);
+  border-radius: 2px;
+}
+
+/* ─── GENERAL CONTENT ELEMENTS ─── */
+.story-title {
+  font-family: var(--font-serif);
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--text-dark);
+  text-align: center;
+  padding: 0 60px;
+  margin-top: 40px;
+}
+
+.story-title span {
+  color: var(--orange);
+}
+
+.story-subtitle {
+  font-size: 24px;
+  color: var(--text-mid);
+  text-align: center;
+  line-height: 1.5;
+  padding: 0 80px;
+  margin-top: 24px;
+}
+
+.story-highlight-box {
+  background: var(--orange-pale);
+  border: 1px dashed rgba(194, 65, 12, 0.3);
+  border-radius: 20px;
+  padding: 24px 32px;
+  margin: 30px auto;
+  width: 800px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--orange);
+}
+</style>
+</head>
+<body>
+
+<!-- EXPORTER CONTROLLER -->
+<div class="exporter-panel">
+  <div class="exporter-title">Heli Hogu Kaarana — <span>10 AM Instagram Stories Exporter</span></div>
+  <p style="text-align: center; color: #94a3b8; font-size: 14px; max-width: 750px;">
+    These 1080x1920 (9:16) story templates correspond to the <strong>10 AM sequential launch chain</strong>. Click the buttons below to export them as high-resolution PNGs ready to share on Instagram!
+  </p>
+  <div class="exporter-buttons">
+    <button class="export-btn" onclick="exportSlide('story1', '01_story_hook.png')">📥 Export Story 1 (Hook)</button>
+    <button class="export-btn" onclick="exportSlide('story2', '02_story_solution.png')">📥 Export Story 2 (Solution)</button>
+    <button class="export-btn" onclick="exportSlide('story3', '03_story_link.png')">📥 Export Story 3 (Link)</button>
+    <button class="export-btn" onclick="exportSlide('story4', '04_story_qna.png')">📥 Export Story 4 (Q&A)</button>
+    <button class="export-btn all" onclick="exportAllStories()">⚡ Export All 4 Stories</button>
+  </div>
+  <div class="status-msg" id="status-message">Ready to export stories</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     STORY 1 — THE HOOK (10:00 AM)
+     "ಹಿಮವಂತನ ಪ್ರೀತಿ ಮತ್ತು ತ್ಯಾಗದ ಬಗ್ಗೆ ನಿಮಗೆಷ್ಟು ಗೊತ್ತು?"
+     Interactive Poll
+     UI/UX: Saffron Theme + Playfair Serif + Noto Kannada
+     Spelling: Himavant (standardized)
+ ══════════════════════════════════════════════════════════ -->
+<div class="story-slide" id="story1">
+  <!-- Sun rays watermark -->
+  <svg class="sun-rays" viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(450,450)">
+      <line class="sunray-line" x1="0" y1="-420" x2="0" y2="420"/>
+      <line class="sunray-line" x1="-420" y1="0" x2="420" y2="0"/>
+      <line class="sunray-line" x1="-297" y1="-297" x2="297" y2="297"/>
+      <line class="sunray-line" x1="297" y1="-297" x2="-297" y2="297"/>
+      <line class="sunray-line" x1="-160" y1="-390" x2="160" y2="390"/>
+      <line class="sunray-line" x1="160" y1="-390" x2="-160" y2="390"/>
+    </g>
+  </svg>
+
+  <div class="story-header">
+    <div class="story-logo">ಹೇಳಿ ಹೋಗು <span>ಕಾರಣ</span></div>
+    <div class="story-badge">📖 The Hook</div>
+  </div>
+
+  <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 40px; padding: 0 40px; z-index: 5;">
+    
+    <!-- Big Book Cover Icon -->
+    <div style="text-align: center;">
+      <svg width="150" height="150" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto;">
+        <rect x="28" y="24" width="104" height="124" rx="6" fill="rgba(194,65,12,0.06)" stroke="#c2410c" stroke-width="2"/>
+        <rect x="28" y="24" width="16" height="124" rx="4" fill="rgba(194,65,12,0.12)" stroke="#c2410c" stroke-width="1.5"/>
+        <text x="80" y="105" text-anchor="middle" font-family="Noto Serif Kannada, serif" font-size="28" font-weight="700" fill="#c2410c">ಹ</text>
+        <path d="M106 24 L106 50 L100 44 L94 50 L94 24" fill="#c2410c" opacity="0.6"/>
+      </svg>
+    </div>
+
+    <!-- Kannada Quote / Question -->
+    <div style="text-align: center;">
+      <h2 style="font-family: var(--font-kannada); font-size: 52px; font-weight: 700; color: var(--orange); line-height: 1.35; padding: 0 40px;">
+        ಹಿಮವಂತನ ಪ್ರೀತಿ ಮತ್ತು ತ್ಯಾಗದ ಬಗ್ಗೆ ನಿಮಗೆಷ್ಟು ಗೊತ್ತು?
+      </h2>
+      <p style="font-family: var(--font-serif); font-size: 28px; font-style: italic; color: var(--text-muted); margin-top: 20px;">
+        "How much do you know about Himavant's love and sacrifice?"
+      </p>
+    </div>
+
+    <div class="story-subtitle" style="font-size: 22px; color: var(--text-mid); padding: 0 100px;">
+      Ravi Belagere's legendary novel reimagined with an advanced interactive AI Companion.
+    </div>
+
+    <!-- Mock Instagram Poll Sticker -->
+    <div class="sticker-container">
+      <div class="insta-poll-sticker">
+        <div class="poll-question">Choose an option below:</div>
+        <div class="poll-options">
+          <div class="poll-option highlight">ತುಂಬಾ ಗೊತ್ತು</div>
+          <div class="poll-option">ತಿಳಿಬೇಕಿದೆ</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="story-footer">
+    <div class="story-handle">@heli.hogu.kaarana</div>
+    <div class="story-domain">heli-hogu-kaarana.vercel.app</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     STORY 2 — THE SOLUTION (10:02 AM)
+     Web Guide AI interaction demo
+     UI/UX: Saffron Chat Box mockup, audio player, characters link
+ ══════════════════════════════════════════════════════════ -->
+<div class="story-slide" id="story2">
+  <div class="story-header">
+    <div class="story-logo">ಹೇಳi ಹೋಗು <span>ಕಾರಣ</span></div>
+    <div class="story-badge">🤖 AI Companion</div>
+  </div>
+
+  <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 0 40px; z-index: 5;">
+    
+    <h2 class="story-title" style="font-size: 48px;">
+      Talk directly with the <span>novel's universe</span>
+    </h2>
+
+    <p class="story-subtitle" style="font-size: 22px; margin-top: 10px;">
+      Ask complex questions and receive detailed character analyses instantly in Kannada and English.
+    </p>
+
+    <!-- Website Mockup Container -->
+    <div class="story-web-mockup">
+      <!-- Web Header Mock -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 16px;">
+        <div style="display: flex; gap: 8px;">
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: #eab308;"></div>
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: #22c55e;"></div>
+        </div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--orange);">💬 AI Guide Tab</div>
+      </div>
+
+      <!-- User Query Mock -->
+      <div class="mock-chat-bubble user">
+        "Why did Himavant sacrifice his happiness?"
+      </div>
+
+      <!-- AI Response Mock -->
+      <div class="mock-chat-bubble ai">
+        <strong>Himavant's</strong> sacrifice is the emotional anchor of the novel. He voluntarily chooses his own sorrow and silent exile to ensure the safety and peace of those he loves, defining a pure, selfless love that expects nothing in return...
+      </div>
+
+      <!-- Audio Stream Player Mock -->
+      <div class="mock-audio-player">
+        <div class="player-btn">
+          <!-- Play icon SVG -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1;">
+          <span style="font-size: 14px; font-weight: 700; color: var(--text-dark);">Audio Playback Stream</span>
+          <div class="wave-bar">
+            <div class="wave-progress"></div>
+          </div>
+        </div>
+        <span style="font-size: 13px; font-weight: 700; color: var(--orange);">🔊 Hear in English</span>
+      </div>
+    </div>
+
+    <!-- Kannada Callout Overlay -->
+    <div class="story-highlight-box" style="margin-top: 10px;">
+      Ravi Belagere ಅವರ ಕ್ಲಾಸಿಕ್ ಕಾದಂಬರಿಯನ್ನು ಈಗ AI ಸಹಾಯದಿಂದ ಓದಿ, ಚರ್ಚಿಸಿ ಮತ್ತು ಆಲಿಸಿ!
+    </div>
+
+  </div>
+
+  <div class="story-footer">
+    <div class="story-handle">@heli.hogu.kaarana</div>
+    <div class="story-domain">heli-hogu-kaarana.vercel.app</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     STORY 3 — THE LINK (10:04 AM)
+     Visual of E-books & Quotes + Saffron Instagram Link Sticker
+ ══════════════════════════════════════════════════════════ -->
+<div class="story-slide" id="story3">
+  <!-- Sun rays watermark -->
+  <svg class="sun-rays" viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg" style="left: -200px; bottom: -200px; top: auto; right: auto; opacity: 0.1;">
+    <g transform="translate(450,450)">
+      <line class="sunray-line" x1="0" y1="-420" x2="0" y2="420"/>
+      <line class="sunray-line" x1="-420" y1="0" x2="420" y2="0"/>
+    </g>
+  </svg>
+
+  <div class="story-header">
+    <div class="story-logo">ಹೇಳಿ ಹೋಗು <span>ಕಾರಣ</span></div>
+    <div class="story-badge">🔗 Live Access</div>
+  </div>
+
+  <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 40px; padding: 0 40px; z-index: 5;">
+    
+    <h2 class="story-title">
+      Start exploring the <span>Interactive Web Guide</span>
+    </h2>
+
+    <p class="story-subtitle" style="font-size: 24px; padding: 0 60px;">
+      Read online, create custom quote graphics, and view the interactive D3 Character Map!
+    </p>
+
+    <!-- Visual Dashboard Cards Preview -->
+    <div style="display: flex; flex-direction: column; gap: 24px; width: 850px; margin: 0 auto;">
+      <!-- Feature Card 1 -->
+      <div style="background: var(--white); border-radius: 20px; padding: 28px; display: flex; align-items: center; gap: 24px; border: 1.5px solid rgba(194, 65, 12, 0.06); box-shadow: var(--card-shadow);">
+        <div style="font-size: 48px;">📚</div>
+        <div style="text-align: left;">
+          <h4 style="font-size: 22px; font-weight: 800; color: var(--text-dark);">Read & Download Free E-Books</h4>
+          <p style="font-size: 16px; color: var(--text-muted); margin-top: 4px;">Kannada, English, and Bilingual side-by-side editions available for reading offline.</p>
+        </div>
+      </div>
+
+      <!-- Feature Card 2 -->
+      <div style="background: var(--white); border-radius: 20px; padding: 28px; display: flex; align-items: center; gap: 24px; border: 1.5px solid rgba(194, 65, 12, 0.06); box-shadow: var(--card-shadow);">
+        <div style="font-size: 48px;">🎨</div>
+        <div style="text-align: left;">
+          <h4 style="font-size: 22px; font-weight: 800; color: var(--text-dark);">Generate Custom Quote Cards</h4>
+          <p style="font-size: 16px; color: var(--text-muted); margin-top: 4px;">Customize typography, backgrounds, and sizes to export beautiful quotes directly to your stories.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert / System limits info -->
+    <div style="width: 800px; margin: 0 auto; text-align: center; color: var(--text-muted); font-size: 18px; line-height: 1.5; padding: 0 40px;">
+      ⚠️ Daily limit is capped to prevent server API abuse. Access the interactive guide right now to start asking!
+    </div>
+
+    <!-- Mock Instagram Link Sticker -->
+    <div class="sticker-container">
+      <div class="insta-link-sticker">
+        Ask Himavant Now 🔗
+      </div>
+    </div>
+
+  </div>
+
+  <div class="story-footer">
+    <div class="story-handle">@heli.hogu.kaarana</div>
+    <div class="story-domain">heli-hogu-kaarana.vercel.app</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     STORY 4 — Q&A / AMA (10:06 AM)
+     Interactive Q&A Sticker box
+     UI/UX: Saffron Theme + Playfair Serif
+ ══════════════════════════════════════════════════════════ -->
+<div class="story-slide" id="story4">
+  <div class="story-header">
+    <div class="story-logo">ಹೇಳಿ ಹೋಗು <span>ಕಾರಣ</span></div>
+    <div class="story-badge">💬 Community AMA</div>
+  </div>
+
+  <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 40px; padding: 0 40px; z-index: 5;">
+    
+    <div style="text-align: center;">
+      <!-- Wobbly decorative quote mark -->
+      <span style="font-family: var(--font-serif); font-size: 140px; color: var(--orange); opacity: 0.15; line-height: 0; display: block; margin-bottom: -40px;">“</span>
+      <h2 class="story-title" style="font-size: 52px; padding: 0 40px; margin-top: 0;">
+        What questions do you have about the <span>story?</span>
+      </h2>
+      <p class="story-subtitle" style="font-size: 24px; padding: 0 60px; margin-top: 16px;">
+        Type your questions about Himavant's decisions, relationships, or story themes.
+      </p>
+    </div>
+
+    <!-- Mock Instagram Q&A Sticker -->
+    <div class="sticker-container">
+      <div class="insta-qna-sticker">
+        <div class="qna-header-badge">Ask a Question</div>
+        <div class="qna-title">What do you want to ask Himavant?</div>
+        <div class="qna-input-placeholder">Type something...</div>
+      </div>
+    </div>
+
+    <div class="story-highlight-box" style="width: 780px;">
+      We will input your questions into the AI Guide and share the best screenshots and answers right here on our story!
+    </div>
+
+  </div>
+
+  <div class="story-footer">
+    <div class="story-handle">@heli.hogu.kaarana</div>
+    <div class="story-domain">heli-hogu-kaarana.vercel.app</div>
+  </div>
+</div>
+
+
+<script>
+  function exportSlide(slideId, fileName) {
+    const slideElement = document.getElementById(slideId);
+    const statusEl = document.getElementById('status-message');
+    
+    statusEl.textContent = `Generating high-res image for ${fileName}...`;
+    statusEl.style.color = '#38bdf8';
+    
+    // Force scroll to top so html2canvas renders from origin
+    window.scrollTo(0, 0);
+    
+    // Configure html2canvas for high quality 2x export
+    html2canvas(slideElement, {
+      scale: 2, // 2x scale makes it 2160x3840, perfect for sharp 9:16 Story display!
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#fdf5ee',
+      logging: false
+    }).then(canvas => {
+      const image = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = fileName;
+      link.href = image;
+      link.click();
+      
+      statusEl.textContent = `Successfully downloaded ${fileName}! ✅`;
+      statusEl.style.color = '#4ade80';
+      setTimeout(() => {
+        statusEl.textContent = 'Ready to export stories';
+        statusEl.style.color = '#94a3b8';
+      }, 3000);
+    }).catch(err => {
+      console.error(err);
+      statusEl.textContent = `Error exporting story: ${err.message} ❌`;
+      statusEl.style.color = '#ef4444';
+      setTimeout(() => {
+        statusEl.textContent = 'Ready to export stories';
+        statusEl.style.color = '#94a3b8';
+      }, 3000);
+    });
+  }
+  
+  function exportAllStories() {
+    const stories = [
+      { id: 'story1', name: '01_story_hook.png' },
+      { id: 'story2', name: '02_story_solution.png' },
+      { id: 'story3', name: '03_story_link.png' },
+      { id: 'story4', name: '04_story_qna.png' }
+    ];
+    
+    let index = 0;
+    function next() {
+      if (index >= stories.length) return;
+      exportSlide(stories[index].id, stories[index].name);
+      index++;
+      // Add delay to prevent multiple concurrent downloads crashing browser
+      setTimeout(next, 1500);
+    }
+    next();
+  }
+</script>
+
+</body>
+</html>
