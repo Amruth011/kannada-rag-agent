@@ -2528,7 +2528,7 @@ async def root():
                                 <circle cx="250" cy="300" r="22" fill="#fff" stroke="#16a34a" stroke-width="2" />
                                 <text x="250" y="304" font-size="9" text-anchor="middle" fill="#0f172a">ಕಾವೇರಮ್ಮ</text>
                             </g>
-                            <!-- Himavanta (Protagonist) -->
+                            <!-- Himavant (Protagonist) -->
                             <g class="node" onclick="clickChar('himavant')" id="node-himavant">
                                 <circle cx="250" cy="180" r="25" fill="#fff" stroke="#c2410c" stroke-width="3" filter="url(#glow)" />
                                 <text x="250" y="184" font-size="11" font-weight="bold" text-anchor="middle" fill="#c2410c">ಹಿಮವಂತ</text>
@@ -2874,7 +2874,7 @@ async def root():
             // --- CHARACTER MAP DATA & LOGIC ---
             const CHAR_DATA = {
                 himavant: {
-                    name_en: "Himavanta",
+                    name_en: "Himavant",
                     name_kn: "ಹಿಮವಂತ",
                     badge_en: "Protagonist",
                     badge_kn: "ಕಥಾನಾಯಕ",
@@ -2887,7 +2887,7 @@ async def root():
                     name_kn: "ಪ್ರಾರ್ಥನಾ",
                     badge_en: "Female Lead",
                     badge_kn: "ನಾಯಕಿ",
-                    desc_en: "The practical female lead who represents the intense struggle between secure social status, practical life choices, and genuine love for Himavanta.",
+                    desc_en: "The practical female lead who represents the intense struggle between secure social status, practical life choices, and genuine love for Himavant.",
                     desc_kn: "ಕಾದಂಬರಿಯ ನಾಯಕಿ. ವ್ಯವಹಾರಿಕ ಜಗತ್ತಿನ ಭದ್ರತೆ, ಸಾಮಾಜಿಕ ಗೌರವ ಮತ್ತು ಹಿಮವಂತನ ಮೇಲಿರುವ ನೈಜ ಪ್ರೀತಿಯ ನಡುವಿನ ತಳಮಳವನ್ನು ಪ್ರತಿನಿಧಿಸುವ ಪಾತ್ರ.",
                     pages: "Pages 5, 22, 54, 108, 195, 280, 340"
                 },
@@ -2905,7 +2905,7 @@ async def root():
                     name_kn: "ರಸೂಲ್",
                     badge_en: "Loyal Friend",
                     badge_kn: "ನಿಷ್ಠಾವಂತ ಗೆಳೆಯ",
-                    desc_en: "Himavanta's loyal and rugged friend who stays with him through his darkest times, representing true loyalty and companionship.",
+                    desc_en: "Himavant's loyal and rugged friend who stays with him through his darkest times, representing true loyalty and companionship.",
                     desc_kn: "ಹಿಮವಂತನ ನಿಷ್ಠಾವಂತ ಒಡನಾಡಿ. ಕಷ್ಟದ ಸಮಯದಲ್ಲಿ ನೆರಳಾಗಿ ನಿಂತು ಸ್ನೇಹ ಮತ್ತು ನಿಷ್ಠೆಯನ್ನು ಎತ್ತಿಹಿಡಿಯುವ ಪಾತ್ರ.",
                     pages: "Pages 34, 78, 112, 160, 255"
                 },
@@ -2914,7 +2914,7 @@ async def root():
                     name_kn: "ಉರ್ಮಿಳಾ",
                     badge_en: "Devoted Companion",
                     badge_kn: "ನಿಷ್ಠಾವಂತ ಒಡನಾಡಿ",
-                    desc_en: "A devoted, loyal, and supportive character who stands by Himavanta through thick and thin, providing emotional stability.",
+                    desc_en: "A devoted, loyal, and supportive character who stands by Himavant through thick and thin, providing emotional stability.",
                     desc_kn: "ಹಿಮವಂತನಿಗೆ ಕಷ್ಟಸುಖಗಳಲ್ಲಿ ಜೊತೆಯಾಗಿ ನಿಲ್ಲುವ, ಪ್ರೀತಿ ಮತ್ತು ನಿಷ್ಠೆಯ ಮೂಲಕ ಕಥೆಯಲ್ಲಿ ಮಹತ್ವದ ಬೆಂಬಲ ನೀಡುವ ಸದ್ಗುಣಿ ಪಾತ್ರ.",
                     pages: "Pages 67, 110, 145, 230, 290"
                 },
