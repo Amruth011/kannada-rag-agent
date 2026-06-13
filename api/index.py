@@ -1508,10 +1508,10 @@ async def root():
             },
             {
               "@type": "Question",
-              "name": "Who is Himavanth (Himavant / ಹಿಮವಂತ) in Heli Hogu Kaarana?",
+              "name": "Who is Himavant (ಹಿಮವಂತ) in Heli Hogu Kaarana?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Himavanth is the protagonist of Ravi Belagere's classic Kannada romance. He is known for his silent, deep love and ultimate sacrifice. Our AI Guide allows you to explore his detailed character map, visual connections, and ask specific questions about his motives."
+                "text": "Himavant is the protagonist of Ravi Belagere's classic Kannada romance. He is known for his silent, deep love and ultimate sacrifice. Our AI Guide allows you to explore his detailed character map, visual connections, and ask specific questions about his motives."
               }
             }
           ]
@@ -2683,9 +2683,9 @@ async def root():
 
                             <!-- Question 4 -->
                             <details class="faq-item">
-                                <summary class="faq-question">Who is Himavanth (ಹಿಮವಂತ) in Heli Hogu Kaarana?</summary>
+                                <summary class="faq-question">Who is Himavant (ಹಿಮವಂತ) in Heli Hogu Kaarana?</summary>
                                 <div class="faq-answer">
-                                    <strong>Answer:</strong> Himavanth is the protagonist of the novel, representing the pinnacle of silent, selfless love and sacrifice. If you want a deep analysis of his character arc and relationships, open the <strong>Characters</strong> tab to view our D3 relationship node map.
+                                    <strong>Answer:</strong> Himavant is the protagonist of the novel, representing the pinnacle of silent, selfless love and sacrifice. If you want a deep analysis of his character arc and relationships, open the <strong>Characters</strong> tab to view our D3 relationship node map.
                                     <br><br>
                                     <span style="color: var(--primary); font-style: italic; font-size: 0.88rem;">ಹಿಮವಂತ ಕಾದಂಬರಿಯ ನಾಯಕನಾಗಿದ್ದು, ತನ್ನ ನಿಸ್ವಾರ್ಥ ಪ್ರೀತಿ ಮತ್ತು ತ್ಯಾಗಕ್ಕೆ ಹೆಸರಾಗಿದ್ದಾನೆ. ಅವನ ಕಥೆಯನ್ನು ಪಾತ್ರಗಳ ಲಿಂಕ್‌ನಲ್ಲಿ ವಿಶ್ಯುಯಲ್ ಮ್ಯಾಪ್ ಮೂಲಕ ನೋಡಬಹುದು.</span>
                                 </div>
