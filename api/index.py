@@ -1455,14 +1455,14 @@ async def root():
         
         <!-- Primary Meta Tags -->
         <meta name="title" content="ಹೇಳಿ ಹೋಗು ಕಾರಣ — Bilingual AI Book Guide" />
-        <meta name="description" content="Explore Ravi Belagere's classic Kannada novel 'Heli Hogu Kaarana' with an interactive AI-powered bilingual guide. Search, listen in English or Kannada, and analyze characters." />
+        <meta name="description" content="Read Ravi Belagere's classic Kannada novel 'Heli Hogu Kaarana' (ಹೇಳಿ ಹೋಗು ಕಾರಣ) online or download the E-Book/PDF for offline reading. Use our AI Guide for bilingual audio playbacks, D3 character maps, and deep novel analysis." />
 
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://heli-hogu-kaarana.vercel.app/" />
         <meta property="og:site_name" content="Heli Hogu Kaarana" />
         <meta property="og:title" content="ಹೇಳಿ ಹೋಗು ಕಾರಣ — Bilingual AI Book Guide" />
-        <meta property="og:description" content="Explore Ravi Belagere's classic Kannada novel 'Heli Hogu Kaarana' with an interactive AI-powered bilingual guide. Search, listen in English or Kannada, and analyze characters." />
+        <meta property="og:description" content="Read Ravi Belagere's classic Kannada novel 'Heli Hogu Kaarana' (ಹೇಳಿ ಹೋಗು ಕಾರಣ) online or download the E-Book/PDF for offline reading. Use our AI Guide for bilingual audio playbacks, D3 character maps, and deep novel analysis." />
         <meta property="og:image" content="https://raw.githubusercontent.com/Amruth011/kannada-rag-agent/main/banner.svg" />
 
         <!-- Google Site Name Structured Data -->
@@ -1476,11 +1476,53 @@ async def root():
         }
         </script>
 
+        <!-- Google FAQ Page Structured Data (SEO & AI Search Optimization) -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Heli Hogu Kaarana PDF download free: Is it available?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes! You can read the full text of 'Heli Hogu Kaarana' (ಹೇಳಿ ಹೋಗು ಕಾರಣ) online or download the E-Book (HTML/offline edition) for free on our official AI Novel Guide website (https://heli-hogu-kaarana.vercel.app/). We support Kannada, English, and side-by-side Bilingual editions."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Where can I buy a physical copy of Heli Hogu Kaarana by Ravi Belagere online?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You can purchase physical print copies of the novel 'Heli Hogu Kaarana' from online portals like Amazon, Flipkart, or local Kannada book dealers (e.g. Sapna Book House). Our website serves as an interactive AI-powered reading companion and bilingual audio guide."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I read Heli Hogu Kaarana online in Kannada and English?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Our AI Guide website features a dedicated E-Book section where you can read the novel online in original Kannada, translated English, or a side-by-side Bilingual layout. You can also listen to audio chapter playbacks in both languages."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Who is Himavanth (Himavant / ಹಿಮವಂತ) in Heli Hogu Kaarana?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Himavanth is the protagonist of Ravi Belagere's classic Kannada romance. He is known for his silent, deep love and ultimate sacrifice. Our AI Guide allows you to explore his detailed character map, visual connections, and ask specific questions about his motives."
+              }
+            }
+          ]
+        }
+        </script>
+
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:url" content="https://heli-hogu-kaarana.vercel.app/" />
         <meta property="twitter:title" content="ಹೇಳಿ ಹೋಗು ಕಾರಣ — Bilingual AI Book Guide" />
-        <meta property="twitter:description" content="Explore Ravi Belagere's classic Kannada novel 'Heli Hogu Kaarana' with an interactive AI-powered bilingual guide. Search, listen in English or Kannada, and analyze characters." />
+        <meta property="twitter:description" content="Read Ravi Belagere's classic Kannada novel 'Heli Hogu Kaarana' (ಹೇಳಿ ಹೋಗು ಕಾರಣ) online or download the E-Book/PDF for offline reading. Use our AI Guide for bilingual audio playbacks, D3 character maps, and deep novel analysis." />
         <meta property="twitter:image" content="https://raw.githubusercontent.com/Amruth011/kannada-rag-agent/main/banner.svg" />
 
         <title>ಹೇಳಿ ಹೋಗು ಕಾರಣ — Bilingual AI Book Guide</title>
@@ -2752,6 +2794,70 @@ async def root():
                         <div id="fb-success-msg" style="color: #10b981; font-weight: 700; text-align: center; display: none; margin-top: 10px; font-size: 0.95rem;">✅ Thank you! Your feedback has been submitted. / ಧನ್ಯವಾದ!</div>
                     </form>
                 </div>
+        </div>
+
+        <!-- FAQ SECTION FOR SEO & AI CRAWLER OPTIMIZATION -->
+        <div class="container fade-in" style="margin-top: 3rem; margin-bottom: 2rem;">
+            <div class="card" style="padding: 2.2rem 2rem; position: relative;">
+                <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-bottom: 0.5rem; font-size: 1.8rem; font-weight: 700;">🙋 Frequently Asked Questions (FAQ)</h2>
+                <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2.2rem;">
+                    Common queries about reading online, PDF downloads, and buying the novel.
+                </p>
+                
+                <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 800px; margin: 0 auto;">
+                    <!-- Question 1 -->
+                    <div style="border-bottom: 1px solid var(--border); padding-bottom: 1.2rem;">
+                        <h3 style="font-family: var(--font-sans); font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px;">
+                            Q1: Is the Heli Hogu Kaarana PDF download available for free?
+                        </h3>
+                        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 4px;">
+                            <strong>Answer:</strong> Yes! You can read the full text of <em>Heli Hogu Kaarana</em> (ಹೇಳಿ ಹೋಗು ಕಾರಣ) online or download it as an offline e-book for free. Simply navigate to the <strong>E-Books</strong> tab on this site. We provide Kannada, English, and side-by-side Bilingual editions.
+                        </p>
+                        <p style="font-size: 0.85rem; color: var(--primary); line-height: 1.6; font-style: italic; margin-top: 2px;">
+                            ಕನ್ನಡ ಆವೃತ್ತಿ, ಇಂಗ್ಲಿಷ್ ಅನುವಾದ ಮತ್ತು ದ್ವಿಭಾಷಾ ಇ-ಪುಸ್ತಕಗಳನ್ನು ನೀವು ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಓದಬಹುದು ಅಥವಾ ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಓದಲು ಉಚಿತವಾಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿಕೊಳ್ಳಬಹುದು.
+                        </p>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div style="border-bottom: 1px solid var(--border); padding-bottom: 1.2rem;">
+                        <h3 style="font-family: var(--font-sans); font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px;">
+                            Q2: Where can I buy a physical copy of Heli Hogu Kaarana online?
+                        </h3>
+                        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 4px;">
+                            <strong>Answer:</strong> If you prefer to buy a physical paperback print copy of Ravi Belagere's classic novel, you can search on e-commerce portals like <strong>Amazon</strong> or <strong>Flipkart</strong>, or purchase directly from local book outlets such as Sapna Book House.
+                        </p>
+                        <p style="font-size: 0.85rem; color: var(--primary); line-height: 1.6; font-style: italic; margin-top: 2px;">
+                            ರವಿ ಬೆಳಗರೆ ಅವರ ಹೇಳಿ ಹೋಗು ಕಾರಣ ಮುದ್ರಿತ ಪುಸ್ತಕವನ್ನು ಖರೀದಿಸಲು ಬಯಸಿದರೆ, ಅಮೆಜಾನ್ ಅಥವಾ ಫ್ಲಿಪ್‌ಕಾರ್ಟ್ ಮತ್ತು ಸ್ಥಳೀಯ ಪುಸ್ತಕದ ಅಂಗಡಿಗಳಲ್ಲಿ ಪತ್ತೆಹಚ್ಚಬಹುದು.
+                        </p>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div style="border-bottom: 1px solid var(--border); padding-bottom: 1.2rem;">
+                        <h3 style="font-family: var(--font-sans); font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px;">
+                            Q3: Can I read Heli Hogu Kaarana online using this website?
+                        </h3>
+                        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 4px;">
+                            <strong>Answer:</strong> Absolutely! This website acts as a digital reading companion. You can read any chapter online or use our advanced <strong>AI Book Guide</strong> to get chapter summaries, search specific scenes, listen to audio voice playbacks, or explore character connections.
+                        </p>
+                        <p style="font-size: 0.85rem; color: var(--primary); line-height: 1.6; font-style: italic; margin-top: 2px;">
+                            ಖಂಡಿತವಾಗಿಯೂ! ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಓದುವ ಜೊತೆಗೆ, ಕಥೆಯ ಪಾತ್ರಗಳು, ಸನ್ನಿವೇಶಗಳು ಮತ್ತು ಆಡಿಯೋ ಪ್ಲೇಬ್ಯಾಕ್ ಕೇಳಲು ನಮ್ಮ AI ಗೈಡ್ ಅನ್ನು ಬಳಸಬಹುದು.
+                        </p>
+                    </div>
+
+                    <!-- Question 4 -->
+                    <div style="padding-bottom: 0.5rem;">
+                        <h3 style="font-family: var(--font-sans); font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px;">
+                            Q4: Who is Himavanth (ಹಿಮವಂತ) in Heli Hogu Kaarana?
+                        </h3>
+                        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 4px;">
+                            <strong>Answer:</strong> Himavanth is the lead character in the novel, known for his ultimate definition of sacrifice and deep, silent love. If you want a deep analysis of his character arc or relationship maps, click on the <strong>Characters</strong> tab to see our D3 visual relationship map.
+                        </p>
+                        <p style="font-size: 0.85rem; color: var(--primary); line-height: 1.6; font-style: italic; margin-top: 2px;">
+                            ಹಿಮವಂತ ಕಾದಂಬರಿಯ ನಾಯಕನಾಗಿದ್ದು, ತನ್ನ ನಿಸ್ವಾರ್ಥ ಪ್ರೀತಿ ಮತ್ತು ತ್ಯಾಗಕ್ಕೆ ಹೆಸರಾಗಿದ್ದಾನೆ. ಅವನ ಕಥೆಯನ್ನು ವಿಶ್ಯುಯಲ್ ಮ್ಯಾಪ್ ಮೂಲಕ ಪಾತ್ರಗಳ ಲಿಂಕ್‌ನಲ್ಲಿ ನೋಡಬಹುದು.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- FOOTER WITH CREDITS & SUPPORT -->
