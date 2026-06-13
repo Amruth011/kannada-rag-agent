@@ -1,0 +1,1501 @@
+<USER_REQUEST>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heli Hogu Kaarana AI – LinkedIn Post</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Serif+Kannada:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: #e5e0d8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 20px 48px;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+  min-height: 100vh;
+}
+
+.controls {
+  margin-bottom: 18px;
+  display: flex;
+  gap: 10px;
+}
+.controls button {
+  background: #c2410c;
+  color: #fff;
+  border: none;
+  padding: 10px 26px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.4px;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.controls button:hover { background: #9a3408; }
+
+/* ═══════════════════════════════════
+   POSTER WRAPPER  1200 × auto
+═══════════════════════════════════ */
+#poster {
+  width: 1200px;
+  background: #fffcf8;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.14);
+}
+
+/* ── TOP ANNOUNCEMENT STRIP ── */
+.announce-strip {
+  background: #c2410c;
+  text-align: center;
+  padding: 11px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 2px;
+  border-bottom: none;
+}
+
+/* ── SITE HEADER ── */
+.site-header {
+  background: #fffcf8;
+  border-bottom: 1px solid #f0e8de;
+  padding: 14px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.site-logo {
+  font-family: 'Noto Serif Kannada', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.site-logo span { color: #c2410c; }
+.site-nav {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.nav-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  border: 1px solid #e8ddd5;
+  background: transparent;
+}
+.nav-pill.active {
+  background: #c2410c;
+  color: #fff;
+  border-color: #c2410c;
+}
+
+/* ── 6-PANEL GRID ── */
+.panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: 1.5px solid #f0e0d0;
+}
+
+/* ═══════════════════════════════════
+   EACH PANEL
+═══════════════════════════════════ */
+.panel {
+  border-right: 1.5px solid #f0e0d0;
+  border-bottom: 1.5px solid #f0e0d0;
+  background: #fffcf8;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel:nth-child(even) { border-right: none; }
+
+/* header banner */
+.p-banner {
+  background: #c2410c;
+  padding: 9px 18px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+}
+.p-num {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+.p-banner-text {
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* panel inner body */
+.p-body {
+  display: flex;
+  flex: 1;
+  min-height: 230px;
+}
+
+/* left column */
+.p-left {
+  flex: 1;
+  padding: 18px 16px 18px 20px;
+  border-right: 1px solid #f0e0d0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+/* right column – mockup area */
+.p-right {
+  width: 248px;
+  flex-shrink: 0;
+  padding: 14px 12px;
+  background: #fdf8f2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── TYPOGRAPHY ── */
+.sec-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: #c2410c;
+}
+.big-title {
+  font-size: 21px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+  letter-spacing: -0.3px;
+}
+.kannada-title {
+  font-family: 'Noto Serif Kannada', serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: #c2410c;
+  line-height: 1.4;
+}
+.subtitle {
+  font-size: 11.5px;
+  color: #64748b;
+  line-height: 1.55;
+}
+.divider { height: 1px; background: #f0e0d0; width: 100%; }
+
+/* feature list */
+.feat-list { display: flex; flex-direction: column; gap: 5px; }
+.feat-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 11.5px;
+  color: #334155;
+  line-height: 1.45;
+}
+.feat-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #c2410c;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.feat-arrow { color: #c2410c; font-weight: 700; flex-shrink: 0; line-height: 1.45; }
+
+/* tags */
+.tags-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+.tag {
+  display: inline-block;
+  background: #fff4ef;
+  border: 1px solid #fcd0bc;
+  color: #9a3408;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+}
+.tag-blue { background:#eff6ff; border-color:#bfdbfe; color:#1e40af; }
+.tag-green { background:#f0fdf4; border-color:#bbf7d0; color:#166534; }
+.tag-purple { background:#faf5ff; border-color:#e9d5ff; color:#6b21a8; }
+.tag-slate { background:#f8fafc; border-color:#e2e8f0; color:#475569; }
+
+/* ═══════════════════════════
+   PANEL 1 — MOCKUP (actual UI)
+═══════════════════════════ */
+.mock-p1 {
+  width: 220px;
+  background: #fffcf8;
+  border: 1px solid #e8ddd5;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.mock-p1-strip {
+  background: #c2410c;
+  padding: 6px 10px;
+  font-size: 8px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+.mock-p1-nav {
+  background: #fffcf8;
+  border-bottom: 1px solid #f0e0d0;
+  padding: 7px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.mock-logo-k {
+  font-family: 'Noto Serif Kannada', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.mock-logo-k span { color: #c2410c; }
+.mock-navpill {
+  background: #c2410c;
+  color: #fff;
+  font-size: 7px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+.mock-p1-body { padding: 12px 10px; }
+.mock-kannada-big {
+  font-family: 'Noto Serif Kannada', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: center;
+  line-height: 1.3;
+  margin-bottom: 5px;
+}
+.mock-tagline {
+  font-size: 8px;
+  color: #64748b;
+  text-align: center;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+/* settings card */
+.mock-settings-card {
+  background: #fff;
+  border: 1px solid #f0e0d0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.mock-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.mock-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 8px;
+  color: #334155;
+}
+.mock-checkbox {
+  width: 11px; height: 11px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 2px;
+  background: #fff;
+  flex-shrink: 0;
+}
+.mock-queries-badge {
+  background: #fff4ef;
+  border: 1px solid #fcd0bc;
+  color: #c2410c;
+  font-size: 7.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 8px;
+}
+.mock-lang-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 8px;
+  color: #64748b;
+}
+.mock-lang-select {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 5px;
+  font-size: 7.5px;
+  color: #334155;
+  padding: 2px 6px;
+}
+/* query shortcuts */
+.mock-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 7px;
+}
+.mock-sc {
+  border: 1px solid #e8ddd5;
+  background: #fff;
+  color: #334155;
+  font-size: 7.5px;
+  padding: 3px 7px;
+  border-radius: 12px;
+}
+/* query input */
+.mock-input {
+  border: 1.5px solid #c2410c;
+  border-radius: 8px;
+  padding: 7px 9px;
+  font-size: 9px;
+  color: #0f172a;
+  background: #fff;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.mock-cursor { display: inline-block; width: 1px; height: 10px; background: #c2410c; }
+.mock-btn {
+  background: #c2410c;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  text-align: center;
+  padding: 7px;
+  border-radius: 7px;
+  letter-spacing: 0.3px;
+}
+
+/* ═══════════════════════════════
+   PANEL 2 — PIPELINE
+═══════════════════════════════ */
+.pipeline-card {
+  width: 218px;
+  background: #fff;
+  border: 1px solid #e8ddd5;
+  border-radius: 10px;
+  padding: 12px 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.pipe-title {
+  font-size: 9px;
+  font-weight: 700;
+  color: #c2410c;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.pipe-step-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+.pipe-icon {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.pipe-icon.orange { background: #fff4ef; }
+.pipe-icon.blue { background: #eff6ff; }
+.pipe-icon.green { background: #f0fdf4; }
+.pipe-icon.purple { background: #faf5ff; }
+.pipe-icon.amber { background: #fffbeb; }
+.pipe-texts { flex: 1; }
+.pipe-name {
+  font-size: 8.5px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.pipe-desc {
+  font-size: 7.5px;
+  color: #64748b;
+  line-height: 1.3;
+}
+.pipe-connector {
+  width: 1px;
+  height: 6px;
+  background: #c2410c;
+  opacity: 0.35;
+  margin: 0 0 0 12px;
+}
+
+/* ═══════════════════════════════
+   PANEL 3 — QUERY UI MOCKUP
+═══════════════════════════════ */
+.mock-p3 {
+  width: 220px;
+  background: #fff;
+  border: 1px solid #e8ddd5;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.mock-p3-section { margin-bottom: 8px; }
+.mock-p3-label {
+  font-size: 8.5px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.mock-auto-play-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.mock-cb-box {
+  width: 13px; height: 13px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 3px;
+  background: #fff;
+  flex-shrink: 0;
+}
+.mock-cb-text { font-size: 9px; color: #334155; }
+.mock-cb-icon { font-size: 9px; }
+.queries-counter {
+  margin-left: auto;
+  background: #fff4ef;
+  border: 1px solid #fcd0bc;
+  color: #c2410c;
+  font-size: 8px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 8px;
+}
+.mock-lang-dropdown {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 9px;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.mock-shortcut-pills {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.mock-sp {
+  border: 1px solid #e8ddd5;
+  background: #fafafa;
+  color: #334155;
+  font-size: 8px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mock-query-field {
+  border: 1.5px solid #c2410c;
+  border-radius: 7px;
+  padding: 7px 9px;
+  font-size: 9px;
+  color: #0f172a;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.mock-analyze-btn {
+  background: #c2410c;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  text-align: center;
+  padding: 7px;
+  border-radius: 7px;
+  margin-top: 7px;
+}
+
+/* ═══════════════════════════════
+   PANEL 4 — RESPONSE MOCKUP
+═══════════════════════════════ */
+.mock-p4 {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.response-card {
+  background: #fff;
+  border: 1px solid #f0e0d0;
+  border-left: 3px solid #c2410c;
+  border-radius: 8px;
+  padding: 10px 10px 10px 11px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.response-lang-badge {
+  display: inline-block;
+  background: #fff4ef;
+  border: 1px solid #fcd0bc;
+  color: #c2410c;
+  font-size: 7.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.response-text-k {
+  font-family: 'Noto Serif Kannada', serif;
+  font-size: 10px;
+  color: #0f172a;
+  line-height: 1.7;
+  margin-bottom: 4px;
+}
+.response-text-e {
+  font-size: 9px;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.source-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.source-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  font-size: 8px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 8px;
+}
+/* TTS player */
+.tts-player {
+  background: #fff;
+  border: 1px solid #e8ddd5;
+  border-radius: 8px;
+  padding: 8px 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+}
+.tts-top-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+.tts-play-btn {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: #c2410c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tts-triangle {
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 5px 0 5px 9px;
+  border-color: transparent transparent transparent #fff;
+  margin-left: 2px;
+}
+.tts-info { flex: 1; }
+.tts-title { font-size: 9px; font-weight: 700; color: #0f172a; }
+.tts-sub { font-size: 8px; color: #94a3b8; }
+.tts-time { font-size: 8px; color: #94a3b8; }
+.tts-waveform {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 20px;
+}
+.wv {
+  border-radius: 1px;
+  width: 3px;
+  background: #c2410c;
+  opacity: 0.6;
+}
+.wv.played { opacity: 1; }
+.wv.muted { background: #e2e8f0; opacity: 1; }
+.tts-progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+.tts-bar-wrap {
+  flex: 1;
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  margin: 0 6px;
+  position: relative;
+}
+.tts-bar-fill {
+  height: 100%;
+  width: 20%;
+  background: #c2410c;
+  border-radius: 2px;
+}
+
+/* ═══════════════════════════════
+   PANEL 5 — CHAR PORTAL + EBOOKS
+═══════════════════════════════ */
+.mock-p5 {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+/* Character graph */
+.char-graph-card {
+  background: #fff;
+  border: 1px solid #e8ddd5;
+  border-radius: 9px;
+  padding: 9px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.char-graph-title {
+  font-size: 8px;
+  font-weight: 700;
+  color: #c2410c;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  text-align: center;
+}
+/* Quote card mini */
+.quote-card-mini {
+  background: linear-gradient(135deg, #c2410c 0%, #ea580c 60%, #f97316 100%);
+  border-radius: 8px;
+  padding: 9px 10px;
+}
+.qc-eyebrow {
+  font-size: 7px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+.qc-quote-k {
+  font-family: 'Noto Serif Kannada', serif;
+  font-size: 9.5px;
+  color: #fff;
+  line-height: 1.6;
+  margin-bottom: 5px;
+}
+.qc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.qc-source { font-size: 7.5px; color: rgba(255,255,255,0.7); }
+.qc-dl-btn {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 7.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+/* ebook cards */
+.ebook-row {
+  display: flex;
+  gap: 5px;
+}
+.ebook-card {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #e8ddd5;
+  border-radius: 8px;
+  padding: 7px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.ebook-card.best { border-color: #c2410c; border-width: 1.5px; }
+.ebook-card-flag {
+  background: #c2410c;
+  color: #fff;
+  font-size: 6.5px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 3px;
+  letter-spacing: 0.5px;
+}
+.ebook-title-k {
+  font-family: 'Noto Serif Kannada', serif;
+  font-size: 9px;
+  font-weight: 700;
+  color: #c2410c;
+  margin-bottom: 1px;
+}
+.ebook-title-e { font-size: 7.5px; color: #64748b; margin-bottom: 5px; }
+.ebook-btn {
+  display: block;
+  background: #c2410c;
+  color: #fff;
+  font-size: 7px;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 5px;
+  margin-bottom: 3px;
+  text-align: center;
+}
+.ebook-btn-outline {
+  display: block;
+  border: 1px solid #c2410c;
+  color: #c2410c;
+  font-size: 7px;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+/* ═══════════════════════════════
+   PANEL 6 — TECH STACK
+═══════════════════════════════ */
+.tech-grid {
+  width: 220px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.tech-tile {
+  background: #fff;
+  border: 1px solid #e8ddd5;
+  border-radius: 9px;
+  padding: 10px 6px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.tech-icon-box {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+}
+.tech-name { font-size: 8.5px; font-weight: 700; color: #0f172a; text-align: center; }
+.tech-role { font-size: 7px; color: #94a3b8; text-align: center; }
+
+/* telemetry */
+.telemetry-card {
+  background: #fff4ef;
+  border: 1px solid #fcd0bc;
+  border-radius: 9px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 2px;
+}
+.tel-sep { width: 1px; height: 32px; background: #fcd0bc; }
+.tel-metric { text-align: center; }
+.tel-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: #c2410c;
+  line-height: 1;
+}
+.tel-label { font-size: 8px; color: #9a3408; margin-top: 2px; line-height: 1.3; }
+
+/* ═══════════════════════════════
+   POSTER FOOTER
+═══════════════════════════════ */
+.poster-footer {
+  background: #0f172a;
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.footer-logo-box {
+  width: 30px; height: 30px;
+  background: #c2410c;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Noto Serif Kannada', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+.footer-title { font-size: 13px; font-weight: 700; color: #f8fafc; }
+.footer-sub { font-size: 10px; color: #64748b; margin-top: 1px; }
+.footer-tags { display: flex; gap: 7px; flex-wrap: wrap; }
+.footer-hash { font-size: 10px; color: #c2410c; font-weight: 600; opacity: 0.85; }
+.footer-links { display: flex; flex-direction: column; gap: 3px; text-align: right; }
+.footer-link { font-size: 10px; color: #64748b; }
+.footer-link b { color: #f0a070; }
+
+/* ─── SVG graph ─── */
+svg text { font-family: 'Noto Serif Kannada', 'Plus Jakarta Sans', sans-serif; }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <button onclick="exportPng()">⬇ Export PNG (2×)</button>
+  <button onclick="window.print()">🖨 Save PDF</button>
+</div>
+
+<div id="poster">
+
+  <!-- ANNOUNCE STRIP -->
+  <div class="announce-strip">♦♦ CELEBRATING KANNADA LITERATURE WITH ADVANCED AI VOICE AGENT ♦♦</div>
+
+  <!-- SITE HEADER -->
+  <div class="site-header">
+    <div class="site-logo">ಹೇಳಿ ಹೋಗು <span>ಕಾರಣ</span></div>
+    <div class="site-nav">
+      <div class="nav-pill active">🤖 AI Guide</div>
+      <div class="nav-pill">🗺 Characters</div>
+      <div class="nav-pill">✨ Quotes</div>
+      <div class="nav-pill">📚 E-Books</div>
+      <div class="nav-pill">📝 Feedback</div>
+    </div>
+  </div>
+
+  <!-- 6-PANEL GRID -->
+  <div class="panel-grid">
+
+    <!-- ════════════════════════════
+         PANEL 1 — PROJECT OVERVIEW
+    ════════════════════════════ -->
+    <div class="panel">
+      <div class="p-banner">
+        <span class="p-num">01</span>
+        <span class="p-banner-text">✦ PROJECT OVERVIEW ✦</span>
+      </div>
+      <div class="p-body">
+        <div class="p-left">
+          <div>
+            <div class="big-title">Heli Hogu Kaarana AI</div>
+            <div class="kannada-title">ಹೇಳಿ ಹೋಗು ಕಾರಣ</div>
+          </div>
+          <div class="subtitle">Bilingual AI Guide &amp; Domain RAG Agent<br>for Ravi Belagere's Classic Kannada Romance</div>
+          <div class="divider"></div>
+          <div class="sec-label">Core Capabilities</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot"></span>Grounded Q&amp;A anchored to source page citations</div>
+            <div class="feat-item"><span class="feat-dot"></span>Native Kannada + English bilingual responses</div>
+            <div class="feat-item"><span class="feat-dot"></span>Interactive D3 character network mapping</div>
+            <div class="feat-item"><span class="feat-dot"></span>Sarvam TTS integrated multi-modal voice playback</div>
+          </div>
+          <div class="tags-row">
+            <span class="tag">RAG Agent</span>
+            <span class="tag tag-blue">ChromaDB</span>
+            <span class="tag tag-green">Sarvam AI</span>
+            <span class="tag tag-purple">Vercel</span>
+          </div>
+        </div>
+        <div class="p-right" style="align-items:flex-start;">
+          <div class="mock-p1">
+            <div class="mock-p1-strip">♦♦ CELEBRATING KANNADA LITERATURE ♦♦</div>
+            <div class="mock-p1-nav">
+              <div class="mock-logo-k">ಹೇಳಿ ಹೋಗು <span>ಕಾರಣ</span></div>
+              <div class="mock-navpill">🤖 AI Guide</div>
+            </div>
+            <div class="mock-p1-body">
+              <div class="mock-kannada-big">ಹೇಳಿ ಹೋಗು ಕಾರಣ</div>
+              <div class="mock-tagline">Your AI-powered guide through the literary world of Heli Hogu Kaarana. Ask anything about characters, themes, or the story.</div>
+              <div class="mock-settings-card">
+                <div class="mock-settings-row">
+                  <div class="mock-checkbox-row">
+                    <div class="mock-checkbox"></div>
+                    <span>🔊 Auto-play Voice Output</span>
+                  </div>
+                  <div class="mock-queries-badge">Queries Today: 1/100</div>
+                </div>
+                <div class="mock-lang-row">
+                  🌐 Output Language:
+                  <div class="mock-lang-select">ಕನ್ನಡ (Kannada) ▾</div>
+                </div>
+              </div>
+              <div class="mock-shortcuts">
+                <div class="mock-sc">Who is Himavant?</div>
+                <div class="mock-sc">About Prarthana</div>
+                <div class="mock-sc">Main Themes</div>
+                <div class="mock-sc">Ravi's Role</div>
+              </div>
+              <div class="mock-input">
+                <span style="color:#c2410c">🔍</span>
+                <span style="color:#94a3b8">Who is Himavant?</span>
+                <span class="mock-cursor"></span>
+              </div>
+              <div class="mock-btn">Analyze the Book</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL 2 — RAG PIPELINE
+    ════════════════════════════ -->
+    <div class="panel">
+      <div class="p-banner">
+        <span class="p-num">02</span>
+        <span class="p-banner-text">✦ RAG PIPELINE ARCHITECTURE ✦</span>
+      </div>
+      <div class="p-body">
+        <div class="p-left">
+          <div class="sec-label">Data Ingestion</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-arrow">→</span>Scan 346-page PDF novel ➔ Extract text using <b style="color:#c2410c">Surya OCR</b> layout detection</div>
+            <div class="feat-item"><span class="feat-arrow">→</span>Text chunking via <b style="color:#c2410c">LangChain</b> Recursive Character Text Splitter</div>
+            <div class="feat-item"><span class="feat-arrow">→</span>Generate vector representations using <b style="color:#c2410c">Hugging Face Embeddings</b></div>
+            <div class="feat-item"><span class="feat-arrow">→</span>Ingest <b style="color:#c2410c">687 Chunks</b> into ChromaDB Vector Store</div>
+          </div>
+          <div class="divider"></div>
+          <div class="sec-label">Retrieval &amp; Augmentation</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-arrow">→</span>User query vectorization via <b style="color:#c2410c">Hugging Face</b> ➔ Cosine Similarity in ChromaDB</div>
+            <div class="feat-item"><span class="feat-arrow">→</span>Extract Top-K chunks ➔ Dynamically augment LLM system context prompt templates</div>
+            <div class="feat-item"><span class="feat-arrow">→</span>RAG orchestration via <b style="color:#c2410c">LangChain</b> ➔ Grounded answers via <b style="color:#c2410c">Gemini / Groq LLMs</b></div>
+          </div>
+          <div class="tags-row">
+            <span class="tag">687 Chunks</span>
+            <span class="tag tag-blue">Surya OCR</span>
+            <span class="tag tag-green">LangChain</span>
+            <span class="tag tag-purple">HuggingFace</span>
+          </div>
+        </div>
+        <div class="p-right">
+          <!-- 8-step compact pipeline -->
+          <div class="pipeline-card" style="padding:9px 9px;">
+            <div class="pipe-title">Complete RAG Pipeline</div>
+
+            <div class="pipe-step-row">
+              <div class="pipe-icon orange">📄</div>
+              <div class="pipe-texts">
+                <div class="pipe-name">PDF Novel</div>
+                <div class="pipe-desc">346 pages · scanned Kannada</div>
+              </div>
+            </div>
+            <div class="pipe-connector"></div>
+
+            <div class="pipe-step-row">
+              <div class="pipe-icon blue">🔭</div>
+              <div class="pipe-texts">
+                <div class="pipe-name">Surya OCR</div>
+                <div class="pipe-desc">layout detection pipeline</div>
+              </div>
+            </div>
+            <div class="pipe-connector"></div>
+
+            <div class="pipe-step-row">
+              <div class="pipe-icon green">🔗</div>
+              <div class="pipe-texts">
+                <div class="pipe-name">LangChain Text Splitter</div>
+                <div class="pipe-desc">recursive char · 687 chunks</div>
+              </div>
+            </div>
+            <div class="pipe-connector"></div>
+
+            <div class="pipe-step-row">
+              <div class="pipe-icon amber">🤗</div>
+              <div class="pipe-texts">
+                <div class="pipe-name">HuggingFace Embeddings</div>
+                <div class="pipe-desc">dense vector representations</div>
+              </div>
+            </div>
+            <div class="pipe-connector"></div>
+
+            <div class="pipe-step-row">
+              <div class="pipe-icon green">🧩</div>
+              <div class="pipe-texts">
+                <div class="pipe-name">ChromaDB Vector Store</div>
+                <div class="pipe-desc">687 chunks · persisted store</div>
+              </div>
+            </div>
+            <div class="pipe-connector"></div>
+
+            <div class="pipe-step-row">
+              <div class="pipe-icon purple">🎯</div>
+              <div class="pipe-texts">
+                <div class="pipe-name">Semantic Top-K Retriever</div>
+                <div class="pipe-desc">cosine similarity · ranked</div>
+              </div>
+            </div>
+            <div class="pipe-connector"></div>
+
+            <div class="pipe-step-row">
+              <div class="pipe-icon orange">📝</div>
+              <div class="pipe-texts">
+                <div class="pipe-name">Gemini / Groq LLMs Augmentation</div>
+                <div class="pipe-desc">bilingual context prompt</div>
+              </div>
+            </div>
+            <div class="pipe-connector"></div>
+
+            <div class="pipe-step-row">
+              <div class="pipe-icon amber">⚡</div>
+              <div class="pipe-texts">
+                <div class="pipe-name">Grounded Bilingual Response</div>
+                <div class="pipe-desc">final answer · ಕನ್ನಡ + English</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL 3 — BILINGUAL QUERY
+    ════════════════════════════ -->
+    <div class="panel">
+      <div class="p-banner">
+        <span class="p-num">03</span>
+        <span class="p-banner-text">✦ BILINGUAL QUERY INTERFACE ✦</span>
+      </div>
+      <div class="p-body">
+        <div class="p-left">
+          <div class="sec-label">Dual Language Support</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot"></span>Native Kannada Unicode script input supported</div>
+            <div class="feat-item"><span class="feat-dot"></span>English transliteration fallback available</div>
+            <div class="feat-item"><span class="feat-dot"></span>Output language selector — Kannada or English</div>
+          </div>
+          <div class="divider"></div>
+          <div class="sec-label">Suggested Query Shortcuts</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot"></span>"Who is Himavant?" · "About Prarthana"</div>
+            <div class="feat-item"><span class="feat-dot"></span>"ಹಿಮವಂತ ಮತ್ತು ಪ್ರಾರ್ಥನಾ ಸಂಬಂಧ"</div>
+            <div class="feat-item"><span class="feat-dot"></span>"Main Themes" · "Ravi's Role" shortcuts</div>
+          </div>
+          <div class="divider"></div>
+          <div class="sec-label">UX Controls</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot"></span>Auto-play Voice Output toggle (Sarvam TTS)</div>
+            <div class="feat-item"><span class="feat-dot"></span>Queries Today counter — Daily request limit (100 queries) to prevent system API abuse</div>
+          </div>
+        </div>
+        <div class="p-right" style="align-items:flex-start;">
+          <div class="mock-p3">
+            <div class="mock-p3-section">
+              <div class="mock-p3-label">Voice &amp; Language</div>
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px;">
+                <div class="mock-auto-play-row">
+                  <div class="mock-cb-box"></div>
+                  <span class="mock-cb-icon">🔊</span>
+                  <span class="mock-cb-text">Auto-play Voice Output</span>
+                </div>
+                <div class="queries-counter">1 / 100</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:8.5px;color:#64748b;">
+                <span>🌐 Output Language:</span>
+                <div class="mock-lang-dropdown" style="flex:1;">
+                  <span>ಕನ್ನಡ (Kannada)</span>
+                  <span style="color:#c2410c">▾</span>
+                </div>
+              </div>
+            </div>
+            <div class="mock-p3-section">
+              <div class="mock-p3-label">Quick Queries</div>
+              <div class="mock-shortcut-pills">
+                <div class="mock-sp">Who is Himavant?</div>
+                <div class="mock-sp">About Prarthana</div>
+                <div class="mock-sp">Main Themes</div>
+                <div class="mock-sp">Ravi's Role</div>
+              </div>
+            </div>
+            <div class="mock-p3-section" style="margin-bottom:0">
+              <div class="mock-p3-label" style="margin-bottom:4px">Your Query</div>
+              <div class="mock-query-field">
+                <span style="color:#94a3b8">ಪ್ರಾರ್ಥನಾ ಬಗ್ಗೆ ಹೇಳಿ</span>
+                <span class="mock-cursor" style="background:#c2410c;width:1px;height:10px;display:inline-block;"></span>
+              </div>
+              <div class="mock-analyze-btn">Analyze the Book</div>
+              <div style="font-size:8px;color:#94a3b8;text-align:center;margin-top:5px;">🔄 Reset Conversation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL 4 — RESPONSE & TTS
+    ════════════════════════════ -->
+    <div class="panel">
+      <div class="p-banner">
+        <span class="p-num">04</span>
+        <span class="p-banner-text">✦ RESPONSE &amp; TTS PLAYBACK ✦</span>
+      </div>
+      <div class="p-body">
+        <div class="p-left">
+          <div class="sec-label">Grounded AI Response</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot"></span>Bilingual output — Kannada + English in one pass</div>
+            <div class="feat-item"><span class="feat-dot"></span>Strict anti-hallucination prompt constraints</div>
+            <div class="feat-item"><span class="feat-dot"></span>Responses anchored to source page numbers</div>
+            <div class="feat-item"><span class="feat-dot"></span>Inline citation tags e.g. <span class="tag tag-blue" style="font-size:9px;">📄 ಪುಟ 7</span></div>
+          </div>
+          <div class="divider"></div>
+          <div class="sec-label">TTS Audio Playback</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot"></span>Bilingual TTS: streams native Kannada &amp; English audio responses</div>
+            <div class="feat-item"><span class="feat-dot"></span>Inline player: play/pause · 1.0x – 2.0x speed control · 5s skip</div>
+            <div class="feat-item"><span class="feat-dot"></span>Real-time audio waveform visualizer for active playback states</div>
+            <div class="feat-item"><span class="feat-dot"></span>"Hear in Kannada/English" + "Copy Text" quick action buttons</div>
+          </div>
+        </div>
+        <div class="p-right" style="align-items:flex-start;padding-top:12px;">
+          <div class="mock-p4">
+            <div class="response-card">
+              <div class="response-lang-badge">ಕನ್ನಡ ಉತ್ತರ</div>
+              <div class="response-text-k">ರವಿ ಬೆಳಗೆರೆ ಅವರ 'ಹೇಳಿ ಹೋಗು ಕಾರಣ' ಕಾದಂಬರಿಯಲ್ಲಿ, ಹಿಮವಂತ ಪ್ರಾರ್ಥನಾ ಜೊತೆಗೆ ಕಥೆಯ ಮುಖ್ಯ ಪಾತ್ರಗಳಲ್ಲಿ ಒಬ್ಬನಾಗಿದ್ದಾನೆ.</div>
+              <div class="response-text-e">In Ravi Belagere's novel, Himavant is one of the central characters alongside Prarthana, travelling from Chinnrayapattna...</div>
+              <div class="source-tags">
+                <div class="source-tag">📄 ಪುಟ 7</div>
+                <div class="source-tag">📄 Page 120</div>
+              </div>
+            </div>
+            <!-- Hear in Kannada/English / Copy Text buttons -->
+            <div style="display:flex;gap:6px;margin:-2px 0 0;">
+              <div style="flex:1;background:#c2410c;color:#fff;font-size:8px;font-weight:700;text-align:center;padding:6px 4px;border-radius:7px;">🔊 Hear in Kannada/English</div>
+              <div style="flex:1;background:#fff;border:1px solid #e8ddd5;color:#334155;font-size:8px;font-weight:600;text-align:center;padding:6px 4px;border-radius:7px;">📋 Copy Text</div>
+            </div>
+            <!-- TTS Player -->
+            <div class="tts-player">
+              <div class="tts-top-row">
+                <div class="tts-play-btn"><div class="tts-triangle"></div></div>
+                <div class="tts-info">
+                  <div class="tts-title">Sarvam TTS · Kannada</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:4px;">
+                  <div style="background:#fff4ef;border:1px solid #fcd0bc;color:#c2410c;font-size:7px;font-weight:700;padding:1px 5px;border-radius:4px;">1.0×</div>
+                  <div class="tts-time">0:06</div>
+                </div>
+              </div>
+              <div class="tts-waveform">
+                <div class="wv played" style="height:5px"></div>
+                <div class="wv played" style="height:10px"></div>
+                <div class="wv played" style="height:14px"></div>
+                <div class="wv played" style="height:8px"></div>
+                <div class="wv" style="height:16px"></div>
+                <div class="wv" style="height:12px"></div>
+                <div class="wv" style="height:18px"></div>
+                <div class="wv" style="height:10px"></div>
+                <div class="wv" style="height:14px"></div>
+                <div class="wv muted" style="height:8px"></div>
+                <div class="wv muted" style="height:12px"></div>
+                <div class="wv muted" style="height:16px"></div>
+                <div class="wv muted" style="height:9px"></div>
+                <div class="wv muted" style="height:13px"></div>
+                <div class="wv muted" style="height:7px"></div>
+                <div class="wv muted" style="height:11px"></div>
+                <div class="wv muted" style="height:15px"></div>
+                <div class="wv muted" style="height:8px"></div>
+                <div class="wv muted" style="height:10px"></div>
+                <div class="wv muted" style="height:6px"></div>
+              </div>
+              <div class="tts-progress-row">
+                <span class="tts-time">0:06</span>
+                <div class="tts-bar-wrap"><div class="tts-bar-fill"></div></div>
+                <span class="tts-time">2:41</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL 5 — CHARACTER PORTAL
+    ════════════════════════════ -->
+    <div class="panel">
+      <div class="p-banner">
+        <span class="p-num">05</span>
+        <span class="p-banner-text">✦ CHARACTER PORTAL &amp; READER HUB ✦</span>
+      </div>
+      <div class="p-body">
+        <div class="p-left">
+          <div class="sec-label">Character Relationship Map</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot"></span>D3-rendered network of all character nodes</div>
+            <div class="feat-item"><span class="feat-dot"></span>ಹಿಮವಂತ · ಪ್ರಾರ್ಥನಾ · ಬೆಳಗರಿ · ದೇಬು and more</div>
+            <div class="feat-item"><span class="feat-dot"></span>Relationship edge labels: Love / Loyalty / Conflict</div>
+            <div class="feat-item"><span class="feat-dot"></span>Click nodes for bio, page refs &amp; dynamic context</div>
+          </div>
+          <div class="divider"></div>
+          <div class="sec-label">Quote Card Maker</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot"></span>Instagram-ready Kannada quote card creator</div>
+            <div class="feat-item"><span class="feat-dot"></span>Saffron Gold / Dark Night themes · 1:1 &amp; 4:5</div>
+            <div class="feat-item"><span class="feat-dot"></span>One-click "Save Quote Card to Device"</div>
+          </div>
+          <div class="divider"></div>
+          <div class="sec-label">E-Books &amp; Reader</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot"></span>Kannada, English &amp; Bilingual editions</div>
+            <div class="feat-item"><span class="feat-dot"></span>Read Online or Download Offline</div>
+          </div>
+        </div>
+        <div class="p-right" style="align-items:flex-start;padding-top:10px;">
+          <div class="mock-p5">
+            <!-- Character Graph -->
+            <div class="char-graph-card">
+              <div class="char-graph-title">🗺 ಪಾತ್ರಗಳ ನಕ್ಷೆ / Character Relationship Map</div>
+              <svg width="196" height="128" viewBox="0 0 196 128">
+                <!-- edges -->
+                <line x1="98" y1="64" x2="46" y2="32" stroke="#c2410c" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"/>
+                <line x1="98" y1="64" x2="152" y2="32" stroke="#c2410c" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"/>
+                <line x1="98" y1="64" x2="162" y2="80" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.4"/>
+                <line x1="98" y1="64" x2="34" y2="88" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.4"/>
+                <line x1="98" y1="64" x2="98" y2="110" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.4"/>
+                <line x1="98" y1="64" x2="170" y2="100" stroke="#94a3b8" stroke-width="0.7" stroke-dasharray="3 2" opacity="0.35"/>
+                <!-- edge labels -->
+                <text x="65" y="44" font-size="6" fill="#c2410c" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif">Love / ಪ್ರೀತಿ</text>
+                <text x="130" y="40" font-size="6" fill="#94a3b8" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif">Conflict</text>
+                <!-- center node: ಹಿಮವಂತ -->
+                <circle cx="98" cy="64" r="18" fill="#fff4ef" stroke="#c2410c" stroke-width="1.5"/>
+                <text x="98" y="61" font-size="8" fill="#c2410c" text-anchor="middle" font-weight="700">ಹಿಮವಂತ</text>
+                <text x="98" y="72" font-size="6" fill="#9a3408" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif">Himavant</text>
+                <!-- ಪ್ರಾರ್ಥನಾ -->
+                <circle cx="46" cy="32" r="13" fill="#faf5ff" stroke="#7c3aed" stroke-width="1"/>
+                <text x="46" y="29" font-size="7.5" fill="#6b21a8" text-anchor="middle" font-weight="700">ಪ್ರಾರ್ಥನಾ</text>
+                <text x="46" y="39" font-size="6" fill="#94a3b8" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif">Prarthana</text>
+                <!-- ಬೆಳಗರಿ -->
+                <circle cx="152" cy="32" r="12" fill="#fef2f2" stroke="#ef4444" stroke-width="1"/>
+                <text x="152" y="29" font-size="7.5" fill="#dc2626" text-anchor="middle" font-weight="700">ಬೆಳಗರಿ</text>
+                <text x="152" y="39" font-size="6" fill="#94a3b8" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif">Belagari</text>
+                <!-- ದೇಬು -->
+                <circle cx="162" cy="80" r="11" fill="#eff6ff" stroke="#3b82f6" stroke-width="1"/>
+                <text x="162" y="77" font-size="7.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">ದೇಬು</text>
+                <text x="162" y="87" font-size="6" fill="#94a3b8" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif">Debu</text>
+                <!-- ರಾಮೂ -->
+                <circle cx="34" cy="88" r="11" fill="#f0fdf4" stroke="#16a34a" stroke-width="1"/>
+                <text x="34" y="85" font-size="7.5" fill="#15803d" text-anchor="middle" font-weight="700">ರಾಮೂ</text>
+                <text x="34" y="95" font-size="6" fill="#94a3b8" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif">Ramu</text>
+                <!-- ಗಾವೇರಮ್ಮ -->
+                <circle cx="98" cy="110" r="11" fill="#f0fdf4" stroke="#15803d" stroke-width="1"/>
+                <text x="98" y="108" font-size="7" fill="#15803d" text-anchor="middle" font-weight="700">ಗಾವೇರಮ್ಮ</text>
+                <!-- ಶಾರ್ಮಿಳಾ -->
+                <circle cx="170" cy="100" r="10" fill="#fdf4ff" stroke="#a855f7" stroke-width="1"/>
+                <text x="170" y="98" font-size="7" fill="#7e22ce" text-anchor="middle" font-weight="700">ಶಾರ್ಮಿಳಾ</text>
+              </svg>
+            </div>
+            <!-- Quote Card mini -->
+            <div class="quote-card-mini">
+              <div class="qc-eyebrow">✨ ಕೋಟ್ ಕಾರ್ಡ್ / Quote Card</div>
+              <div class="qc-quote-k">ಹೇಳಿ ಹೋಗು ಕಾರಣ... ಯಾಕೆಂದರೆ ನಿನಗಾಗಿ ಕಾಯುವ ಹೃದಯ ಇಲ್ಲಿದೆ.</div>
+              <div class="qc-footer">
+                <div class="qc-source">— Ravi Belagere · heli-hogu-kaarana.vercel.app</div>
+                <div class="qc-dl-btn">💾 Save PNG</div>
+              </div>
+            </div>
+            <!-- E-Book editions -->
+            <div class="ebook-row">
+              <div class="ebook-card">
+                <div class="ebook-title-k">ಕನ್ನಡ ಆವೃತ್ತಿ</div>
+                <div class="ebook-title-e">Kannada Edition</div>
+                <div class="ebook-btn">📖 Read Online</div>
+                <div class="ebook-btn-outline">⬇ Read Offline</div>
+              </div>
+              <div class="ebook-card best">
+                <div class="ebook-card-flag">BEST</div>
+                <div class="ebook-title-k">ದ್ವಿಭಾಷಾ ಆವೃತ್ತಿ</div>
+                <div class="ebook-title-e">Bilingual Edition</div>
+                <div class="ebook-btn">📖 Read Online</div>
+                <div class="ebook-btn-outline">⬇ Read Offline</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         PANEL 6 — TECH STACK
+    ════════════════════════════ -->
+    <div class="panel">
+      <div class="p-banner">
+        <span class="p-num">06</span>
+        <span class="p-banner-text">✦ TECH STACK &amp; TELEMETRY ✦</span>
+      </div>
+      <div class="p-body">
+        <div class="p-left">
+          <div class="sec-label">Backend Architecture</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot"></span>Decoupled Python Serverless Functions on Vercel</div>
+            <div class="feat-item"><span class="feat-dot"></span>Stateless RAG endpoints, cold-start optimized</div>
+            <div class="feat-item"><span class="feat-dot"></span>ChromaDB persisted vector store integration</div>
+          </div>
+          <div class="divider"></div>
+          <div class="sec-label">GA4 Custom Telemetry</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot"></span>Custom events: <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;font-size:10px">query_submitted</code>, <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;font-size:10px">audio_played</code></div>
+            <div class="feat-item"><span class="feat-dot"></span>Full query strings &amp; language captured real-time</div>
+            <div class="feat-item"><span class="feat-dot"></span>Feedback ratings &amp; audio click events logged</div>
+          </div>
+          <div class="divider"></div>
+          <div class="telemetry-card">
+            <div class="tel-metric">
+              <div class="tel-val">687</div>
+              <div class="tel-label">Chunks<br>Indexed</div>
+            </div>
+            <div class="tel-sep"></div>
+            <div class="tel-metric">
+              <div class="tel-val">346</div>
+              <div class="tel-label">Novel<br>Pages</div>
+            </div>
+            <div class="tel-sep"></div>
+            <div class="tel-metric">
+              <div class="tel-val">2</div>
+              <div class="tel-label">Languages<br>Supported</div>
+            </div>
+            <div class="tel-sep"></div>
+            <div class="tel-metric">
+              <div class="tel-val">∞</div>
+              <div class="tel-label">Queries<br>Handled</div>
+            </div>
+          </div>
+       
+
+        </div> <!-- End p-left -->
+
+        <div class="p-right" style="align-items:flex-start; flex-direction:column; gap:12px;">
+          <!-- Tech Stack Grid -->
+          <div class="tech-grid">
+            <!-- Python -->
+            <div class="tech-tile">
+              <div class="tech-icon-box" style="background:#eff6ff; color:#1e40af;">🐍</div>
+              <div class="tech-name">Python</div>
+              <div class="tech-role">Serverless API</div>
+            </div>
+            <!-- ChromaDB -->
+            <div class="tech-tile">
+              <div class="tech-icon-box" style="background:#f0fdf4; color:#166534;">📦</div>
+              <div class="tech-name">ChromaDB</div>
+              <div class="tech-role">Vector Store</div>
+            </div>
+            <!-- Vercel -->
+            <div class="tech-tile">
+              <div class="tech-icon-box" style="background:#f8fafc; color:#0f172a;">▲</div>
+              <div class="tech-name">Vercel</div>
+              <div class="tech-role">Deployment</div>
+            </div>
+            <!-- LangChain -->
+            <div class="tech-tile">
+              <div class="tech-icon-box" style="background:#f0fdf4; color:#15803d;">🔗</div>
+              <div class="tech-name">LangChain</div>
+              <div class="tech-role">Orchestration</div>
+            </div>
+            <!-- Hugging Face -->
+            <div class="tech-tile">
+              <div class="tech-icon-box" style="background:#fffbeb; color:#b45309;">🤗</div>
+              <div class="tech-name">Hugging Face</div>
+              <div class="tech-role">Embeddings</div>
+            </div>
+            <!-- Gemini + Groq -->
+            <div class="tech-tile">
+              <div class="tech-icon-box" style="background:#faf5ff; color:#6b21a8;">🤖</div>
+              <div class="tech-name" style="font-size: 8px; line-height: 1.1;">Gemini + Groq</div>
+              <div class="tech-role">LLM &amp; TTS</div>
+            </div>
+          </div>
+
+          <!-- Support & Community -->
+          <div class="tech-tile" style="width: 220px; align-items: flex-start; gap: 8px; background: #fffcf8; border-color: #fcd0bc; border-width: 1px;">
+            <div style="font-size: 9px; font-weight: 700; color: #c2410c; letter-spacing: 0.5px;">SUPPORT &amp; COMMUNITY</div>
+            <div style="font-size: 8px; color: #64748b; line-height: 1.3;">Loved the AI Book Guide? Here is how you can help:</div>
+            <div style="display:flex; flex-direction:column; gap:5px; width:100%;">
+              <a href="https://amruthportfolio.me" target="_blank" style="text-decoration:none; display:block; background:#c2410c; color:#fff; font-size:8px; font-weight:700; text-align:center; padding:5px; border-radius:5px;">🌐 Support Developer</a>
+              <a href="https://instagram.com/heli.hogu.kaarana" target="_blank" style="text-decoration:none; display:block; border:1px solid #c2410c; color:#c2410c; font-size:8px; font-weight:700; text-align:center; padding:5px; border-radius:5px;">📢 Follow on Instagram</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- End panel-grid -->
+
+  <!-- POSTER FOOTER -->
+  <div class="poster-footer">
+    <div class="footer-brand">
+      <div class="footer-logo-box">ಕ</div>
+      <div>
+        <div class="footer-title">ಹೇಳಿ ಹೋಗು ಕಾರಣ — Heli Hogu Kaarana AI</div>
+        <div class="footer-sub">Bilingual RAG Agent · Built by Amruth Amarnath · heli-hogu-kaarana.vercel.app</div>
+      </div>
+    </div>
+    <div class="footer-tags">
+      <span class="footer-hash">#KannadaAI</span>
+      <span class="footer-hash">#RAGAgent</span>
+      <span class="footer-hash">#SarvamAI</span>
+      <span class="footer-hash">#GenAI</span>
+      <span class="footer-hash">#BuildInPublic</span>
+      <span class="footer-hash">#ChromaDB</span>
+    </div>
+    <div class="footer-links">
+      <div class="footer-link">Portfolio: <b>amruthportfolio.me</b></div>
+      <div class="footer-link">GitHub: <b>Amruth011</b></div>
+    </div>
+  </div>
+  <div style="background:#090d16; text-align:center; padding:6px; font-size:7.5px; color:#475569;">
+    © Ravi Belagere · Bhavana Prakashana · Independent AI Tribute
+  </div>
+
+</div> <!-- End poster -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+function exportPng() {
+  const poster = document.getElementById('poster');
+  html2canvas(poster, { scale: 2 }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'heli-hogu-kaarana-rag.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+</script>
+</body>
+</html>

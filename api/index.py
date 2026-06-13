@@ -1460,9 +1460,21 @@ async def root():
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://heli-hogu-kaarana.vercel.app/" />
+        <meta property="og:site_name" content="Heli Hogu Kaarana" />
         <meta property="og:title" content="ಹೇಳಿ ಹೋಗು ಕಾರಣ — Bilingual AI Book Guide" />
         <meta property="og:description" content="Explore Ravi Belagere's classic Kannada novel 'Heli Hogu Kaarana' with an interactive AI-powered bilingual guide. Search, listen in English or Kannada, and analyze characters." />
         <meta property="og:image" content="https://raw.githubusercontent.com/Amruth011/kannada-rag-agent/main/banner.svg" />
+
+        <!-- Google Site Name Structured Data -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Heli Hogu Kaarana",
+          "alternateName": ["ಹೇಳಿ ಹೋಗು ಕಾರಣ", "Heli Hogu Kaarana AI"],
+          "url": "https://heli-hogu-kaarana.vercel.app/"
+        }
+        </script>
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image" />
