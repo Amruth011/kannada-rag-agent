@@ -2506,6 +2506,223 @@ async def root():
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- FAQ ACCORDION COMPONENT (SEO & AI CRAWLER OPTIMIZED) -->
+                    <div class="faq-accordion-section" style="margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 3rem;">
+                        <style>
+                            .faq-badge {
+                                display: inline-flex;
+                                align-items: center;
+                                background: var(--primary-light);
+                                color: var(--primary);
+                                border: 1px solid rgba(194, 65, 12, 0.2);
+                                font-size: 0.75rem;
+                                font-weight: 700;
+                                letter-spacing: 1.5px;
+                                text-transform: uppercase;
+                                padding: 6px 16px;
+                                border-radius: 50px;
+                                margin-bottom: 16px;
+                            }
+                            .faq-container {
+                                max-width: 800px;
+                                margin: 0 auto;
+                                display: flex;
+                                flex-direction: column;
+                                gap: 14px;
+                            }
+                            .faq-item {
+                                background: rgba(194, 65, 12, 0.04);
+                                border: 1.5px solid transparent;
+                                border-radius: 16px;
+                                padding: 20px 24px;
+                                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                                text-align: left;
+                            }
+                            .faq-item[open] {
+                                border-color: var(--primary);
+                                background: var(--card);
+                                box-shadow: 0 10px 30px rgba(194, 65, 12, 0.06);
+                            }
+                            .faq-question {
+                                font-size: 1.05rem;
+                                font-weight: 700;
+                                color: var(--text);
+                                cursor: pointer;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                outline: none;
+                                list-style: none;
+                                user-select: none;
+                            }
+                            .faq-question::-webkit-details-marker {
+                                display: none;
+                            }
+                            .faq-question::after {
+                                content: '+';
+                                font-size: 1.4rem;
+                                color: var(--text-muted);
+                                font-weight: 500;
+                                transition: transform 0.2s ease;
+                            }
+                            .faq-item[open] .faq-question::after {
+                                content: '−';
+                                color: var(--primary);
+                                font-weight: 700;
+                            }
+                            .faq-answer {
+                                margin-top: 14px;
+                                font-size: 0.92rem;
+                                color: var(--text-muted);
+                                line-height: 1.6;
+                                border-top: 1px solid rgba(194, 65, 12, 0.08);
+                                padding-top: 14px;
+                            }
+                            .faq-answer strong {
+                                color: var(--text);
+                            }
+                            .faq-contact-card {
+                                background: rgba(194, 65, 12, 0.04);
+                                border: 1px solid rgba(194, 65, 12, 0.08);
+                                border-radius: 16px;
+                                padding: 1.5rem 2rem;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                flex-wrap: wrap;
+                                gap: 1.5rem;
+                                margin-top: 2rem;
+                                text-align: left;
+                            }
+                            .faq-contact-btn {
+                                background: transparent;
+                                border: 1.5px solid var(--text);
+                                color: var(--text) !important;
+                                text-decoration: none;
+                                padding: 10px 22px;
+                                border-radius: 50px;
+                                font-weight: 700;
+                                font-size: 0.88rem;
+                                display: inline-flex;
+                                align-items: center;
+                                transition: all 0.2s;
+                            }
+                            .faq-contact-btn:hover {
+                                background: var(--text);
+                                color: var(--card) !important;
+                                transform: translateY(-1px);
+                            }
+                            @media (max-width: 768px) {
+                                .faq-doodles, .faq-doodle-notepad {
+                                    display: none !important;
+                                }
+                            }
+                            @media (max-width: 576px) {
+                                .faq-contact-card {
+                                    flex-direction: column;
+                                    text-align: center;
+                                    align-items: center;
+                                }
+                            }
+                        </style>
+
+                        <div style="text-align: center; margin-bottom: 2.2rem; position: relative;">
+                            <!-- Floating decorative outline icons matching screenshot -->
+                            <svg class="faq-doodles" width="120" height="90" viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; right: 20px; top: -15px; color: var(--text-muted); opacity: 0.25; pointer-events: none;">
+                                <!-- Question bubble ? -->
+                                <path d="M40 50 C30 55, 20 45, 18 35 C15 22, 28 12, 40 15 C52 18, 58 32, 50 45 Z" />
+                                <path d="M18 35 C15 38, 12 40, 10 40 C14 43, 16 46, 18 48" /> <!-- small tail -->
+                                <path d="M30 25 C31 21, 36 20, 38 23 C39 25, 37 27, 35 29 C34 30, 34 32, 34 33" />
+                                <circle cx="34" cy="37" r="1.2" fill="currentColor" />
+
+                                <!-- Info bubble i -->
+                                <path d="M85 35 C95 38, 108 30, 110 20 C112 10, 98 4, 88 5 C75 6, 68 18, 75 28 Z" />
+                                <path d="M75 28 C74 32, 70 35, 68 38 C72 38, 74 37, 76 36" /> <!-- tail -->
+                                <circle cx="92" cy="12" r="1.5" fill="currentColor" />
+                                <path d="M92 16 L92 24 M90 16 L94 16 M90 24 L94 24" />
+                            </svg>
+                            
+                            <div class="faq-badge">📖 FAQ / ಸಹಾಯ ಕೇಂದ್ರ</div>
+                            <h2 style="font-family: var(--font-serif); color: var(--primary); margin-bottom: 0.5rem; font-size: 1.8rem; font-weight: 700;">Frequently Asked Questions</h2>
+                            <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 600px; margin: 0 auto; line-height: 1.45;">
+                                Find answers to common questions about reading online, PDF downloads, and using the AI Guide.
+                            </p>
+                        </div>
+
+                        <div class="faq-container">
+                            <!-- Question 1 -->
+                            <details class="faq-item">
+                                <summary class="faq-question">Is the Heli Hogu Kaarana PDF download available for free?</summary>
+                                <div class="faq-answer">
+                                    <strong>Answer:</strong> Yes! You can read the entire novel online or download it as an offline E-Book for free. Click the <strong>E-Books</strong> tab in the navigation menu to access Kannada, English, or Bilingual (side-by-side) editions.
+                                    <br><br>
+                                    <span style="color: var(--primary); font-style: italic; font-size: 0.88rem;">ಹೌದು! ಕಾದಂಬರಿಯ ಕನ್ನಡ ಆವೃತ್ತಿ, ಇಂಗ್ಲಿಷ್ ಅನುವಾದ ಮತ್ತು ದ್ವಿಭಾಷಾ ಇ-ಪುಸ್ತಕಗಳನ್ನು ನೀವು ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಓದಬಹುದು ಅಥವಾ ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಓದಲು ಉಚಿತವಾಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿಕೊಳ್ಳಬಹುದು.</span>
+                                </div>
+                            </details>
+
+                            <!-- Question 2 -->
+                            <details class="faq-item">
+                                <summary class="faq-question">Where can I buy a physical copy of Heli Hogu Kaarana online?</summary>
+                                <div class="faq-answer">
+                                    <strong>Answer:</strong> Physical paperback print copies of the novel can be purchased online from e-commerce portals like <strong>Amazon</strong> or <strong>Flipkart</strong>, or bought directly from local Kannada book dealers (e.g. Sapna Book House).
+                                    <br><br>
+                                    <span style="color: var(--primary); font-style: italic; font-size: 0.88rem;">ರವಿ ಬೆಳಗರೆ ಅವರ ಹೇಳಿ ಹೋಗು ಕಾರಣ ಮುದ್ರಿತ ಪುಸ್ತಕವನ್ನು ಖರೀದಿಸಲು ಬಯಸಿದರೆ, ಅಮೆಜಾನ್ ಅಥವಾ ಫ್ಲಿಪ್‌ಕಾರ್ಟ್ ಮತ್ತು ಸ್ಥಳೀಯ ಕನ್ನಡ ಪುಸ್ತಕದ ಅಂಗಡಿಗಳಲ್ಲಿ ಪತ್ತೆಹಚ್ಚಬಹುದು.</span>
+                                </div>
+                            </details>
+
+                            <!-- Question 3 -->
+                            <details class="faq-item">
+                                <summary class="faq-question">How do I read Heli Hogu Kaarana online in Kannada & English?</summary>
+                                <div class="faq-answer">
+                                    <strong>Answer:</strong> This website acts as a digital reading companion. You can read the novel chapter-by-chapter under the <strong>E-Books</strong> tab. For a comparative reading experience, the Bilingual Edition displays the Kannada and English translations side-by-side.
+                                    <br><br>
+                                    <span style="color: var(--primary); font-style: italic; font-size: 0.88rem;">ಕನ್ನಡ ಮತ್ತು ಇಂಗ್ಲಿಷ್ ಭಾಷೆಗಳನ್ನು ಒಟ್ಟಿಗೆ ಓದಲು ದ್ವಿಭಾಷಾ ಆವೃತ್ತಿ ಅತ್ಯಂತ ಸೂಕ್ತವಾಗಿದೆ, ಇದು ಎರಡೂ ಭಾಷೆಗಳನ್ನು ಅಕ್ಕಪಕ್ಕದಲ್ಲಿ ಪ್ರದರ್ಶಿಸುತ್ತದೆ.</span>
+                                </div>
+                            </details>
+
+                            <!-- Question 4 -->
+                            <details class="faq-item">
+                                <summary class="faq-question">Who is Himavanth (ಹಿಮವಂತ) in Heli Hogu Kaarana?</summary>
+                                <div class="faq-answer">
+                                    <strong>Answer:</strong> Himavanth is the protagonist of the novel, representing the pinnacle of silent, selfless love and sacrifice. If you want a deep analysis of his character arc and relationships, open the <strong>Characters</strong> tab to view our D3 relationship node map.
+                                    <br><br>
+                                    <span style="color: var(--primary); font-style: italic; font-size: 0.88rem;">ಹಿಮವಂತ ಕಾದಂಬರಿಯ ನಾಯಕನಾಗಿದ್ದು, ತನ್ನ ನಿಸ್ವಾರ್ಥ ಪ್ರೀತಿ ಮತ್ತು ತ್ಯಾಗಕ್ಕೆ ಹೆಸರಾಗಿದ್ದಾನೆ. ಅವನ ಕಥೆಯನ್ನು ಪಾತ್ರಗಳ ಲಿಂಕ್‌ನಲ್ಲಿ ವಿಶ್ಯುಯಲ್ ಮ್ಯಾಪ್ ಮೂಲಕ ನೋಡಬಹುದು.</span>
+                                </div>
+                            </details>
+
+                            <!-- Contact Us Section matching screenshot -->
+                            <div class="faq-contact-card">
+                                <div style="display: flex; align-items: center; gap: 14px; text-align: left; flex: 1;">
+                                    <!-- info icon -->
+                                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: 800; font-size: 1.1rem; flex-shrink: 0;">
+                                        i
+                                    </div>
+                                    <div>
+                                        <h4 style="font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--text);">Still have a question?</h4>
+                                        <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.4;">If you didn't find your answer, feel free to reach out to us.</p>
+                                    </div>
+                                </div>
+                                <!-- Button and Doodle Container -->
+                                <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+                                    <!-- notepad/pen SVG doodle -->
+                                    <svg class="faq-doodle-notepad" width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted); opacity: 0.8;">
+                                        <!-- notepad -->
+                                        <rect x="8" y="10" width="18" height="22" rx="3" />
+                                        <!-- rings of notebook -->
+                                        <path d="M12 7 L12 11 M16 7 L16 11 M20 7 L20 11 M24 7 L24 11" />
+                                        <!-- lines -->
+                                        <path d="M12 16 L22 16 M12 21 L22 21 M12 26 L18 26" />
+                                        <!-- pen -->
+                                        <path d="M30 12 L32 10 C33 9, 35 9, 36 10 C37 11, 37 13, 36 14 L30 20 L27 20 L27 17 Z" fill="rgba(194, 65, 12, 0.05)" />
+                                    </svg>
+                                    <a href="https://instagram.com/heli.hogu.kaarana" target="_blank" class="faq-contact-btn">
+                                        Contact us
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- SECTION 2: CHARACTER MAP -->
@@ -2796,69 +3013,7 @@ async def root():
                 </div>
         </div>
 
-        <!-- FAQ SECTION FOR SEO & AI CRAWLER OPTIMIZATION -->
-        <div class="container fade-in" style="margin-top: 3rem; margin-bottom: 2rem;">
-            <div class="card" style="padding: 2.2rem 2rem; position: relative;">
-                <h2 style="font-family: var(--font-serif); color: var(--primary); text-align: center; margin-bottom: 0.5rem; font-size: 1.8rem; font-weight: 700;">🙋 Frequently Asked Questions (FAQ)</h2>
-                <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2.2rem;">
-                    Common queries about reading online, PDF downloads, and buying the novel.
-                </p>
-                
-                <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 800px; margin: 0 auto;">
-                    <!-- Question 1 -->
-                    <div style="border-bottom: 1px solid var(--border); padding-bottom: 1.2rem;">
-                        <h3 style="font-family: var(--font-sans); font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px;">
-                            Q1: Is the Heli Hogu Kaarana PDF download available for free?
-                        </h3>
-                        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 4px;">
-                            <strong>Answer:</strong> Yes! You can read the full text of <em>Heli Hogu Kaarana</em> (ಹೇಳಿ ಹೋಗು ಕಾರಣ) online or download it as an offline e-book for free. Simply navigate to the <strong>E-Books</strong> tab on this site. We provide Kannada, English, and side-by-side Bilingual editions.
-                        </p>
-                        <p style="font-size: 0.85rem; color: var(--primary); line-height: 1.6; font-style: italic; margin-top: 2px;">
-                            ಕನ್ನಡ ಆವೃತ್ತಿ, ಇಂಗ್ಲಿಷ್ ಅನುವಾದ ಮತ್ತು ದ್ವಿಭಾಷಾ ಇ-ಪುಸ್ತಕಗಳನ್ನು ನೀವು ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಓದಬಹುದು ಅಥವಾ ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಓದಲು ಉಚಿತವಾಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿಕೊಳ್ಳಬಹುದು.
-                        </p>
-                    </div>
-
-                    <!-- Question 2 -->
-                    <div style="border-bottom: 1px solid var(--border); padding-bottom: 1.2rem;">
-                        <h3 style="font-family: var(--font-sans); font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px;">
-                            Q2: Where can I buy a physical copy of Heli Hogu Kaarana online?
-                        </h3>
-                        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 4px;">
-                            <strong>Answer:</strong> If you prefer to buy a physical paperback print copy of Ravi Belagere's classic novel, you can search on e-commerce portals like <strong>Amazon</strong> or <strong>Flipkart</strong>, or purchase directly from local book outlets such as Sapna Book House.
-                        </p>
-                        <p style="font-size: 0.85rem; color: var(--primary); line-height: 1.6; font-style: italic; margin-top: 2px;">
-                            ರವಿ ಬೆಳಗರೆ ಅವರ ಹೇಳಿ ಹೋಗು ಕಾರಣ ಮುದ್ರಿತ ಪುಸ್ತಕವನ್ನು ಖರೀದಿಸಲು ಬಯಸಿದರೆ, ಅಮೆಜಾನ್ ಅಥವಾ ಫ್ಲಿಪ್‌ಕಾರ್ಟ್ ಮತ್ತು ಸ್ಥಳೀಯ ಪುಸ್ತಕದ ಅಂಗಡಿಗಳಲ್ಲಿ ಪತ್ತೆಹಚ್ಚಬಹುದು.
-                        </p>
-                    </div>
-
-                    <!-- Question 3 -->
-                    <div style="border-bottom: 1px solid var(--border); padding-bottom: 1.2rem;">
-                        <h3 style="font-family: var(--font-sans); font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px;">
-                            Q3: Can I read Heli Hogu Kaarana online using this website?
-                        </h3>
-                        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 4px;">
-                            <strong>Answer:</strong> Absolutely! This website acts as a digital reading companion. You can read any chapter online or use our advanced <strong>AI Book Guide</strong> to get chapter summaries, search specific scenes, listen to audio voice playbacks, or explore character connections.
-                        </p>
-                        <p style="font-size: 0.85rem; color: var(--primary); line-height: 1.6; font-style: italic; margin-top: 2px;">
-                            ಖಂಡಿತವಾಗಿಯೂ! ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಓದುವ ಜೊತೆಗೆ, ಕಥೆಯ ಪಾತ್ರಗಳು, ಸನ್ನಿವೇಶಗಳು ಮತ್ತು ಆಡಿಯೋ ಪ್ಲೇಬ್ಯಾಕ್ ಕೇಳಲು ನಮ್ಮ AI ಗೈಡ್ ಅನ್ನು ಬಳಸಬಹುದು.
-                        </p>
-                    </div>
-
-                    <!-- Question 4 -->
-                    <div style="padding-bottom: 0.5rem;">
-                        <h3 style="font-family: var(--font-sans); font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px;">
-                            Q4: Who is Himavanth (ಹಿಮವಂತ) in Heli Hogu Kaarana?
-                        </h3>
-                        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 4px;">
-                            <strong>Answer:</strong> Himavanth is the lead character in the novel, known for his ultimate definition of sacrifice and deep, silent love. If you want a deep analysis of his character arc or relationship maps, click on the <strong>Characters</strong> tab to see our D3 visual relationship map.
-                        </p>
-                        <p style="font-size: 0.85rem; color: var(--primary); line-height: 1.6; font-style: italic; margin-top: 2px;">
-                            ಹಿಮವಂತ ಕಾದಂಬರಿಯ ನಾಯಕನಾಗಿದ್ದು, ತನ್ನ ನಿಸ್ವಾರ್ಥ ಪ್ರೀತಿ ಮತ್ತು ತ್ಯಾಗಕ್ಕೆ ಹೆಸರಾಗಿದ್ದಾನೆ. ಅವನ ಕಥೆಯನ್ನು ವಿಶ್ಯುಯಲ್ ಮ್ಯಾಪ್ ಮೂಲಕ ಪಾತ್ರಗಳ ಲಿಂಕ್‌ನಲ್ಲಿ ನೋಡಬಹುದು.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- FAQ SECTION MOVED TO AI GUIDE TAB -->
         
         <!-- FOOTER WITH CREDITS & SUPPORT -->
         <footer style="margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 3rem; padding-bottom: 4rem; text-align: center; font-family: var(--font-sans); width: 100%;">
