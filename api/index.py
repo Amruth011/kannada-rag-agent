@@ -2472,50 +2472,66 @@ async def root():
                             <!-- Connection Lines (Edges) -->
                             <g stroke="#c2410c" stroke-linecap="round">
                                 <!-- Himavant <-> Prarthana -->
-                                <path d="M 250,180 Q 160,135 110,90" stroke-width="2.5" fill="none" opacity="0.4" class="edge" id="edge-him-pra" />
-                                <!-- Himavant <-> Ravi -->
-                                <path d="M 250,180 Q 340,135 390,90" stroke-width="2.5" fill="none" opacity="0.4" class="edge" id="edge-him-rav" />
-                                <!-- Prarthana <-> Ravi -->
-                                <path d="M 110,90 Q 250,60 390,90" stroke-width="1.5" stroke-dasharray="3,3" fill="none" opacity="0.3" class="edge" id="edge-pra-rav" />
+                                <path d="M 250,180 L 120,110" stroke-width="2.5" fill="none" opacity="0.4" class="edge" id="edge-him-pra" />
+                                <!-- Himavant <-> Debu -->
+                                <path d="M 250,180 L 380,110" stroke-width="2.5" fill="none" opacity="0.4" class="edge" id="edge-him-deb" />
+                                <!-- Prarthana <-> Debu -->
+                                <path d="M 120,110 Q 250,80 380,110" stroke-width="1.5" stroke-dasharray="3,3" fill="none" opacity="0.3" class="edge" id="edge-pra-deb" />
                                 <!-- Himavant <-> Rasool -->
-                                <path d="M 250,180 Q 200,240 150,290" stroke-width="2" fill="none" opacity="0.4" class="edge" id="edge-him-ras" />
+                                <path d="M 250,180 L 110,240" stroke-width="2" fill="none" opacity="0.4" class="edge" id="edge-him-ras" />
+                                <!-- Himavant <-> Urmila -->
+                                <path d="M 250,180 L 390,240" stroke-width="2" fill="none" opacity="0.4" class="edge" id="edge-him-urm" />
                                 <!-- Himavant <-> Ravi Belagere -->
-                                <path d="M 250,180 Q 300,240 350,290" stroke-width="2" fill="none" opacity="0.4" class="edge" id="edge-him-bel" />
+                                <path d="M 250,180 L 250,60" stroke-width="2" fill="none" opacity="0.4" class="edge" id="edge-him-bel" />
+                                <!-- Himavant <-> Kasuthi Kaveramma -->
+                                <path d="M 250,180 L 250,300" stroke-width="2" fill="none" opacity="0.4" class="edge" id="edge-him-kav" />
                             </g>
 
                             <!-- Edge Labels -->
                             <g font-size="8" fill="var(--text-muted)" text-anchor="middle" class="edge-label">
-                                <text x="170" y="145" transform="rotate(-30 170 145)">Love / ಪ್ರೇಮ</text>
-                                <text x="330" y="145" transform="rotate(30 330 145)">Friend / ಸ್ನೇಹ</text>
-                                <text x="175" y="225" transform="rotate(30 175 225)">Loyalty / ನಿಷ್ಠೆ</text>
-                                <text x="325" y="225" transform="rotate(-30 325 225)">Narrator / ನಿರೂಪಕ</text>
+                                <text x="185" y="135" transform="rotate(-28 185 135)">Love / ಪ್ರೇಮ</text>
+                                <text x="315" y="135" transform="rotate(28 315 135)">Conflict / ಸಂಘರ್ಷ</text>
+                                <text x="180" y="220" transform="rotate(23 180 220)">Loyalty / ನಿಷ್ಠೆ</text>
+                                <text x="320" y="220" transform="rotate(-23 320 220)">Devotion / ಭಕ್ತಿ</text>
+                                <text x="235" y="120" transform="rotate(90 235 120)">Narrator / ನಿರೂಪಕ</text>
+                                <text x="265" y="240" transform="rotate(90 265 240)">Impact / ಪ್ರಭಾವ</text>
                             </g>
 
                             <!-- Character Nodes -->
                             <!-- Prarthana -->
                             <g class="node" onclick="clickChar('prarthana')" id="node-prarthana">
-                                <circle cx="110" cy="90" r="22" fill="#fff" stroke="#ca8a04" stroke-width="2.5" filter="url(#glow)" />
-                                <text x="110" y="94" font-size="10" text-anchor="middle" fill="#0f172a">ಪ್ರಾರ್ಥನಾ</text>
+                                <circle cx="120" cy="110" r="22" fill="#fff" stroke="#ca8a04" stroke-width="2.5" filter="url(#glow)" />
+                                <text x="120" y="114" font-size="10" text-anchor="middle" fill="#0f172a">ಪ್ರಾರ್ಥನಾ</text>
                             </g>
-                            <!-- Ravi -->
-                            <g class="node" onclick="clickChar('ravi')" id="node-ravi">
-                                <circle cx="390" cy="90" r="22" fill="#fff" stroke="#4338ca" stroke-width="2.5" filter="url(#glow)" />
-                                <text x="390" y="94" font-size="10" text-anchor="middle" fill="#0f172a">ರವಿ</text>
+                            <!-- Debu -->
+                            <g class="node" onclick="clickChar('debu')" id="node-debu">
+                                <circle cx="380" cy="110" r="22" fill="#fff" stroke="#4338ca" stroke-width="2.5" filter="url(#glow)" />
+                                <text x="380" y="114" font-size="10" text-anchor="middle" fill="#0f172a">ದೇಬು</text>
                             </g>
-                            <!-- Rasool Jamadar -->
+                            <!-- Rasool -->
                             <g class="node" onclick="clickChar('rasool')" id="node-rasool">
-                                <circle cx="150" cy="290" r="22" fill="#fff" stroke="#475569" stroke-width="2" />
-                                <text x="150" y="294" font-size="9" text-anchor="middle" fill="#0f172a">ರಸೂಲ್</text>
+                                <circle cx="110" cy="240" r="22" fill="#fff" stroke="#475569" stroke-width="2" />
+                                <text x="110" y="244" font-size="9" text-anchor="middle" fill="#0f172a">ರಸೂಲ್</text>
+                            </g>
+                            <!-- Urmila -->
+                            <g class="node" onclick="clickChar('urmila')" id="node-urmila">
+                                <circle cx="390" cy="240" r="22" fill="#fff" stroke="#9333ea" stroke-width="2" />
+                                <text x="390" y="244" font-size="9" text-anchor="middle" fill="#0f172a">ಉರ್ಮಿಳಾ</text>
                             </g>
                             <!-- Ravi Belagere -->
                             <g class="node" onclick="clickChar('belagere')" id="node-belagere">
-                                <circle cx="350" cy="290" r="22" fill="#fff" stroke="#dc2626" stroke-width="2" />
-                                <text x="350" y="294" font-size="9" text-anchor="middle" fill="#0f172a">ಬೆಳಗೆರೆ</text>
+                                <circle cx="250" cy="60" r="22" fill="#fff" stroke="#dc2626" stroke-width="2" />
+                                <text x="250" y="64" font-size="9" text-anchor="middle" fill="#0f172a">ಬೆಳಗರೆ</text>
                             </g>
-                            <!-- Himavant (Protagonist) -->
+                            <!-- Kasuthi Kaveramma -->
+                            <g class="node" onclick="clickChar('kaveramma')" id="node-kaveramma">
+                                <circle cx="250" cy="300" r="22" fill="#fff" stroke="#16a34a" stroke-width="2" />
+                                <text x="250" y="304" font-size="9" text-anchor="middle" fill="#0f172a">ಕಾವೇರಮ್ಮ</text>
+                            </g>
+                            <!-- Himavanta (Protagonist) -->
                             <g class="node" onclick="clickChar('himavant')" id="node-himavant">
                                 <circle cx="250" cy="180" r="25" fill="#fff" stroke="#c2410c" stroke-width="3" filter="url(#glow)" />
-                                <text x="250" y="184" font-size="11" font-weight="bold" text-anchor="middle" fill="#c2410c">ಹಿಮವಂತ್</text>
+                                <text x="250" y="184" font-size="11" font-weight="bold" text-anchor="middle" fill="#c2410c">ಹಿಮವಂತ</text>
                             </g>
                         </svg>
 
@@ -2858,12 +2874,12 @@ async def root():
             // --- CHARACTER MAP DATA & LOGIC ---
             const CHAR_DATA = {
                 himavant: {
-                    name_en: "Himavant",
-                    name_kn: "ಹಿಮವಂತ್",
+                    name_en: "Himavanta",
+                    name_kn: "ಹಿಮವಂತ",
                     badge_en: "Protagonist",
                     badge_kn: "ಕಥಾನಾಯಕ",
-                    desc_en: "The passionate, intense protagonist of Heli Hogu Kaarana. He is a man of deep emotions, conflicted by his love for Prarthana and his complex life choices in a gritty underworld environment.",
-                    desc_kn: "ಕಾದಂಬರಿಯ ಕಥಾನಾಯಕ. ತೀವ್ರವಾದ ಭಾವನೆಗಳುಳ್ಳ, ಪ್ರಾರ್ಥನಾಳ ಮೇಲಿನ ಪ್ರೀತಿ ಹಾಗೂ ತನ್ನ ಜೀವನದ ಸಂಕೀರ್ಣ ನಿರ್ಧಾರಗಳ ನಡುವೆ ಒದ್ದಾಡುವ ತೇಜಸ್ವಿ ವ್ಯಕ್ತಿತ್ವ.",
+                    desc_en: "The simple, deeply loving, and innocent protagonist of Heli Hogu Kaarana. After losing his true love Prarthana, his life spirals into tragedy and emotional despair.",
+                    desc_kn: "ಕಾದಂಬರಿಯ ಕಥಾನಾಯಕ. ಸರಳ, ಅತ್ಯಂತ ಪ್ರೀತಿಯುಳ್ಳ ಮತ್ತು ಮುಗ್ಧ ವ್ಯಕ್ತಿತ್ವ. ಪ್ರಾರ್ಥನಾಳನ್ನು ಕಳೆದುಕೊಂಡ ನಂತರ ಈತನ ಜೀವನವು ಭಾವನಾತ್ಮಕ ದುರಂತದ ಕಡೆಗೆ ಸಾಗುತ್ತದೆ.",
                     pages: "Major presence throughout the novel (e.g. Pages 1, 10, 45, 120, 240, 310)"
                 },
                 prarthana: {
@@ -2871,36 +2887,54 @@ async def root():
                     name_kn: "ಪ್ರಾರ್ಥನಾ",
                     badge_en: "Female Lead",
                     badge_kn: "ನಾಯಕಿ",
-                    desc_en: "The mysterious, beautiful female lead. Her relationship with Himavant is full of emotional depth, silence, and unspoken words, driving much of the story's emotional tension.",
-                    desc_kn: "ಕಾದಂಬರಿಯ ನಾಯಕಿ. ಹಿಮವಂತನ ಪ್ರೀತಿಯ ಸೆಲೆ. ಅವಳ ಮೌನ, ಗಾಂಭೀರ್ಯ ಮತ್ತು ರಹಸ್ಯಮಯ ನಡವಳಿಕೆ ಇಡೀ ಕಥೆಗೆ ಹೊಸ ಭಾವನಾತ್ಮಕ ತಿರುವು ನೀಡುತ್ತದೆ.",
+                    desc_en: "The practical female lead who represents the intense struggle between secure social status, practical life choices, and genuine love for Himavanta.",
+                    desc_kn: "ಕಾದಂಬರಿಯ ನಾಯಕಿ. ವ್ಯವಹಾರಿಕ ಜಗತ್ತಿನ ಭದ್ರತೆ, ಸಾಮಾಜಿಕ ಗೌರವ ಮತ್ತು ಹಿಮವಂತನ ಮೇಲಿರುವ ನೈಜ ಪ್ರೀತಿಯ ನಡುವಿನ ತಳಮಳವನ್ನು ಪ್ರತಿನಿಧಿಸುವ ಪಾತ್ರ.",
                     pages: "Pages 5, 22, 54, 108, 195, 280, 340"
                 },
-                ravi: {
-                    name_en: "Ravi",
-                    name_kn: "ರವಿ",
-                    badge_en: "Close Friend",
-                    badge_kn: "ಆತ್ಮೀಯ ಗೆಳೆಯ",
-                    desc_en: "Himavant's close companion and sounding board. He plays a vital role in balancing Himavant's volatile decisions and acts as a bridge of sanity in his turbulent life.",
-                    desc_kn: "ಹಿಮವಂತನ ನಿಷ್ಠಾವಂತ ಒಡನಾಡಿ. ಕಷ್ಟದ ಸಮಯದಲ್ಲಿ ಜೊತೆಯಾಗಿ ನಿಂತು, ಜೀವನದ ಮಹತ್ತರ ತಿರುವುಗಳಲ್ಲಿ ಮಾರ್ಗದರ್ಶನ ನೀಡುವ ವಿಶ್ವಾಸಾರ್ಹ ಗೆಳೆಯ.",
-                    pages: "Pages 15, 42, 87, 134, 210, 295"
+                debu: {
+                    name_en: "Debashish (Debu)",
+                    name_kn: "ದೇಬು",
+                    badge_en: "Husband / Catalyst",
+                    badge_kn: "ಪತಿ / ಮಹತ್ವದ ತಿರುವು",
+                    desc_en: "Debashish Bandopadhyaya (Debu) is a wealthy man who marries Prarthana, weaving his way into the love triangle and bringing intense conflict to the plot.",
+                    desc_kn: "ಪ್ರಾರ್ಥನಾಳನ್ನು ಮದುವೆಯಾಗುವ ಶ್ರೀಮಂತ ವ್ಯಕ್ತಿ. ಪ್ರೇಮ ತ್ರಿಕೋನದಲ್ಲಿ ಭಾಗಿಯಾಗಿ ಕಥೆಗೆ ಪ್ರಮುಖ ತಿರುವು ಮತ್ತು ಸಂಘರ್ಷ ತರುವ ಪಾತ್ರ.",
+                    pages: "Pages 55, 78, 122, 190, 260"
                 },
                 rasool: {
-                    name_en: "Rasool Jamadar",
-                    name_kn: "ರಸೂಲ್ ಜಮಾದಾರ",
-                    badge_en: "Companion / Protector",
-                    badge_kn: "ನಿಷ್ಠಾವಂತ ರಕ್ಷಕ",
-                    desc_en: "A rugged associate and protector, representing the fierce and loyal underground world elements in Ravi Belagere's classic narrative landscape.",
-                    desc_kn: "ಹಿಮವಂತನಿಗೆ ನೆರಳಾಗಿ ನಿಲ್ಲುವ ಒರಟು ಸ್ವಭಾವದ ನಿಷ್ಠಾವಂತ ಸಾಥಿ. ಭೂಗತ ಜಗತ್ತಿನ ಕಥಾ ಹೆಣಿಗೆಯಲ್ಲಿ ಧೈರ್ಯ ಮತ್ತು ನಿಷ್ಠೆಯ ಸಂಕೇತ.",
+                    name_en: "Rasool",
+                    name_kn: "ರಸೂಲ್",
+                    badge_en: "Loyal Friend",
+                    badge_kn: "ನಿಷ್ಠಾವಂತ ಗೆಳೆಯ",
+                    desc_en: "Himavanta's loyal and rugged friend who stays with him through his darkest times, representing true loyalty and companionship.",
+                    desc_kn: "ಹಿಮವಂತನ ನಿಷ್ಠಾವಂತ ಒಡನಾಡಿ. ಕಷ್ಟದ ಸಮಯದಲ್ಲಿ ನೆರಳಾಗಿ ನಿಂತು ಸ್ನೇಹ ಮತ್ತು ನಿಷ್ಠೆಯನ್ನು ಎತ್ತಿಹಿಡಿಯುವ ಪಾತ್ರ.",
                     pages: "Pages 34, 78, 112, 160, 255"
+                },
+                urmila: {
+                    name_en: "Urmila",
+                    name_kn: "ಉರ್ಮಿಳಾ",
+                    badge_en: "Devoted Companion",
+                    badge_kn: "ನಿಷ್ಠಾವಂತ ಒಡನಾಡಿ",
+                    desc_en: "A devoted, loyal, and supportive character who stands by Himavanta through thick and thin, providing emotional stability.",
+                    desc_kn: "ಹಿಮವಂತನಿಗೆ ಕಷ್ಟಸುಖಗಳಲ್ಲಿ ಜೊತೆಯಾಗಿ ನಿಲ್ಲುವ, ಪ್ರೀತಿ ಮತ್ತು ನಿಷ್ಠೆಯ ಮೂಲಕ ಕಥೆಯಲ್ಲಿ ಮಹತ್ವದ ಬೆಂಬಲ ನೀಡುವ ಸದ್ಗುಣಿ ಪಾತ್ರ.",
+                    pages: "Pages 67, 110, 145, 230, 290"
                 },
                 belagere: {
                     name_en: "Ravi Belagere",
                     name_kn: "ರವಿ ಬೆಳಗೆರೆ",
                     badge_en: "Author / Narrator",
                     badge_kn: "ಲೇಖಕ / ನಿರೂಪಕ",
-                    desc_en: "The author and narrator who weaves himself directly into the story's atmosphere. He narrates with his signature intensity, suspense, and emotional attachment to his characters.",
-                    desc_kn: "ಕಾದಂಬರಿಯ ಕರ್ತೃ ಮತ್ತು ಸೂತ್ರಧಾರ. ತಮ್ಮದೇ ಆದ ವಿಶಿಷ್ಟ ಪತ್ರಿಕೋದ್ಯಮ ಮತ್ತು ಸಾಹಿತ್ಯ ಶೈಲಿಯಲ್ಲಿ ಕಥೆಯನ್ನು ಕಟ್ಟಿಕೊಡುತ್ತಾ, ಓದುಗರನ್ನು ಸೆಳೆಯುವ ನಿರೂಪಕ.",
+                    desc_en: "The author and narrator of Heli Hogu Kaarana. He weaves his distinct journalistic intensity and emotional voice into the backdrop of the entire story.",
+                    desc_kn: "ಕಾದಂಬರಿಯ ಲೇಖಕರು ಮತ್ತು ನಿರೂಪಕರು. ಇಡೀ ಕಥೆಯ ಹೆಣಿಗೆಯಲ್ಲಿ ತಮ್ಮದೇ ಆದ ವಿಶಿಷ್ಟ ಮತ್ತು ಭಾವನಾತ್ಮಕ ನಿರೂಪಣಾ ಶೈಲಿಯನ್ನು ತಂದಿದ್ದಾರೆ.",
                     pages: "Narrates and comments throughout the entire novel"
+                },
+                kaveramma: {
+                    name_en: "Kasuthi Kaveramma",
+                    name_kn: "ಕಸೂತಿ ಕಾವೇರಮ್ಮ",
+                    badge_en: "Notable Figure",
+                    badge_kn: "ಪ್ರಮುಖ ಪಾತ್ರ",
+                    desc_en: "An influential character who plays a key role in driving the narrative forward and affecting the lives of the main characters.",
+                    desc_kn: "ಕಥಾಹಂದರದಲ್ಲಿ ಪ್ರಮುಖ ಪಾತ್ರ ವಹಿಸುವ, ಮುಖ್ಯ ಪಾತ್ರಗಳ ಜೀವನದ ಮೇಲೆ ಪ್ರಭಾವ ಬೀರುವ ವಿಶಿಷ್ಟ ವ್ಯಕ್ತಿತ್ವ.",
+                    pages: "Pages 82, 115, 148, 202, 275"
                 }
             };
 
@@ -2940,7 +2974,7 @@ async def root():
                         edge.style.strokeWidth = "4";
                         edge.style.opacity = "0.9";
                     } else {
-                        edge.style.strokeWidth = id.includes('pra-rav') ? '1.5' : '2.5';
+                        edge.style.strokeWidth = id.includes('pra-deb') ? '1.5' : '2.5';
                         edge.style.opacity = "0.4";
                     }
                 });
