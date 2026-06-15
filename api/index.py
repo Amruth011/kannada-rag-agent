@@ -2326,6 +2326,74 @@ async def root():
             .control-group select:focus, .control-group textarea:focus {
                 border-color: var(--primary);
             }
+            
+            /* BOTTOM NAVIGATION BAR FOR MOBILE */
+            .mobile-bottom-nav {
+                display: none;
+            }
+            #theme-toggle-btn-mobile {
+                display: none;
+            }
+            @media (max-width: 768px) {
+                .nav-header .nav-menu {
+                    display: none !important;
+                }
+                .nav-header {
+                    padding: 0.6rem 1rem;
+                }
+                #theme-toggle-btn-mobile {
+                    display: inline-flex !important;
+                    background: none;
+                    border: none;
+                    padding: 0.35rem 0.6rem;
+                    cursor: pointer;
+                    font-size: 1.05rem;
+                }
+                .mobile-bottom-nav {
+                    display: flex !important;
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    background: rgba(255, 255, 255, 0.94);
+                    backdrop-filter: blur(20px);
+                    border-top: 1px solid var(--border);
+                    justify-content: space-around;
+                    align-items: center;
+                    padding: 0.5rem 0.2rem;
+                    z-index: 9999;
+                    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+                }
+                body.dark-mode .mobile-bottom-nav {
+                    background: rgba(15, 23, 42, 0.94);
+                }
+                .mobile-nav-item {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 3px;
+                    background: none;
+                    border: none;
+                    color: var(--text-muted);
+                    font-size: 0.65rem;
+                    font-weight: 700;
+                    cursor: pointer;
+                    padding: 4px 8px;
+                    flex-grow: 1;
+                    font-family: inherit;
+                    outline: none;
+                    transition: color 0.2s;
+                }
+                .mobile-nav-item .icon {
+                    font-size: 1.15rem;
+                }
+                .mobile-nav-item.active {
+                    color: var(--primary);
+                }
+                body {
+                    padding-bottom: 75px !important;
+                }
+            }
         </style>
     </head>
     <body>
@@ -2373,18 +2441,21 @@ async def root():
 
         <!-- NAVBAR -->
         <header class="nav-header">
-            <div class="nav-container">
-                <div class="logo">
+            <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div class="logo" onclick="switchTab('chat')" style="cursor: pointer;">
                     <span class="logo-title">ಹೇಳಿ ಹೋಗು</span><span class="logo-sub">  ಕಾರಣ</span>
                 </div>
-                <nav class="nav-menu" id="top-nav-menu">
-                    <button class="nav-item active" id="nav-chat" onclick="switchTab('chat')">💬 AI Guide</button>
-                    <button class="nav-item" id="nav-charmap" onclick="switchTab('charmap')">🗺️ Characters</button>
-                    <button class="nav-item" id="nav-quotemaker" onclick="switchTab('quotemaker')">🎨 Quotes</button>
-                    <button class="nav-item" id="nav-downloads" onclick="switchTab('downloads')">📚 E-Books</button>
-                    <button class="nav-item" id="nav-feedback" onclick="switchTab('feedback')">✍️ Feedback</button>
-                    <button id="theme-toggle-btn" class="nav-item" onclick="toggleTheme()" aria-label="Toggle Theme" style="cursor: pointer; padding: 0.35rem 0.6rem; border-radius: 8px; font-size: 1.05rem;">🌓</button>
-                </nav>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <button id="theme-toggle-btn-mobile" onclick="toggleTheme()" aria-label="Toggle Theme">🌓</button>
+                    <nav class="nav-menu" id="top-nav-menu">
+                        <button class="nav-item active" id="nav-chat" onclick="switchTab('chat')">💬 AI Guide</button>
+                        <button class="nav-item" id="nav-charmap" onclick="switchTab('charmap')">🗺️ Characters</button>
+                        <button class="nav-item" id="nav-quotemaker" onclick="switchTab('quotemaker')">🎨 Quotes</button>
+                        <button class="nav-item" id="nav-downloads" onclick="switchTab('downloads')">📚 E-Books</button>
+                        <button class="nav-item" id="nav-feedback" onclick="switchTab('feedback')">✍️ Feedback</button>
+                        <button id="theme-toggle-btn" class="nav-item" onclick="toggleTheme()" aria-label="Toggle Theme" style="cursor: pointer; padding: 0.35rem 0.6rem; border-radius: 8px; font-size: 1.05rem;">🌓</button>
+                    </nav>
+                </div>
             </div>
         </header>
 
@@ -2405,7 +2476,16 @@ async def root():
                             <path d="M0,0 L100,0 L100,20 C85,20 75,5 65,5 C58,5 55,2 50,0 C45,2 42,5 35,5 C25,5 15,20 0,20 Z" />
                         </svg>
                     </div>
-                    <div class="settings">
+                    
+                    <!-- Quick Feature Links for Discovery -->
+                    <div class="chat-quick-links" style="display: flex; gap: 8px; justify-content: center; margin-top: 2.2rem; margin-bottom: 0.8rem; flex-wrap: wrap; padding: 0 0.5rem; position: relative; z-index: 10;">
+                        <button onclick="switchTab('charmap')" style="background: var(--bg-secondary); border: 1.5px solid var(--primary); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 700; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; outline: none; font-family: inherit;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">🗺️ Character Map</button>
+                        <button onclick="switchTab('quotemaker')" style="background: var(--bg-secondary); border: 1.5px solid var(--primary); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 700; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; outline: none; font-family: inherit;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">🎨 Quote Maker</button>
+                        <button onclick="switchTab('downloads')" style="background: var(--bg-secondary); border: 1.5px solid var(--primary); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 700; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; outline: none; font-family: inherit;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">📚 E-Books (Offline)</button>
+                        <button onclick="switchTab('feedback')" style="background: var(--bg-secondary); border: 1.5px solid var(--primary); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 700; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; outline: none; font-family: inherit;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">✍️ Feedback</button>
+                    </div>
+
+                    <div class="settings" style="margin-top: 0.5rem;">
                         <label class="toggle-label">
                             <input type="checkbox" id="auto-speak"> 🔊 Auto-play Voice Output
                         </label>
@@ -3017,6 +3097,53 @@ async def root():
             </div>
         </div>
         
+        <!-- PAYMENT MODAL -->
+        <div id="pay-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9999; align-items:center; justify-content:center; padding:1rem;" onclick="if(event.target===this)this.style.display='none'">
+            <div style="background:var(--bg-card,#fffcf8); border-radius:20px; padding:2rem 1.5rem; max-width:390px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.25); position:relative; text-align:center; box-sizing:border-box;">
+                <!-- Delayed Trustworthy Close Button -->
+                <button id="pay-close-btn" onclick="document.getElementById('pay-modal').style.display='none'" style="position:absolute; top:12px; right:14px; background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--text-muted); opacity: 0; display: none; transition: opacity 0.5s ease; z-index:10000;">✕</button>
+
+                <p style="margin:0 0 0.5rem; font-family:var(--font-serif); font-size:1.2rem; font-weight:700; color:var(--primary);">☕ Support Developer / ಕೊಡುಗೆ ನೀಡಿ</p>
+                
+                <!-- Genuine Emotional Message -->
+                <div style="font-size:0.78rem; color:var(--text); line-height:1.45; text-align:left; margin-bottom:1rem; background:rgba(194, 65, 12, 0.04); padding:10px 14px; border-radius:12px; border:1px solid rgba(194, 65, 12, 0.08); max-height:180px; overflow-y:auto;">
+                    <p style="margin: 0 0 8px 0; font-weight: 500;">
+                        ನಾವು ನಿಮಗಾಗಿ ಹಗಲಿರುಳು ಶ್ರಮಿಸಿ, ನಿದ್ದೆಯಿಲ್ಲದ ರಾತ್ರಿಗಳನ್ನು ಕಳೆದು ಈ AI ಮಾರ್ಗದರ್ಶಿಯನ್ನು ರೂಪಿಸಿದ್ದೇವೆ. ನಿಮಗೆ ಇದು ಇಷ್ಟವಾದರೆ ದಯವಿಟ್ಟು ಕೈಲಾದಷ್ಟು ಕೊಡುಗೆ ನೀಡಿ. ಯಾವುದೇ ಕನಿಷ್ಠ ಮಿತಿ ಇಲ್ಲ - ನಿಮ್ಮ ಇಷ್ಟದಂತೆ 1 ರೂಪಾಯಿ ಅಥವಾ 1 ಕೋಟಿ ನೀಡಬಹುದು! ನೀವು ನೀಡುವ 1 ರೂಪಾಯಿಯೂ ಸರ್ವರ್ ಮತ್ತು API ವೆಚ್ಚಗಳನ್ನು ಸರಿದೂಗಿಸಲು ನಮಗೆ ಸಹಾಯ ಮಾಡುತ್ತದೆ. 🙏
+                    </p>
+                    <p style="margin: 0; font-style: italic; color: var(--text-muted); font-size: 0.74rem;">
+                        We spent sleepless nights and put our hearts into building this AI Guide for you guys. If you love it, please consider contributing. There is no minimum amount—pay ₹1 or ₹1 Crore, it's entirely your choice! Even ₹1 helps us manage the website's API and server expenses to keep the AI active.
+                    </p>
+                </div>
+
+                <!-- QR Code (encodes UPI, but ID not shown as text) -->
+                <div style="background:white; border-radius:14px; padding:0.75rem; display:inline-block; box-shadow:0 4px 16px rgba(0,0,0,0.08); margin-bottom:0.75rem;">
+                    <img src="data:image/png;base64,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" 
+                         style="width:160px;height:160px;display:block;margin:0 auto;" alt="UPI QR Code" onerror="this.style.display='none';document.getElementById('qr-fallback').style.display='block'">
+                    <div id="qr-fallback" style="display:none;width:160px;height:160px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:#64748b;margin:0 auto;">QR code</div>
+                </div>
+
+                <!-- UPI ID and Copy Button -->
+                <div style="background:#faf6f0; border:1px solid rgba(194, 65, 12, 0.12); border-radius:12px; padding:10px 14px; margin-bottom:1rem; display:flex; align-items:center; justify-content:space-between; gap:8px; text-align:left;">
+                    <div style="flex-grow:1;">
+                        <span style="font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; font-weight:800; display:block; letter-spacing:0.5px;">UPI ID for GPay / GPay / Paytm</span>
+                        <strong style="font-size:0.9rem; color:var(--text); font-family:monospace; word-break:break-all;">amruthambu320@okaxis</strong>
+                    </div>
+                    <button onclick="copyUPI()" class="voice-btn" style="padding:6px 12px; font-size:0.75rem; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer; outline:none; white-space:nowrap; transition:transform-transform 0.1s;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+                        📋 Copy ID
+                    </button>
+                </div>
+                <div id="copy-upi-status" style="display:none; font-size:0.75rem; color:#16a34a; font-weight:700; margin-bottom:0.5rem; text-align:center; width:100%;"></div>
+
+                <!-- UPI deep-link button (opens any UPI app) -->
+                <a href="upi://pay?pa=amruthambu320@okaxis&pn=Amruth%20Ambu&tn=Heli%20Hogu%20Kaarana%20AI%20Support&cu=INR" style="display:block; background:#16a34a; color:white; text-decoration:none; padding:10px 20px; border-radius:10px; font-weight:700; font-size:0.9rem; margin-bottom:0.75rem;">⚡ Pay with UPI App</a>
+
+                <!-- Warning note for in-app browsers -->
+                <div style="font-size:0.7rem; color:var(--primary); background:var(--primary-light); padding:8px 12px; border-radius:8px; border:1px solid rgba(194, 65, 12, 0.15); margin-bottom:0; text-align:left; line-height:1.35;">
+                    ⚠️ <strong>Instagram/Facebook user?</strong> In-app browsers often block GPay/PhonePe deep links. If the button above does not open your UPI app, please **Copy UPI ID** above or open this website in **Chrome/Safari**.
+                </div>
+            </div>
+        </div>
+        
         <!-- FOOTER WITH CREDITS & SUPPORT -->
         <footer style="margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 3rem; padding-bottom: 4rem; text-align: center; font-family: var(--font-sans); width: 100%;">
             <div style="max-width: 680px; margin: 0 auto; padding: 0 1.5rem; display: flex; flex-direction: column; gap: 2rem; align-items: center;">
@@ -3035,7 +3162,7 @@ async def root():
                                 <h5 style="margin: 0 0 6px 0; font-size: 0.95rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px;">☕ Keep the AI Online</h5>
                                 <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.45;">Contributions keep the AI voice & search servers active. Even ₹20 makes a big difference!</p>
                             </div>
-                            <button onclick="document.getElementById('pay-modal').style.display='flex'" style="background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(194, 65, 12, 0.2); outline: none;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 15px rgba(194, 65, 12, 0.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(194, 65, 12, 0.2)'">
+                            <button onclick="openPayModal()" style="background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(194, 65, 12, 0.2); outline: none;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 15px rgba(194, 65, 12, 0.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(194, 65, 12, 0.2)'">
                                 ☕ Support Developer
                             </button>
                         </div>
@@ -3123,16 +3250,64 @@ async def root():
                     btn.disabled = false; btn.innerText = '✅ Confirm Payment';
                 }
             }
+
+            function copyUPI() {
+                const upiText = 'amruthambu320@okaxis';
+                navigator.clipboard.writeText(upiText).then(() => {
+                    const copyStatus = document.getElementById('copy-upi-status');
+                    copyStatus.innerText = '✅ UPI ID Copied! Paste in GPay / PhonePe / Paytm App.';
+                    copyStatus.style.display = 'block';
+                    setTimeout(() => {
+                        copyStatus.style.display = 'none';
+                    }, 4000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            }
+
+            function openPayModal() {
+                document.getElementById('pay-modal').style.display = 'flex';
+                initCloseButton();
+            }
+
+            function initCloseButton() {
+                const closeBtn = document.getElementById('pay-close-btn');
+                if (closeBtn) {
+                    closeBtn.style.display = 'none';
+                    closeBtn.style.opacity = '0';
+                    setTimeout(() => {
+                        closeBtn.style.display = 'block';
+                        setTimeout(() => {
+                            closeBtn.style.opacity = '0.7';
+                        }, 50);
+                    }, 3000); // 3-second delay to show up
+                }
+            }
+
+            // Auto-trigger payment modal after 5 seconds on load (only once per session)
+            window.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    if (!sessionStorage.getItem('auto_pay_shown')) {
+                        sessionStorage.setItem('auto_pay_shown', 'true');
+                        openPayModal();
+                    }
+                }, 5000);
+            });
         </script>
 
         <script>
-            // --- TAB SWITCHER LOGIC ---
             function switchTab(tabId) {
                 // Update top navbar active state
                 const navItems = document.querySelectorAll('#top-nav-menu .nav-item');
                 navItems.forEach(btn => btn.classList.remove('active'));
                 const activeNav = document.getElementById('nav-' + tabId);
                 if (activeNav) activeNav.classList.add('active');
+                
+                // Update mobile bottom navbar active state
+                const mobileNavItems = document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item');
+                mobileNavItems.forEach(btn => btn.classList.remove('active'));
+                const activeMobileNav = document.getElementById('mobile-nav-' + tabId);
+                if (activeMobileNav) activeMobileNav.classList.add('active');
                 
                 // Switch section visibility
                 const sections = document.querySelectorAll('.tab-section');
@@ -4088,6 +4263,29 @@ async def root():
                 }
             })();
         </script>
+        <!-- BOTTOM NAVIGATION BAR FOR MOBILE -->
+        <div class="mobile-bottom-nav">
+            <button class="mobile-nav-item active" id="mobile-nav-chat" onclick="switchTab('chat')">
+                <span class="icon">💬</span>
+                <span>AI Guide</span>
+            </button>
+            <button class="mobile-nav-item" id="mobile-nav-charmap" onclick="switchTab('charmap')">
+                <span class="icon">🗺️</span>
+                <span>Characters</span>
+            </button>
+            <button class="mobile-nav-item" id="mobile-nav-quotemaker" onclick="switchTab('quotemaker')">
+                <span class="icon">🎨</span>
+                <span>Quotes</span>
+            </button>
+            <button class="mobile-nav-item" id="mobile-nav-downloads" onclick="switchTab('downloads')">
+                <span class="icon">📚</span>
+                <span>E-Books</span>
+            </button>
+            <button class="mobile-nav-item" id="mobile-nav-feedback" onclick="switchTab('feedback')">
+                <span class="icon">✍️</span>
+                <span>Feedback</span>
+            </button>
+        </div>
     </body>
     </html>
 
