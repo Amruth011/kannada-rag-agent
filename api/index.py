@@ -68,6 +68,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     answer: str
     sources: List[str] = []
+    snippets: Optional[List[dict]] = []
     audio_base64: str = "" # New: returned if voice is requested
 
 class VoiceRequest(BaseModel):
@@ -503,10 +504,24 @@ ANSWER in English:"""
 ಪ್ರಶ್ನೆ (QUESTION): {request.question}
 ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ (ANSWER in Kannada):"""
         
+        # Extract source snippets
+        seen_pages = set()
+        snippets = []
+        for c in chunks:
+            page = c['page']
+            if page not in seen_pages:
+                seen_pages.add(page)
+                text = c['text']
+                snippet_text = text[:150] + "..." if len(text) > 150 else text
+                snippets.append({
+                    "page": str(page),
+                    "text": snippet_text
+                })
+
         answer = call_gemini(full_prompt, history=request.history, system_instruction=sys_instruction)
-        return ChatResponse(answer=answer, sources=retrieved_pages)
+        return ChatResponse(answer=answer, sources=retrieved_pages, snippets=snippets)
     except Exception:
-        return ChatResponse(answer=f"[BACKEND ERROR]: {traceback.format_exc()[:500]}", sources=[])
+        return ChatResponse(answer=f"[BACKEND ERROR]: {traceback.format_exc()[:500]}", sources=[], snippets=[])
 
 @app.post("/voice")
 async def voice(request: VoiceRequest):
@@ -2544,6 +2559,7 @@ async def root():
                     <div id="ans-container">
                         <div id="ans">
                             <div id="text-res"></div>
+                            <div id="sources-res" style="margin-top: 1.5rem; margin-bottom: 1.5rem; padding: 1rem; background: rgba(194, 65, 12, 0.03); border: 1.5px solid rgba(194, 65, 12, 0.08); border-radius: 12px; display: none;"></div>
                             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                                 <button id="v-btn" class="voice-btn" onclick="speak()">
                                     <span>🔊 Hear in English</span>
@@ -3805,8 +3821,11 @@ async def root():
                 localStorage.removeItem('chatHistory');
                 localStorage.removeItem('lastQuestion');
                 localStorage.removeItem('lastAnswer');
+                localStorage.removeItem('lastSnippets');
                 document.getElementById('q').value = '';
                 document.getElementById('ans-container').style.display = 'none';
+                document.getElementById('sources-res').style.display = 'none';
+                document.getElementById('sources-res').innerHTML = '';
                 document.getElementById('clear-history-btn').style.display = 'none';
                 if (currentAudio) {
                     currentAudio.pause();
@@ -3873,11 +3892,34 @@ async def root():
                 // Restore previous query if exists
                 const lastQ = localStorage.getItem('lastQuestion');
                 const lastAns = localStorage.getItem('lastAnswer');
+                const lastSnips = localStorage.getItem('lastSnippets');
                 if (lastQ && lastAns) {
                     document.getElementById('q').value = lastQ;
                     currentText = lastAns;
                     document.getElementById('text-res').innerHTML = formatMarkdown(lastAns);
                     document.getElementById('ans-container').style.display = 'block';
+                    
+                    const sourcesRes = document.getElementById('sources-res');
+                    if (lastSnips) {
+                        try {
+                            const snips = JSON.parse(lastSnips);
+                            if (snips && snips.length > 0) {
+                                let html = '<div style="font-weight: 700; color: var(--primary); margin-bottom: 8px; font-family: var(--font-serif);">Sources:</div>';
+                                snips.forEach(s => {
+                                    html += `<div style="margin-bottom: 8px;"><span style="font-weight: bold; color: var(--text-dark);">Page ${s.page}:</span><br><span style="font-style: italic; color: #4b5563;">"${s.text}"</span></div>`;
+                                });
+                                sourcesRes.innerHTML = html;
+                                sourcesRes.style.display = 'block';
+                            } else {
+                                sourcesRes.style.display = 'none';
+                            }
+                        } catch(e) {
+                            sourcesRes.style.display = 'none';
+                        }
+                    } else {
+                        sourcesRes.style.display = 'none';
+                    }
+                    
                     const clearBtn = document.getElementById('clear-history-btn');
                     if (clearBtn) clearBtn.style.display = 'inline-block';
                 }
@@ -4094,6 +4136,19 @@ async def root():
                     logGAEvent('ask_query', { question: q, language: lang });
                     res.innerHTML = formatMarkdown(d.answer);
                     
+                    // Render sources snippets
+                    const sourcesRes = document.getElementById('sources-res');
+                    if (d.snippets && d.snippets.length > 0) {
+                        let html = '<div style="font-weight: 700; color: var(--primary); margin-bottom: 8px; font-family: var(--font-serif);">Sources:</div>';
+                        d.snippets.forEach(s => {
+                            html += `<div style="margin-bottom: 8px;"><span style="font-weight: bold; color: var(--text-dark);">Page ${s.page}:</span><br><span style="font-style: italic; color: #4b5563;">"${s.text}"</span></div>`;
+                        });
+                        sourcesRes.innerHTML = html;
+                        sourcesRes.style.display = 'block';
+                    } else {
+                        sourcesRes.style.display = 'none';
+                    }
+                    
                     // Update conversational memory if it is a successful non-error response
                     const isError = d.answer.startsWith('[GROQ FAILED]') || d.answer.startsWith('[BACKEND ERROR]') || d.answer.startsWith('[ERROR]');
                     if (!isError) {
@@ -4107,6 +4162,11 @@ async def root():
                             localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
                             localStorage.setItem('lastQuestion', q);
                             localStorage.setItem('lastAnswer', d.answer);
+                            if (d.snippets && d.snippets.length > 0) {
+                                localStorage.setItem('lastSnippets', JSON.stringify(d.snippets));
+                            } else {
+                                localStorage.removeItem('lastSnippets');
+                            }
                             const clearBtn = document.getElementById('clear-history-btn');
                             if (clearBtn) clearBtn.style.display = 'inline-block';
                         } catch(e) {}

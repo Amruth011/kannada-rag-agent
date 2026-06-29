@@ -586,6 +586,10 @@ for msg in st.session_state.messages:
         st.write(msg["content"])
         if msg.get("pages"):
             st.caption(f"📄 Sources: Pages {', '.join(map(str, msg['pages']))}")
+        if msg.get("snippets"):
+            st.markdown("**Sources:**")
+            for snip in msg["snippets"]:
+                st.markdown(f"**Page {snip['page']}:**  \n> \"{snip['text']}\"")
         if msg.get("audio"):
             st.audio(msg["audio"])
 
@@ -690,6 +694,8 @@ if question:
 
             pages = sorted(set(c["page"] for c in chunks)) if chunks else []
             st.write(answer)
+            
+            msg_snippets = []
             if pages:
                 page_info = ""
                 if final_range:
@@ -697,6 +703,15 @@ if question:
                 elif final_page:
                     page_info = f" (filtered: page {final_page})"
                 st.caption(f"📄 Sources: Pages {', '.join(map(str, pages))}{page_info}")
+                
+                st.markdown("**Sources:**")
+                for p in pages:
+                    pg_chunks = [c for c in chunks if c["page"] == p]
+                    if pg_chunks:
+                        best_chunk = max(pg_chunks, key=lambda x: x.get("score", 0))
+                        snippet = best_chunk["text"][:150] + "..." if len(best_chunk["text"]) > 150 else best_chunk["text"]
+                        msg_snippets.append({"page": p, "text": snippet})
+                        st.markdown(f"**Page {p}:**  \n> \"{snippet}\"")
             elif general:
                 st.caption("📖 Answer based on book knowledge")
 
@@ -719,7 +734,7 @@ if question:
 
             st.session_state.messages.append({
                 "role": "assistant", "content": answer,
-                "pages": pages, "audio": audio_bytes
+                "pages": pages, "snippets": msg_snippets, "audio": audio_bytes
             })
 
         except Exception as e:
