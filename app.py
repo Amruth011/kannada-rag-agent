@@ -98,6 +98,20 @@ def is_general_question(q):
 def is_character_question(q):
     return any(re.search(p, q, re.IGNORECASE) for p in CHARACTER_PATTERNS)
 
+def calculate_confidence(chunks):
+    if not chunks:
+        return 0.0
+    avg_score = sum(c.get("score", 0.0) for c in chunks) / len(chunks)
+    # Cosine similarity mapping
+    if avg_score >= 0.35:
+        p = 85 + (avg_score - 0.35) * 23.0 # maps 0.35-1.0 to 85%-100%
+    elif avg_score >= 0.25:
+        p = 70 + (avg_score - 0.25) * 150.0 # maps 0.25-0.35 to 70%-85%
+    else:
+        p = 50 + (avg_score - 0.20) * 400.0 # maps 0.20-0.25 to 50%-70%
+    return min(100.0, max(0.0, p))
+
+
 
 # ── Page config ───────────────────────────────────────────────────────────────
 from PIL import Image
@@ -584,6 +598,12 @@ if "messages" not in st.session_state:
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
+        if msg.get("confidence_pct") is not None:
+            pct = msg["confidence_pct"]
+            lbl = msg["confidence_label"]
+            st.markdown(f"**Confidence:**\n{lbl} ({int(pct)}%)")
+            if pct < 60:
+                st.warning("⚠️ Low confidence: Retrieved evidence may be insufficient.")
         if msg.get("pages"):
             st.caption(f"📄 Sources: Pages {', '.join(map(str, msg['pages']))}")
         if msg.get("snippets"):
@@ -695,6 +715,15 @@ if question:
             pages = sorted(set(c["page"] for c in chunks)) if chunks else []
             st.write(answer)
             
+            # Compute confidence score
+            confidence_pct = calculate_confidence(chunks) if not general else 100.0
+            confidence_label = "High" if confidence_pct >= 85 else ("Medium" if confidence_pct >= 70 else "Low")
+            
+            if not general and chunks:
+                st.markdown(f"**Confidence:**\n{confidence_label} ({int(confidence_pct)}%)")
+                if confidence_pct < 60:
+                    st.warning("⚠️ Low confidence: Retrieved evidence may be insufficient.")
+            
             msg_snippets = []
             if pages:
                 page_info = ""
@@ -733,8 +762,13 @@ if question:
                     st.warning(f"TTS error: {e}")
 
             st.session_state.messages.append({
-                "role": "assistant", "content": answer,
-                "pages": pages, "snippets": msg_snippets, "audio": audio_bytes
+                "role": "assistant",
+                "content": answer,
+                "pages": pages,
+                "snippets": msg_snippets,
+                "confidence_pct": confidence_pct if not general and chunks else None,
+                "confidence_label": confidence_label if not general and chunks else None,
+                "audio": audio_bytes
             })
 
         except Exception as e:

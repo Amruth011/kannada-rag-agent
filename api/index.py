@@ -69,6 +69,8 @@ class ChatResponse(BaseModel):
     answer: str
     sources: List[str] = []
     snippets: Optional[List[dict]] = []
+    confidence_pct: float = 0.0
+    confidence_label: str = ""
     audio_base64: str = "" # New: returned if voice is requested
 
 class VoiceRequest(BaseModel):
@@ -518,10 +520,42 @@ ANSWER in English:"""
                     "text": snippet_text
                 })
 
+        # Calculate retrieval confidence score
+        confidence_pct = 0.0
+        confidence_label = "Low"
+        
+        general_patterns = [
+            r'what is (this|the) book', r'about (this|the) book',
+            r'book (about|summary|theme)', r'who (is|wrote|is the author).*ravi',
+            r'ravi belagere', r'author', r'ಪುಸ್ತಕ(ದ|ವು|ದ ಬಗ್ಗೆ)', r'ಕಾದಂಬರಿ',
+            r'ರವಿ ಬೆಳಗೆರೆ', r'ವಿಷಯ ಏನು', r'ಯಾರು ಬರೆದ', r'ಮುಖ್ಯ ವಿಷಯ',
+            r'summary', r'theme', r'title mean', r'ಶೀರ್ಷಿಕೆ',
+        ]
+        is_general = any(re.search(pat, request.question, re.IGNORECASE) for pat in general_patterns)
+        
+        if is_general:
+            confidence_pct = 100.0
+            confidence_label = "High"
+        elif chunks:
+            stop_words = {"what", "is", "this", "the", "in", "of", "to", "who", "whom", "about", "and", "or", "a", "an", "page", "pages", "ಪುಟ", "ಪುಟಗಳು"}
+            query_words = [w for w in re.sub(r'[^\w\s]', '', request.question.lower()).split() if w not in stop_words]
+            expected = max(10, 10 * len(query_words))
+            avg_score = sum(c.get("score", 0.0) for c in chunks) / len(chunks)
+            ratio = avg_score / expected
+            
+            if ratio >= 1.0:
+                p = 90 + min(10.0, (ratio - 1.0) * 5)
+            elif ratio >= 0.5:
+                p = 70 + (ratio - 0.5) * 40.0
+            else:
+                p = ratio * 140.0
+            confidence_pct = min(100.0, max(0.0, p))
+            confidence_label = "High" if confidence_pct >= 85 else ("Medium" if confidence_pct >= 70 else "Low")
+
         answer = call_gemini(full_prompt, history=request.history, system_instruction=sys_instruction)
-        return ChatResponse(answer=answer, sources=retrieved_pages, snippets=snippets)
+        return ChatResponse(answer=answer, sources=retrieved_pages, snippets=snippets, confidence_pct=confidence_pct, confidence_label=confidence_label)
     except Exception:
-        return ChatResponse(answer=f"[BACKEND ERROR]: {traceback.format_exc()[:500]}", sources=[], snippets=[])
+        return ChatResponse(answer=f"[BACKEND ERROR]: {traceback.format_exc()[:500]}", sources=[], snippets=[], confidence_pct=0.0, confidence_label="Low")
 
 @app.post("/voice")
 async def voice(request: VoiceRequest):
@@ -2559,6 +2593,13 @@ async def root():
                     <div id="ans-container">
                         <div id="ans">
                             <div id="text-res"></div>
+                            <div id="confidence-res" style="margin-top: 1rem; margin-bottom: 1rem; font-family: var(--font-sans); display: none;">
+                                <div style="font-weight: 700; color: var(--primary); margin-bottom: 4px; font-family: var(--font-serif);">Confidence:</div>
+                                <div id="confidence-val" style="font-size: 1.1rem; font-weight: bold; display: flex; align-items: center; gap: 8px;"></div>
+                                <div id="confidence-warn" style="display: none; margin-top: 8px; padding: 0.5rem 0.75rem; background: #fee2e2; border: 1.5px solid #fecaca; color: #991b1b; border-radius: 8px; font-size: 0.85rem; font-weight: 500;">
+                                    ⚠️ Low confidence: Retrieved evidence may be insufficient.
+                                </div>
+                            </div>
                             <div id="sources-res" style="margin-top: 1.5rem; margin-bottom: 1.5rem; padding: 1rem; background: rgba(194, 65, 12, 0.03); border: 1.5px solid rgba(194, 65, 12, 0.08); border-radius: 12px; display: none;"></div>
                             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                                 <button id="v-btn" class="voice-btn" onclick="speak()">
@@ -3822,10 +3863,14 @@ async def root():
                 localStorage.removeItem('lastQuestion');
                 localStorage.removeItem('lastAnswer');
                 localStorage.removeItem('lastSnippets');
+                localStorage.removeItem('lastConfidence');
                 document.getElementById('q').value = '';
                 document.getElementById('ans-container').style.display = 'none';
                 document.getElementById('sources-res').style.display = 'none';
                 document.getElementById('sources-res').innerHTML = '';
+                document.getElementById('confidence-res').style.display = 'none';
+                document.getElementById('confidence-val').innerHTML = '';
+                document.getElementById('confidence-warn').style.display = 'none';
                 document.getElementById('clear-history-btn').style.display = 'none';
                 if (currentAudio) {
                     currentAudio.pause();
@@ -3893,6 +3938,7 @@ async def root():
                 const lastQ = localStorage.getItem('lastQuestion');
                 const lastAns = localStorage.getItem('lastAnswer');
                 const lastSnips = localStorage.getItem('lastSnippets');
+                const lastConf = localStorage.getItem('lastConfidence');
                 if (lastQ && lastAns) {
                     document.getElementById('q').value = lastQ;
                     currentText = lastAns;
@@ -3918,6 +3964,33 @@ async def root():
                         }
                     } else {
                         sourcesRes.style.display = 'none';
+                    }
+                    
+                    const confRes = document.getElementById('confidence-res');
+                    const confVal = document.getElementById('confidence-val');
+                    const confWarn = document.getElementById('confidence-warn');
+                    if (lastConf) {
+                        try {
+                            const conf = JSON.parse(lastConf);
+                            if (conf && conf.pct !== undefined) {
+                                let color = '#dc2626'; // Low
+                                if (conf.lbl === 'High') color = '#16a34a';
+                                else if (conf.lbl === 'Medium') color = '#ea580c';
+                                confVal.innerHTML = `<span style="color: ${color};">${conf.lbl}</span> <span style="color: #6b7280; font-size: 0.95rem;">(${conf.pct}%)</span>`;
+                                if (conf.pct < 60) {
+                                    confWarn.style.display = 'block';
+                                } else {
+                                    confWarn.style.display = 'none';
+                                }
+                                confRes.style.display = 'block';
+                            } else {
+                                confRes.style.display = 'none';
+                            }
+                        } catch(e) {
+                            confRes.style.display = 'none';
+                        }
+                    } else {
+                        confRes.style.display = 'none';
                     }
                     
                     const clearBtn = document.getElementById('clear-history-btn');
@@ -4148,6 +4221,29 @@ async def root():
                     } else {
                         sourcesRes.style.display = 'none';
                     }
+
+                    // Render confidence score
+                    const confRes = document.getElementById('confidence-res');
+                    const confVal = document.getElementById('confidence-val');
+                    const confWarn = document.getElementById('confidence-warn');
+                    if (d.confidence_pct !== undefined && d.confidence_pct > 0) {
+                        const pct = Math.round(d.confidence_pct);
+                        const lbl = d.confidence_label;
+                        let color = '#dc2626'; // Low
+                        if (lbl === 'High') color = '#16a34a';
+                        else if (lbl === 'Medium') color = '#ea580c';
+                        
+                        confVal.innerHTML = `<span style="color: ${color};">${lbl}</span> <span style="color: #6b7280; font-size: 0.95rem;">(${pct}%)</span>`;
+                        
+                        if (pct < 60) {
+                            confWarn.style.display = 'block';
+                        } else {
+                            confWarn.style.display = 'none';
+                        }
+                        confRes.style.display = 'block';
+                    } else {
+                        confRes.style.display = 'none';
+                    }
                     
                     // Update conversational memory if it is a successful non-error response
                     const isError = d.answer.startsWith('[GROQ FAILED]') || d.answer.startsWith('[BACKEND ERROR]') || d.answer.startsWith('[ERROR]');
@@ -4166,6 +4262,11 @@ async def root():
                                 localStorage.setItem('lastSnippets', JSON.stringify(d.snippets));
                             } else {
                                 localStorage.removeItem('lastSnippets');
+                            }
+                            if (d.confidence_pct !== undefined) {
+                                localStorage.setItem('lastConfidence', JSON.stringify({pct: d.confidence_pct, lbl: d.confidence_label}));
+                            } else {
+                                localStorage.removeItem('lastConfidence');
                             }
                             const clearBtn = document.getElementById('clear-history-btn');
                             if (clearBtn) clearBtn.style.display = 'inline-block';
