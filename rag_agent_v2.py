@@ -184,17 +184,7 @@ def retrieve_v2(
 # ══════════════════════════════════════════════════════════════════════════════
 
 def get_best_gemini_model():
-    try:
-        models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        for model in models:
-            if "gemini-2.5-flash" in model: return model
-        for model in models:
-            if "gemini-2.0-flash" in model: return model
-        for model in models:
-            if "gemini-1.5-flash" in model: return model
-        return models[0] if models else "gemini-1.5-flash"
-    except Exception:
-        return "gemini-1.5-flash"
+    return "models/gemini-flash-lite-latest"
 
 def call_gemini_api(messages: list, retries=1) -> Optional[str]:
     if not GEMINI_API_KEY: return None
