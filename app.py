@@ -460,6 +460,7 @@ with st.sidebar:
     # ── Display Options ───────────────────────────────────────────────────────
     st.markdown("""<div style='background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:14px;padding:0.6rem 1rem;margin-bottom:0.5rem;margin-top:0.3rem;backdrop-filter:blur(10px);'><p style='color:#38bdf8;font-size:0.8rem;font-weight:600;margin:0;'>🔍 Display Options</p></div>""", unsafe_allow_html=True)
     show_chunks = st.checkbox("Show source chunks", value=False)
+    debug_mode  = st.checkbox("🔬 Debug Mode (show reranking scores)", value=False)
 
     st.markdown("""<div style='background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.2);border-radius:14px;padding:0.6rem 1rem;margin-bottom:0.5rem;margin-top:0.3rem;backdrop-filter:blur(10px);'><p style='color:#f472b6;font-size:0.8rem;font-weight:600;margin:0;'>🔊 Audio</p></div>""", unsafe_allow_html=True)
     enable_tts = st.checkbox("Read answer aloud (TTS)", value=False)
@@ -660,7 +661,7 @@ if question:
             if final_page:
                 final_range = None
 
-            chunks, fallback_msg = retrieve_v2(
+            chunks, fallback_msg, retrieval_meta = retrieve_v2(
                 query        = question,
                 page         = final_page if not general else None,
                 page_range   = final_range if not general else None,
@@ -746,8 +747,19 @@ if question:
 
             if show_chunks and chunks:
                 with st.expander("📑 Source chunks"):
+                    # Retrieval stats header
+                    if retrieval_meta.get("reranked"):
+                        st.markdown(
+                            f"📥 **Retrieval:** {retrieval_meta['fetched']} chunks fetched &nbsp;→&nbsp; "
+                            f"✅ **After Re-ranking:** Top {retrieval_meta['final']} selected",
+                            unsafe_allow_html=True
+                        )
+                        st.divider()
                     for c in chunks:
-                        st.markdown(f"**Page {c['page']}** (score: {c['score']})")
+                        score_str = f"cosine: {c['score']}"
+                        if debug_mode and "rerank_score" in c:
+                            score_str += f" | reranker: {c['rerank_score']:.4f}"
+                        st.markdown(f"**Page {c['page']}** ({score_str})")
                         st.text(c["text"][:300])
                         st.divider()
 

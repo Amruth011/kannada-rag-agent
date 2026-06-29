@@ -49,6 +49,11 @@ if GEMINI_API_KEY:
 
 STANDARD_THRESHOLD  = 0.25
 CHARACTER_THRESHOLD = 0.20
+
+# ── Re-ranking configuration ──────────────────────────────────────────────────
+RERANK_MODEL    = "BAAI/bge-reranker-v2-m3"  # multilingual cross-encoder
+RERANK_FETCH_K  = 15   # wider initial retrieval
+RERANK_TOP_N    = 4    # chunks to keep after reranking
 NOT_FOUND_MSG_EN = (
     "⚠️ Not found in document — "
     "no relevant passages matched your query with sufficient confidence."
@@ -102,10 +107,58 @@ def detect_page_filter(question: str):
     return None, None
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# 2a. CROSS-ENCODER RE-RANKER
+# ══════════════════════════════════════════════════════════════════════════════
+
+_reranker = None  # singleton — loaded once
+
+def _get_reranker():
+    """Lazy-load the cross-encoder re-ranker (cached after first call)."""
+    global _reranker
+    if _reranker is None:
+        try:
+            from sentence_transformers import CrossEncoder
+            _reranker = CrossEncoder(RERANK_MODEL, max_length=512)
+            print(f"[OK] Re-ranker loaded: {RERANK_MODEL}")
+        except Exception as e:
+            print(f"[WARN] Re-ranker load failed ({e}) - skipping reranking.")
+            _reranker = False  # sentinel: don't retry
+    return _reranker if _reranker is not False else None
+
+
+def rerank_chunks(query: str, chunks: list, top_n: int = RERANK_TOP_N) -> list:
+    """
+    Re-rank retrieved chunks with a cross-encoder.
+
+    Returns chunks sorted by reranker score descending, capped at top_n.
+    Each chunk gains a 'rerank_score' key.
+    If the reranker fails to load, returns the original list unchanged.
+    """
+    if not chunks:
+        return chunks
+
+    reranker = _get_reranker()
+    if reranker is None:
+        # Fallback: return top_n from original cosine ordering
+        for c in chunks:
+            c["rerank_score"] = c.get("score", 0.0)
+        return chunks[:top_n]
+
+    pairs = [(query, c["text"]) for c in chunks]
+    scores = reranker.predict(pairs).tolist()
+
+    for chunk, score in zip(chunks, scores):
+        chunk["rerank_score"] = round(float(score), 4)
+
+    reranked = sorted(chunks, key=lambda c: c["rerank_score"], reverse=True)
+    return reranked[:top_n]
+
+
 def retrieve_with_filter(
     query: str,
     vectorstore,
-    top_k: int = 5,
+    top_k: int = RERANK_FETCH_K,
     threshold: float = STANDARD_THRESHOLD,
     page: Optional[int] = None,
     page_range: Optional[tuple] = None,
@@ -160,24 +213,52 @@ def retrieve_v2(
     page: Optional[int] = None,
     page_range: Optional[tuple] = None,
     is_character: bool = False,
-    language: str = "English"
-) -> tuple[list[dict], str]:
+    language: str = "English",
+    use_reranking: bool = True,
+) -> tuple[list[dict], str, dict]:
+    """
+    Retrieve and (optionally) rerank chunks for a query.
+
+    Returns:
+        chunks       — top-N reranked (or top-K raw) chunks
+        fallback_msg — not-found message if no chunks above threshold
+        meta         — dict with retrieval stats for UI display
+    """
     vs        = _get_vs()
     threshold = CHARACTER_THRESHOLD if is_character else STANDARD_THRESHOLD
-    top_k     = 10 if is_character else 5
+    # Always fetch wide pool; reranker will narrow it down
+    fetch_k   = RERANK_FETCH_K
 
-    chunks = retrieve_with_filter(
+    raw_chunks = retrieve_with_filter(
         query       = query,
         vectorstore = vs,
-        top_k       = top_k,
+        top_k       = fetch_k,
         threshold   = threshold,
         page        = page,
         page_range  = page_range,
     )
 
+    meta = {
+        "fetched":    len(raw_chunks),
+        "reranked":   False,
+        "final":      len(raw_chunks),
+        "rerank_top": RERANK_TOP_N,
+    }
+
+    if use_reranking and raw_chunks:
+        chunks = rerank_chunks(query, raw_chunks, top_n=RERANK_TOP_N)
+        meta["reranked"] = True
+        meta["final"]    = len(chunks)
+    else:
+        # No reranking — just take top chunks by cosine score
+        for c in raw_chunks:
+            c["rerank_score"] = c.get("score", 0.0)
+        chunks = raw_chunks[:RERANK_TOP_N]
+        meta["final"] = len(chunks)
+
     not_found = NOT_FOUND_MSG_EN if language == "English" else NOT_FOUND_MSG_KN
-    fallback = not_found if not chunks else ""
-    return chunks, fallback
+    fallback  = not_found if not chunks else ""
+    return chunks, fallback, meta
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 4.  LLM DISPATCHERS (Gemini -> Sarvam -> Groq)
