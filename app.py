@@ -111,6 +111,22 @@ def calculate_confidence(chunks):
         p = 50 + (avg_score - 0.20) * 400.0 # maps 0.20-0.25 to 50%-70%
     return min(100.0, max(0.0, p))
 
+def get_confidence_label(pct: float) -> str:
+    if pct >= 85:  return "High"
+    if pct >= 70:  return "Medium"
+    if pct >= 60:  return "Low"
+    return "Very Low"
+
+VERY_LOW_THRESHOLD = 60  # Below this -> skip LLM, show guardrail
+
+GUARDRAIL_MSG_EN = (
+    "I could not find sufficient evidence in the novel to answer this question reliably. "
+    "The retrieved passages do not contain enough relevant information."
+)
+GUARDRAIL_MSG_KN = (
+    "ಈ ಪ್ರಶ್ನೆಗೆ ಪುಸ್ತಕದಲ್ಲಿ ಸಾಕಷ್ಟು ಆಧಾರ ಸಿಗಲಿಲ್ಲ. "
+    "ಪಡೆದ ಭಾಗಗಳಲ್ಲಿ ಸಾಕಷ್ಟು ಮಾಹಿತಿ ಇಲ್ಲ."
+)
 
 
 # ── Page config ───────────────────────────────────────────────────────────────
@@ -602,9 +618,21 @@ for msg in st.session_state.messages:
         if msg.get("confidence_pct") is not None:
             pct = msg["confidence_pct"]
             lbl = msg["confidence_label"]
-            st.markdown(f"**Confidence:**\n{lbl} ({int(pct)}%)")
-            if pct < 60:
-                st.warning("⚠️ Low confidence: Retrieved evidence may be insufficient.")
+            conf_color = "#22c55e" if pct >= 85 else ("#f59e0b" if pct >= 70 else ("#f97316" if pct >= 60 else "#ef4444"))
+            st.markdown(
+                f"<span style='font-weight:600;color:{conf_color};'>Confidence: {lbl} ({int(pct)}%)</span>",
+                unsafe_allow_html=True
+            )
+            if msg.get("guardrail"):
+                st.markdown("""
+<div style='background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.35);
+            border-left:4px solid #ef4444;border-radius:12px;padding:0.8rem 1.1rem;
+            margin:0.5rem 0;backdrop-filter:blur(8px);'>
+  <p style='color:#fca5a5;font-weight:700;margin:0 0 0.3rem 0;font-size:0.95rem;'>&#9888; Low Evidence</p>
+  <p style='color:#fecaca;margin:0;font-size:0.88rem;'>Retrieved passages may not contain enough information.</p>
+</div>""", unsafe_allow_html=True)
+            elif pct < 70:
+                st.warning("Low confidence: Retrieved evidence may be insufficient.")
         if msg.get("pages"):
             st.caption(f"📄 Sources: Pages {', '.join(map(str, msg['pages']))}")
         if msg.get("snippets"):
@@ -686,7 +714,73 @@ if question:
                 capped.append(c); cur_len += len(c["text"])
             chunks = capped
 
-            progress.progress(55, text="🧠 Organizing context...")
+            progress.progress(55, text="Organizing context...")
+
+            # ── Compute confidence BEFORE LLM (guardrail decision) ───────────
+            confidence_pct   = calculate_confidence(chunks) if not general else 100.0
+            confidence_label = get_confidence_label(confidence_pct)
+            is_very_low      = (confidence_pct < VERY_LOW_THRESHOLD) and not general and chunks
+            guardrail_msg    = GUARDRAIL_MSG_EN if current_lang == "English" else GUARDRAIL_MSG_KN
+
+            if is_very_low:
+                # ── GUARDRAIL: skip LLM, return insufficient-evidence message ─
+                progress.progress(100, text="Done!")
+                progress.empty()
+
+                # Confidence badge
+                conf_color = "#ef4444"
+                st.markdown(
+                    f"<span style='font-weight:600;color:{conf_color};'>Confidence: {confidence_label} ({int(confidence_pct)}%)</span>",
+                    unsafe_allow_html=True
+                )
+
+                # Low Evidence warning card
+                st.markdown(f"""
+<div style='background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.35);
+            border-left:4px solid #ef4444;border-radius:12px;padding:0.9rem 1.2rem;
+            margin:0.5rem 0;backdrop-filter:blur(8px);'>
+  <p style='color:#fca5a5;font-weight:700;margin:0 0 0.4rem 0;font-size:1rem;'>&#9888; Low Evidence</p>
+  <p style='color:#fecaca;margin:0 0 0.5rem 0;font-size:0.88rem;'>Retrieved passages may not contain enough information.</p>
+  <p style='color:#f8fafc;margin:0;font-size:0.92rem;'>{guardrail_msg}</p>
+</div>""", unsafe_allow_html=True)
+
+                # Still show sources
+                pages = sorted(set(c["page"] for c in chunks)) if chunks else []
+                msg_snippets = []
+                if pages:
+                    st.caption(f"Sources: Pages {', '.join(map(str, pages))}")
+                    st.markdown("**Sources:**")
+                    for p in pages:
+                        pg_chunks = [c for c in chunks if c["page"] == p]
+                        if pg_chunks:
+                            best = max(pg_chunks, key=lambda x: x.get("score", 0))
+                            snippet = best["text"][:150] + "..." if len(best["text"]) > 150 else best["text"]
+                            msg_snippets.append({"page": p, "text": snippet})
+                            st.markdown(f"**Page {p}:**  \n> \"{snippet}\"")
+
+                if show_chunks and chunks:
+                    with st.expander("Source chunks"):
+                        for c in chunks:
+                            score_str = f"cosine: {c['score']}"
+                            if debug_mode and "rerank_score" in c:
+                                score_str += f" | reranker: {c['rerank_score']:.4f}"
+                            st.markdown(f"**Page {c['page']}** ({score_str})")
+                            st.text(c["text"][:300])
+                            st.divider()
+
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": guardrail_msg,
+                    "pages": pages,
+                    "snippets": msg_snippets,
+                    "confidence_pct": confidence_pct,
+                    "confidence_label": confidence_label,
+                    "guardrail": True,
+                    "audio": None,
+                })
+                st.stop()
+
+            # ── Normal path: confidence is sufficient, call LLM ──────────────
             rag_section = (
                 "\n\n".join([f"[Page {c['page']}]: {c['text']}" for c in chunks])
                 if chunks else "(No specific passages retrieved.)"
@@ -702,7 +796,7 @@ if question:
                     clean = re.sub(r'\[Page \d+\]:', '', msg["content"]).strip()
                     history.append(AIMessage(content=clean))
 
-            progress.progress(75, text="✨ Generating answer...")
+            progress.progress(75, text="Generating answer...")
             chain = get_rag_chain(current_lang)
             answer = chain.invoke({
                 "book_context": BOOK_CONTEXT,
@@ -715,15 +809,16 @@ if question:
 
             pages = sorted(set(c["page"] for c in chunks)) if chunks else []
             st.write(answer)
-            
-            # Compute confidence score
-            confidence_pct = calculate_confidence(chunks) if not general else 100.0
-            confidence_label = "High" if confidence_pct >= 85 else ("Medium" if confidence_pct >= 70 else "Low")
-            
+
+            # Display confidence (already computed above)
+            conf_color = "#22c55e" if confidence_pct >= 85 else ("#f59e0b" if confidence_pct >= 70 else ("#f97316" if confidence_pct >= 60 else "#ef4444"))
             if not general and chunks:
-                st.markdown(f"**Confidence:**\n{confidence_label} ({int(confidence_pct)}%)")
-                if confidence_pct < 60:
-                    st.warning("⚠️ Low confidence: Retrieved evidence may be insufficient.")
+                st.markdown(
+                    f"<span style='font-weight:600;color:{conf_color};'>Confidence: {confidence_label} ({int(confidence_pct)}%)</span>",
+                    unsafe_allow_html=True
+                )
+                if confidence_pct < 70:
+                    st.warning("Low confidence: Retrieved evidence may be insufficient.")
             
             msg_snippets = []
             if pages:
@@ -780,6 +875,7 @@ if question:
                 "snippets": msg_snippets,
                 "confidence_pct": confidence_pct if not general and chunks else None,
                 "confidence_label": confidence_label if not general and chunks else None,
+                "guardrail": False,
                 "audio": audio_bytes
             })
 
