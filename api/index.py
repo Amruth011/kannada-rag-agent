@@ -440,14 +440,12 @@ def call_sarvam_tts(text, language="kn-IN"):
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-try:
-    from rag_agent_v2 import (
-        detect_page_filter, is_page_only_query, retrieve_exact_page,
-        rewrite_query, is_general_question, is_character_question, retrieve_v2,
-        get_rag_chain, BOOK_CONTEXT
-    )
-except ImportError as e:
-    print(f"Error importing modern RAG pipeline: {e}")
+
+from rag_agent_v2 import (
+    detect_page_filter, is_page_only_query, retrieve_exact_page,
+    rewrite_query, is_general_question, is_character_question, retrieve_v2,
+    get_rag_chain, BOOK_CONTEXT
+)
 
 def calculate_confidence(chunks):
     if not chunks:
