@@ -913,7 +913,7 @@ if question:
                     history.append(AIMessage(content=clean))
 
             progress.progress(75, text="Generating answer...")
-            chain = get_rag_chain(current_lang)
+            chain = get_rag_chain(current_lang, is_page_summary=page_only)
             answer = chain.invoke({
                 "book_context": BOOK_CONTEXT,
                 "context": rag_section,
@@ -923,18 +923,29 @@ if question:
             progress.progress(100, text="Done!")
             progress.empty()
 
-            if debug_mode and is_rewritten:
-                st.markdown("**Original Query:**")
-                st.markdown(f"> \"{question}\"")
-                st.markdown("**Rewritten Query:**")
-                st.markdown(f"> \"{rewritten_q}\"")
+            if debug_mode:
+                if page_only:
+                    st.markdown("**Page Query Router Debug:**")
+                    st.code(f"Page Query Detected: Yes\nRequested Page: {final_page}\nChunks Retrieved: {len(chunks)}\nRouter Path: Metadata Filter", language="text")
+                elif is_rewritten:
+                    st.markdown("**Original Query:**")
+                    st.markdown(f"> \"{question}\"")
+                    st.markdown("**Rewritten Query:**")
+                    st.markdown(f"> \"{rewritten_q}\"")
 
             pages = sorted(set(c["page"] for c in chunks)) if chunks else []
             st.write(answer)
 
             # Display confidence (already computed above)
-            conf_color = "#22c55e" if confidence_pct >= 85 else ("#f59e0b" if confidence_pct >= 70 else ("#f97316" if confidence_pct >= 60 else "#ef4444"))
-            if not general and chunks:
+            if page_only:
+                page_status = "Success" if chunks else "Failed"
+                conf_color = "#22c55e" if chunks else "#ef4444"
+                st.markdown(
+                    f"<span style='font-weight:600;color:{conf_color};'>Page Retrieval: {page_status}</span>",
+                    unsafe_allow_html=True
+                )
+            elif not general and chunks:
+                conf_color = "#22c55e" if confidence_pct >= 85 else ("#f59e0b" if confidence_pct >= 70 else ("#f97316" if confidence_pct >= 60 else "#ef4444"))
                 st.markdown(
                     f"<span style='font-weight:600;color:{conf_color};'>Confidence: {confidence_label} ({int(confidence_pct)}%)</span>",
                     unsafe_allow_html=True
