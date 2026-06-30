@@ -945,7 +945,14 @@ if question:
             if show_chunks and chunks:
                 with st.expander("📑 Source chunks"):
                     # Retrieval stats header
-                    if retrieval_meta.get("reranked"):
+                    if "merged_fetched" in retrieval_meta:
+                        st.markdown("**Hybrid Retrieval Stats**")
+                        st.markdown(f"- Vector Chunks: {retrieval_meta.get('vector_fetched', 0)}")
+                        st.markdown(f"- BM25 Chunks: {retrieval_meta.get('bm25_fetched', 0)}")
+                        st.markdown(f"- Merged Chunks: {retrieval_meta.get('merged_fetched', 0)}")
+                        st.markdown(f"- Reranked Chunks: {retrieval_meta.get('final', 0)}")
+                        st.divider()
+                    elif retrieval_meta.get("reranked"):
                         st.markdown(
                             f"📥 **Retrieval:** {retrieval_meta['fetched']} chunks fetched &nbsp;→&nbsp; "
                             f"✅ **After Re-ranking:** Top {retrieval_meta['final']} selected",
@@ -953,7 +960,9 @@ if question:
                         )
                         st.divider()
                     for c in chunks:
-                        score_str = f"cosine: {c['score']}"
+                        score_str = f"cosine: {c.get('score', 0)}"
+                        if debug_mode and "rrf_score" in c:
+                            score_str += f" | rrf: {c['rrf_score']:.4f}"
                         if debug_mode and "rerank_score" in c:
                             score_str += f" | reranker: {c['rerank_score']:.4f}"
                         st.markdown(f"**Page {c['page']}** ({score_str})")

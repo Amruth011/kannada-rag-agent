@@ -200,12 +200,56 @@ def retrieve_with_filter(
 # ══════════════════════════════════════════════════════════════════════════════
 
 _vectorstore = None
+_bm25_model = None
+_all_chunks = None
 
 def _get_vs():
     global _vectorstore
     if _vectorstore is None:
         _vectorstore = get_vectorstore()
     return _vectorstore
+
+def _get_bm25():
+    global _bm25_model, _all_chunks
+    if _bm25_model is None:
+        try:
+            from rank_bm25 import BM25Okapi
+        except ImportError:
+            print("Warning: rank_bm25 not installed, BM25 retrieval will be disabled.")
+            return None, []
+            
+        vs = _get_vs()
+        data = vs.get()
+        _all_chunks = [{"text": doc, "page": meta.get("page", "?")} for doc, meta in zip(data["documents"], data["metadatas"])]
+        tokenized_corpus = [doc["text"].lower().split() for doc in _all_chunks]
+        _bm25_model = BM25Okapi(tokenized_corpus)
+    return _bm25_model, _all_chunks
+
+def retrieve_bm25(query: str, top_k: int = 10, page=None, page_range=None):
+    bm25, chunks = _get_bm25()
+    if bm25 is None:
+        return []
+        
+    tokenized_query = query.lower().split()
+    scores = bm25.get_scores(tokenized_query)
+    
+    results = []
+    for score, chunk in zip(scores, chunks):
+        if page is not None and chunk["page"] != page:
+            continue
+        if page_range is not None and not (page_range[0] <= int(chunk["page"]) <= page_range[1]):
+            continue
+            
+        if score > 0:
+            results.append({
+                "text": chunk["text"],
+                "page": chunk["page"],
+                "score": 0.0, # Vector score not applicable here
+                "bm25_score": round(score, 3)
+            })
+            
+    results = sorted(results, key=lambda x: x["bm25_score"], reverse=True)
+    return results[:top_k]
 
 
 def retrieve_v2(
@@ -226,23 +270,54 @@ def retrieve_v2(
     """
     vs        = _get_vs()
     threshold = CHARACTER_THRESHOLD if is_character else STANDARD_THRESHOLD
-    # Always fetch wide pool; reranker will narrow it down
-    fetch_k   = RERANK_FETCH_K
 
-    raw_chunks = retrieve_with_filter(
+    vector_chunks = retrieve_with_filter(
         query       = query,
         vectorstore = vs,
-        top_k       = fetch_k,
+        top_k       = 10,
         threshold   = threshold,
         page        = page,
         page_range  = page_range,
     )
+    
+    bm25_chunks = retrieve_bm25(
+        query      = query,
+        top_k      = 10,
+        page       = page,
+        page_range = page_range
+    )
+    
+    merged_dict = {}
+    
+    # 1. Map chunks to their ranks (0-indexed)
+    vector_ranks = {c["text"]: rank for rank, c in enumerate(vector_chunks)}
+    bm25_ranks = {c["text"]: rank for rank, c in enumerate(bm25_chunks)}
+    
+    # 2. Populate merged_dict with unique chunks
+    for c in vector_chunks + bm25_chunks:
+        if c["text"] not in merged_dict:
+            merged_dict[c["text"]] = c
+            
+    # 3. Calculate RRF score and apply it
+    for text, c in merged_dict.items():
+        rrf_score = 0.0
+        if text in vector_ranks:
+            rrf_score += 1.0 / (60 + vector_ranks[text])
+        if text in bm25_ranks:
+            rrf_score += 1.0 / (60 + bm25_ranks[text])
+        c["rrf_score"] = round(rrf_score, 4)
+        
+    # 4. Sort raw_chunks by RRF score descending
+    raw_chunks = list(merged_dict.values())
+    raw_chunks = sorted(raw_chunks, key=lambda x: x["rrf_score"], reverse=True)
 
     meta = {
-        "fetched":    len(raw_chunks),
-        "reranked":   False,
-        "final":      len(raw_chunks),
-        "rerank_top": RERANK_TOP_N,
+        "vector_fetched": len(vector_chunks),
+        "bm25_fetched":   len(bm25_chunks),
+        "merged_fetched": len(raw_chunks),
+        "reranked":       False,
+        "final":          len(raw_chunks),
+        "rerank_top":     RERANK_TOP_N,
     }
 
     if use_reranking and raw_chunks:

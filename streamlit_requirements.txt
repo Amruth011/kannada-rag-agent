@@ -20,4 +20,4 @@ langchain-groq
 langchain-huggingface
 sentence-transformers>=2.6.0  # includes CrossEncoder for re-ranking
 langchain-classic
-
+rank-bm25
