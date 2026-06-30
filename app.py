@@ -426,6 +426,47 @@ def call_sarvam_tts(text, language="kn-IN"):
         print(f"Google TTS fallback failed: {e}")
         return None
 
+def rewrite_query(current_query, chat_history):
+    if not chat_history:
+        return current_query
+    if detect_page_filter(current_query) != (None, None):
+        return current_query
+    if is_general_question(current_query):
+        return current_query
+    if is_character_question(current_query) and not re.search(r'\b(he|she|they|him|her|his|hers|their|theirs|it|ಈ|ಆ|ಅವನು|ಅವಳು|ಅವರು|ಇವನು|ಇವಳು)\b', current_query, re.IGNORECASE):
+        return current_query
+        
+    has_pronoun = bool(re.search(r'\b(he|she|they|him|her|his|hers|their|theirs|it|this|that|ಈ|ಆ|ಅವನು|ಅವಳು|ಅವರು|ಇವನು|ಇವಳು)\b', current_query, re.IGNORECASE))
+    is_short = len(current_query.split()) <= 4
+    
+    if not (has_pronoun or is_short):
+        return current_query
+        
+    history_text = ""
+    for msg in chat_history[-6:]:
+        if msg["role"] in ["user", "assistant"]:
+            content = re.sub(r'\[Page \d+\]:', '', msg["content"]).strip()
+            history_text += f"{msg['role'].capitalize()}: {content}\n"
+            
+    prompt = f"""Given the following conversation history and a new user query, rewrite the user query to be a standalone, clear question that can be understood without the history.
+Resolve any pronouns (e.g., he, she, him, her, they) to their specific entity (e.g., character names) mentioned in the history.
+Expand vague references (e.g., "Tell me more about him" -> "Tell me more about Himavant in the novel").
+If the query is already clear and standalone, return it exactly as is. Do not answer the question. Only output the rewritten query.
+
+Conversation History:
+{history_text}
+
+User Query: {current_query}
+Rewritten Query:"""
+
+    messages = [{"role": "system", "content": "You are a query rewriting assistant."},
+                {"role": "user", "content": prompt}]
+    
+    rewritten = call_gemini_llm(messages)
+    if rewritten:
+        return rewritten.strip(' "\'')
+    return current_query
+
 def build_prompt(question, chunks, language, use_book_context_only=False):
     rag_section = "" if use_book_context_only else (
         "\n\n".join([f"[Page {c['page']}]: {c['text']}" for c in chunks])
@@ -639,6 +680,12 @@ if "messages" not in st.session_state:
 
 for i, msg in enumerate(st.session_state.messages):
     with st.chat_message(msg["role"]):
+        if msg.get("original_query") and msg.get("rewritten_query") and debug_mode:
+            st.markdown("**Original Query:**")
+            st.markdown(f"> \"{msg['original_query']}\"")
+            st.markdown("**Rewritten Query:**")
+            st.markdown(f"> \"{msg['rewritten_query']}\"")
+            
         st.write(msg["content"])
         if msg.get("confidence_pct") is not None:
             pct = msg["confidence_pct"]
@@ -718,12 +765,16 @@ if question:
     with st.chat_message("assistant"):
         progress = st.progress(0, text="🔍 Searching book...")
         try:
+            progress.progress(10, text="✍️ Rewriting query...")
+            rewritten_q = rewrite_query(question, st.session_state.messages[:-1])
+            is_rewritten = (rewritten_q.lower() != question.lower())
+            
             progress.progress(20, text="📖 Retrieving passages...")
-            general = is_general_question(question)
-            is_char = is_character_question(question)
+            general = is_general_question(rewritten_q)
+            is_char = is_character_question(rewritten_q)
 
             # ── v2: metadata-filtered retrieval ──────────────────────────────
-            auto_page, auto_range = detect_page_filter(question)
+            auto_page, auto_range = detect_page_filter(rewritten_q)
 
             # Sidebar filter overrides auto-detection
             final_page  = sidebar_page_exact if sidebar_page_exact else auto_page
@@ -733,7 +784,7 @@ if question:
                 final_range = None
 
             chunks, fallback_msg, retrieval_meta = retrieve_v2(
-                query        = question,
+                query        = rewritten_q,
                 page         = final_page if not general else None,
                 page_range   = final_range if not general else None,
                 is_character = is_char,
@@ -820,6 +871,8 @@ if question:
                     "confidence_label": confidence_label,
                     "guardrail": True,
                     "audio": None,
+                    "original_query": question if is_rewritten else None,
+                    "rewritten_query": rewritten_q if is_rewritten else None
                 })
                 st.stop()
 
@@ -845,10 +898,16 @@ if question:
                 "book_context": BOOK_CONTEXT,
                 "context": rag_section,
                 "history": history,
-                "question": question
+                "question": rewritten_q
             })
             progress.progress(100, text="Done!")
             progress.empty()
+
+            if debug_mode and is_rewritten:
+                st.markdown("**Original Query:**")
+                st.markdown(f"> \"{question}\"")
+                st.markdown("**Rewritten Query:**")
+                st.markdown(f"> \"{rewritten_q}\"")
 
             pages = sorted(set(c["page"] for c in chunks)) if chunks else []
             st.write(answer)
@@ -919,7 +978,9 @@ if question:
                 "confidence_pct": confidence_pct if not general and chunks else None,
                 "confidence_label": confidence_label if not general and chunks else None,
                 "guardrail": False,
-                "audio": audio_bytes
+                "audio": audio_bytes,
+                "original_query": question if is_rewritten else None,
+                "rewritten_query": rewritten_q if is_rewritten else None
             })
 
         except Exception as e:
