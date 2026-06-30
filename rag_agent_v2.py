@@ -107,6 +107,35 @@ def detect_page_filter(question: str):
     return None, None
 
 
+def is_page_only_query(query: str) -> bool:
+    """
+    Check if the query is strictly asking for the contents of a page,
+    bypassing semantic meaning.
+    """
+    query = query.lower().strip(" ?.")
+    # Remove common stop words for this specific intent
+    query = re.sub(r'\b(what|is|on|summarize|explain|tell|me|about|the|content|of|in|page|number|ಪುಟ|ದಲ್ಲಿ|ಏನಿದೆ|ಬಗ್ಗೆ|ಹೇಳಿ)\b', '', query).strip()
+    return bool(re.fullmatch(r'\d+', query))
+
+
+def retrieve_exact_page(page: int) -> list[dict]:
+    """
+    Retrieve all chunks for an exact page bypassing vector/semantic search.
+    """
+    vs = _get_vs()
+    data = vs.get(where={"page": page})
+    
+    chunks = []
+    for doc, meta in zip(data.get("documents", []), data.get("metadatas", [])):
+        chunks.append({
+            "text": doc,
+            "page": meta.get("page", "?"),
+            "score": 1.0,        # Fake 100% confidence for UI
+            "rerank_score": 1.0, # Fake 100% confidence for UI
+            "rrf_score": 1.0
+        })
+    return chunks
+
 # ══════════════════════════════════════════════════════════════════════════════
 # 2a. CROSS-ENCODER RE-RANKER
 # ══════════════════════════════════════════════════════════════════════════════

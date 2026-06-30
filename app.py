@@ -15,6 +15,8 @@ import datetime
 from rag_agent_v2 import (
     retrieve_v2,
     detect_page_filter,
+    is_page_only_query,
+    retrieve_exact_page,
     get_rag_chain,
 )
 
@@ -765,31 +767,49 @@ if question:
     with st.chat_message("assistant"):
         progress = st.progress(0, text="🔍 Searching book...")
         try:
-            progress.progress(10, text="✍️ Rewriting query...")
-            rewritten_q = rewrite_query(question, st.session_state.messages[:-1])
-            is_rewritten = (rewritten_q.lower() != question.lower())
-            
-            progress.progress(20, text="📖 Retrieving passages...")
-            general = is_general_question(rewritten_q)
-            is_char = is_character_question(rewritten_q)
-
-            # ── v2: metadata-filtered retrieval ──────────────────────────────
-            auto_page, auto_range = detect_page_filter(rewritten_q)
+            # ── v2: exact page bypass check ──────────────────────────────────
+            auto_page, auto_range = detect_page_filter(question)
+            page_only = is_page_only_query(question) if auto_page else False
 
             # Sidebar filter overrides auto-detection
             final_page  = sidebar_page_exact if sidebar_page_exact else auto_page
             final_range = sidebar_page_range if sidebar_page_range else auto_range
-            # Clear range if exact page set
             if final_page:
                 final_range = None
+            
+            if page_only and final_page:
+                progress.progress(20, text=f"📖 Retrieving exact page {final_page}...")
+                rewritten_q = question
+                is_rewritten = False
+                chunks = retrieve_exact_page(final_page)
+                fallback_msg = "" if chunks else f"Page {final_page} not found in the book."
+                retrieval_meta = {"fetched": len(chunks), "final": len(chunks), "exact_page": True}
+                general = False
+                is_char = False
+            else:
+                progress.progress(10, text="✍️ Rewriting query...")
+                rewritten_q = rewrite_query(question, st.session_state.messages[:-1])
+                is_rewritten = (rewritten_q.lower() != question.lower())
+                
+                progress.progress(20, text="📖 Retrieving passages...")
+                general = is_general_question(rewritten_q)
+                is_char = is_character_question(rewritten_q)
+                
+                # Update auto-detect just in case rewrite stripped it but sidebar didn't
+                # Actually, we rely on original question for auto_page, but fallback to rewritten for edge cases
+                if not auto_page and not auto_range:
+                    ap, ar = detect_page_filter(rewritten_q)
+                    if not sidebar_page_exact: final_page = ap
+                    if not sidebar_page_range: final_range = ar
+                    if final_page: final_range = None
 
-            chunks, fallback_msg, retrieval_meta = retrieve_v2(
-                query        = rewritten_q,
-                page         = final_page if not general else None,
-                page_range   = final_range if not general else None,
-                is_character = is_char,
-                language     = current_lang,
-            )
+                chunks, fallback_msg, retrieval_meta = retrieve_v2(
+                    query        = rewritten_q,
+                    page         = final_page if not general else None,
+                    page_range   = final_range if not general else None,
+                    is_character = is_char,
+                    language     = current_lang,
+                )
 
             # ── v2: explicit NOT FOUND fallback ──────────────────────────────
             if fallback_msg and not general:
