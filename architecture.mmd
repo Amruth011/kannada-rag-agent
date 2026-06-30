@@ -1,0 +1,48 @@
+graph TD
+    %% Document Processing Pipeline
+    subgraph Document Processing
+    A[Scanned PDF] -->|Extract Pages| B(pdf_to_images.py)
+    B -->|High-Res Images| C(preprocess_images.py)
+    C -->|OpenCV Enhancement| D(ocr_surya.py)
+    D -->|Raw Kannada Text| E(clean_text.py)
+    E -->|Unicode Normalization| F(chunker.py)
+    F -->|Semantic Chunks + Metadata| G(embed_and_store.py)
+    
+    G -->|Embeddings| H[(ChromaDB)]
+    G -->|Text Corpus| I[(BM25 Index)]
+    end
+    
+    %% Retrieval Pipeline
+    subgraph Retrieval Pipeline
+    Q[User Query] --> R(Query Rewriter)
+    R -->|Gemini Context-Aware Rewrite| S{Retrieval Engine}
+    
+    S -->|Keyword Match| T1[(BM25 Search)]
+    S -->|Semantic Match| T2[(ChromaDB Vector Search)]
+    
+    T1 -->|Top 10 Chunks| U(Hybrid Result Fusion)
+    T2 -->|Top 10 Chunks| U
+    
+    U -->|Reciprocal Rank Fusion| V[Merged Candidate Pool ~15]
+    V --> W(Cross-Encoder Re-ranking)
+    W -->|BAAI/bge-reranker-v2-m3| X[Top 4 Final Chunks]
+    
+    X --> Y{Low Confidence Guardrails}
+    Y -- Pass --> Z1(Gemini / Groq LLM)
+    Y -- Fail --> Z2[Not Found / Fallback Message]
+    
+    Z1 --> Final[Generated Answer]
+    end
+    
+    %% Trust Layer
+    subgraph Trust Layer
+    Final --> B1[Confidence Score Assessment]
+    B1 --> C1{Threshold Check}
+    C1 -- High Confidence --> D1[Attach Source Snippets]
+    C1 -- Low Confidence --> E1[Display Low Confidence Warning]
+    E1 --> D1
+    
+    D1 --> F1[Inject Page Citations]
+    F1 --> G1[Render Feedback Module 👍/👎]
+    G1 --> H1[Final UI Presentation]
+    end
