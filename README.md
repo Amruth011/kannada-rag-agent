@@ -26,6 +26,8 @@
 <img src="https://img.shields.io/badge/687 Chunks-Indexed-7c3aed?style=flat-square"/>
 <img src="https://img.shields.io/badge/Bilingual-EN + KN-0891b2?style=flat-square"/>
 <img src="https://img.shields.io/badge/TTS-Audio Answers-db2777?style=flat-square"/>
+<img src="https://img.shields.io/badge/Re--Ranked-BGE v2 m3-7c3aed?style=flat-square"/>
+<img src="https://img.shields.io/badge/RAGAS-Evaluated-f59e0b?style=flat-square"/>
 <img src="https://img.shields.io/badge/Deployed-Live-16a34a?style=flat-square"/>
 </p>
 
@@ -91,26 +93,32 @@ This is the first of many — my long-term mission is to make Indic-language lit
 
 > *No technical background needed — here's the simple version*
 
-**Step 1 — 📄 Read the book**
+**Step 1 — 📄 Read the book**  
 The AI scans all 346 pages of the Kannada novel using OCR (like a camera that reads text) and stores everything in its memory.
 
-**Step 2 — 🧠 Understand the text**
+**Step 2 — 🧠 Understand the text**  
 Every paragraph is converted into numbers (called embeddings) that capture meaning — so the AI understands that "Himavant" and "the protagonist" mean the same thing.
 
-**Step 3 — 🗄️ Build a smart library**
+**Step 3 — 🗄️ Build a smart library**  
 All 687 text chunks are stored in a vector database — think of it as a super-smart search index that finds meaning, not just keywords.
 
-**Step 4 — 🔀 Route your question**
+**Step 4 — 🔀 Route your question**  
 When you ask something, the AI figures out what kind of question it is:
 - *"What's in page 50?"* → goes directly to page 50
 - *"Who is Himavant?"* → searches for character mentions
 - *"What is this book about?"* → uses general book knowledge
 - *"What did he do next?"* → searches the full story
 
-**Step 5 — 🤖 Generate your answer**
-The relevant passages are sent to Sarvam-M (an Indian AI model) which reads them and writes a clear answer — in English or Kannada, your choice.
+**Step 5 — 🔁 Re-rank for precision**  
+The top 15 candidate chunks are scored by a Cross-Encoder (`BAAI/bge-reranker-v2-m3`) that reads the question and each chunk **together** — far more accurate than vector similarity alone. Only the best 4 chunks proceed.
 
-**Step 6 — 🔊 Speak the answer**
+**Step 6 — 🛡️ Confidence guardrail check**  
+Before generating an answer, the system computes a confidence score. If it's below 60% (Very Low), the LLM is **skipped entirely** and a clear "Low Evidence" message is shown — preventing hallucinated or speculative answers.
+
+**Step 7 — 🤖 Generate your answer**  
+The top reranked passages are sent to Gemini (with Groq as fallback) which writes a clear answer — in English or Kannada, your choice.
+
+**Step 8 — 🔊 Speak the answer**  
 If you turn on TTS, the answer is converted to audio in natural Kannada or English voice and played back to you.
 
 ---
@@ -119,22 +127,29 @@ If you turn on TTS, the answer is converted to audio in natural Kannada or Engli
 
 ```
 Most RAG demos:   PDF → Chunks → LLM → Answer
+
 This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
-                  → Smart Router → 4 Retrieval Strategies → Sarvam LLM
-                  → Bilingual Answer + TTS Audio + Page Citations
-                  → Deployed · Durable Cloud DB · Admin Session Viewer
+                  → Smart Router → 4 Retrieval Strategies
+                  → ChromaDB top-15 → Cross-Encoder Re-ranking → Top-4
+                  → Confidence Guardrail (Very Low = skip LLM)
+                  → Gemini / Groq LLM
+                  → Bilingual Answer + Confidence Score + TTS Audio + Page Citations
+                  → RAGAS Evaluated · Deployed · Durable Cloud DB · Admin Dashboard
 ```
 
-| | Typical RAG Demo | This Project (v2.2) |
+| | Typical RAG Demo | This Project (v2.5) |
 |:--|:--|:--|
 | Language | English only | **Kannada + English** |
 | Input | Clean text PDF | **Scanned Kannada novel (full OCR pipeline)** |
-| Intelligence | Single Model | **Dual-Brain (Gemini + Groq Llama/Scout Fallbacks)** |
+| Retrieval | Top-K cosine | **Top-15 → Cross-Encoder Re-ranked → Top-4** |
+| Reliability | Answer always | **Confidence Guardrail — blocks weak-evidence answers** |
+| Intelligence | Single Model | **Dual-Brain (Gemini + Groq Llama Fallback)** |
 | Stability | Basic | **Auto-Discovery + Rate Limit Armor (Retries)** |
-| Output | Text only | **Formatted Markdown + Custom Audio Player + Compiled E-Books (Bilingual side-by-side with Viewport Scroll-Spy)** |
-| Persistence | None (or Memory) | **Durable Cloud DB (Vercel KV / Upstash Redis REST Integration)** |
-| Analytics | None | **Admin Dashboard with Geolocation Tracking (Background Threads) & User Session Tracking** |
-| Deployment | Local only | **Vercel Serverless UI/API + Streamlit Cloud App** |
+| Quality | Unverified | **RAGAS Evaluated (Faithfulness, Relevancy, Precision, Recall)** |
+| Output | Text only | **Formatted Markdown + Audio Player + Compiled E-Books** |
+| Persistence | None | **Durable Cloud DB (Vercel KV / Upstash Redis)** |
+| Analytics | None | **Admin Dashboard + Geolocation Tracking** |
+| Deployment | Local only | **Vercel Serverless + Streamlit Cloud** |
 
 ---
 
@@ -143,9 +158,11 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 <div align="center">
 
 ![RAG](https://img.shields.io/badge/RAG_Pipelines-000000?style=for-the-badge)
+![Re-Ranking](https://img.shields.io/badge/Cross--Encoder_Re--Ranking-7c3aed?style=for-the-badge)
 ![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)
 ![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97_Hugging_Face-FFD21E?style=for-the-badge&logoColor=black)
 ![LLM](https://img.shields.io/badge/LLM_Integration-7c3aed?style=for-the-badge)
+![RAGAS](https://img.shields.io/badge/RAGAS_Evaluation-f59e0b?style=for-the-badge)
 ![OCR](https://img.shields.io/badge/OCR_Pipeline-0891b2?style=for-the-badge)
 ![Databases](https://img.shields.io/badge/Databases-ChromaDB%20%7C%20Upstash%20Redis-7c3aed?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
@@ -163,13 +180,15 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 <tr>
 <td width="50%">
 
-**🧠 AI & Database Capabilities**
+**🧠 AI & Retrieval Capabilities**
 - Smart query routing — 4 retrieval strategies
-- Character-specific RAG (top-10, θ=0.20)
+- Character-specific RAG (θ=0.20)
 - Page-level direct lookup
 - Conversational memory (last 4 messages)
 - Bilingual answers — English & Kannada
-- **Durable Persistence**: Natively integrates with Vercel KV / Upstash Redis to log feedback and user activities across serverless container reloads.
+- **Cross-Encoder Re-ranking**: ChromaDB fetches 15 candidates; `BAAI/bge-reranker-v2-m3` re-scores all (query, chunk) pairs directly and selects the best 4 — dramatically improving context precision for Kannada + English queries.
+- **Retrieval Confidence Scoring**: Cosine similarity scores are mapped to a 0–100% confidence percentage with 4 tiers: High (≥85%), Medium (70–84%), Low (60–69%), Very Low (<60%).
+- **Low Confidence Guardrail**: If confidence drops below 60%, the LLM call is skipped entirely and a bilingual "Low Evidence" warning is shown — preventing speculative or hallucinated answers.
 
 </td>
 <td width="50%">
@@ -179,8 +198,10 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 - 6 clickable suggestion chips
 - Live progress bar (Search → Generate)
 - Page citations on every answer
-- Source chunks toggle
-- **Interactive E-Book Suite**: Automated compilation of Kannada, English, and side-by-side Bilingual HTML ebooks. Readers include custom viewport-based scroll-spy logic that updates header/sidebar page numbers in real-time.
+- Source snippets with per-page best passage
+- Color-coded confidence badge (green/amber/orange/red)
+- **Debug Mode**: Toggle to reveal per-chunk cosine similarity scores and cross-encoder reranker scores side-by-side
+- **Interactive E-Book Suite**: Automated compilation of Kannada, English, and side-by-side Bilingual HTML ebooks with custom viewport-based scroll-spy
 
 </td>
 </tr>
@@ -196,11 +217,10 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 </td>
 <td width="50%">
 
-**📊 Analytics & Admin Dashboard**
-- Password-protected tabbed dashboard at `/admin`.
-- **User Activity Tab**: Groups user logs using persistent browser UUIDs (`localStorage`), displaying reads, downloads, and locations.
-- **Asynchronous Geolocation**: Logs client location (City, Region, Country) resolved inside a background thread.
-- **User Resolution**: Matches anonymous download logs to user names if they submitted feedback.
+**📊 Evaluation & Analytics**
+- **RAGAS Evaluation Pipeline** (`eval_ragas.py`): Computes Faithfulness, Answer Relevancy, Context Precision, Context Recall for every sample. Outputs CSV + JSON + human-readable report.
+- **Re-Ranking Comparison** (`eval_reranking.py`): Runs both baseline (no reranking) and reranked pipelines side-by-side and generates a Δ comparison report.
+- Password-protected Admin Dashboard at `/admin` with User Activity, Feedback, and Geolocation tabs.
 
 </td>
 </tr>
@@ -217,55 +237,77 @@ This project:     Scanned Kannada PDF → OCR → Normalize → Chunk → Embed
 </div>
 
 <details>
-<summary><b>📐 Pipeline walkthrough — click to expand</b></summary>
+<summary><b>📐 Full pipeline walkthrough — click to expand</b></summary>
 
-### 🛡️ Stability-First Architecture (New v2.0)
+### 🔁 Streamlit RAG Pipeline (v2.5)
 
-This project has been heavily optimized for production stability and handles API failures gracefully:
+```
+User Query
+    ↓
+[Smart Router]  ─── general question?  ──→  Book-level knowledge
+    ↓                  character?       ──→  θ = 0.20
+    ↓                  page/range?      ──→  Metadata filter
+    ↓
+ChromaDB bi-encoder similarity search
+    top_k = 15  (wide candidate pool)
+    ↓
+Cross-Encoder Re-ranker  (BAAI/bge-reranker-v2-m3)
+    scores every (query, chunk) pair
+    sorts by relevance → keeps Top 4
+    ↓
+Confidence Score computation
+    avg cosine score → mapped to 0–100%
+    ↓
+[Guardrail Check]
+    confidence ≥ 60%  →  proceed to LLM
+    confidence < 60%  →  skip LLM, show Low Evidence warning
+    ↓
+LangChain LCEL Chain  (Gemini → Sarvam → Groq fallback)
+    ↓
+Answer  +  Confidence Badge  +  Citations  +  Source Snippets
+    ↓
+[Optional] TTS (Sarvam bulbul:v3 / gTTS fallback)
+```
 
-1. **Dual-Brain Fallback**: The system defaults to **Gemini 1.5 Flash** for deep analysis. If Gemini is unavailable or rate-limited, it automatically falls back to **Groq (Llama 3.3)** within milliseconds.
-2. **Auto-Discovery**: The agent programmatically queries your API keys to find the best available model version for your specific region, preventing `404 Not Found` errors.
-3. **Rate Limit Armor**: Implements automatic retry logic with exponential backoff for `429 Too Many Requests` errors.
-4. **Vercel Optimized**: The backend is built with **FastAPI** and optimized for Vercel Serverless (under 250MB bundle size) with strict 10-second timeout management.
-5. **Smart Capping**: RAG retrieval is capped at the top 2 pages (~5,000 characters) to ensure high speed and reliability on free-tier LLMs.
-6. **Bilingual Audio Custom Media Player**: Implements a custom media player widget containing play/pause toggles, ±5s jump controls, live seek slider, and duration/progress timestamps, automatically resetting on question or language changes.
-7. **Robust Markdown Parser**: Translates raw markdown syntax (`**` and `*`) and page citations into HTML tags, rendering bold/italic fonts and citations as badge elements.
-8. **Daily Usage Counter**: Includes a client-side localStorage query limit display ("Queries Today: X / 100") to track rate limits in real-time.
+### 🛡️ Stability-First Architecture
 
-### 🏗️ Dual-Deployment Architecture Overview
+1. **Dual-Brain Fallback**: Defaults to Gemini Flash Lite; auto-falls back to Groq (Llama 3.1) on quota errors.
+2. **Auto-Discovery**: Queries API keys to find the best available model version for your region.
+3. **Rate Limit Armor**: Automatic retry with exponential backoff on `429` errors.
+4. **Vercel Optimized**: FastAPI backend under 250MB bundle, strict 10s timeout management.
+5. **Smart Context Capping**: Context capped at ~5,000 characters for free-tier LLM reliability.
 
-This project is deployed across two environments with customized retrieval mechanisms optimized for their runtimes:
+### 🏗️ Dual-Deployment Architecture
 
 #### 1. Serverless Edge Architecture (Vercel)
-- **Frontend/Backend**: Served as a unified **FastAPI** application with a vanilla HTML5/CSS3/JavaScript user interface styled in premium dark aesthetics.
-- **Serverless Vector Search**: Since serverless functions have a strict size limit, it implements a custom NumPy similarity search over `vectors.npz` (pre-computed 687 chunk embeddings) using Hugging Face's Feature Extraction API, bypassing heavy local packages.
-- **LLM Engine**: Dual-Brain fallback routing with conversational memory (5 turns). Defaults to Gemini 2.5/1.5 Flash and redirects to Groq (Llama 3.3/3.1/Llama 4 Scout) if rate-limited.
-- **Speech Engine**: Synthesizes bilingual voice outputs using **Sarvam AI (bulbul:v3)** and falls back to **Google TTS (gTTS)** if quota errors occur.
-- **Interactive Voice Player**: Native browser HTML5 controls equipped with custom seeking timeline, play/pause, stop, and ±5s skip buttons.
-- **Quota Armor**: Displays daily query usage status tracking limits using client-side `localStorage`.
+- **Frontend/Backend**: FastAPI with premium HTML5/CSS3/JS UI
+- **Serverless Vector Search**: Custom NumPy cosine similarity over `vectors.npz` (pre-computed 687 embeddings) — no heavy local packages
+- **LLM Engine**: Dual-Brain fallback with 5-turn conversational memory
+- **Speech Engine**: Sarvam AI (bulbul:v3) → gTTS fallback
 
 #### 2. Full Semantic RAG Architecture (Streamlit Cloud)
-- **Frontend/Backend**: Deployed on Streamlit Cloud as an interactive dashboard (`app.py`).
-- **Semantic Vectorstore Retrieval**: Utilizes a persistent **ChromaDB** database and **sentence-transformers** multilingual text embeddings (`paraphrase-multilingual-MiniLM-L12-v2`) to retrieve matches using cosine similarity.
-- **LangChain ReAct Agent Loop**: Exposes retrieval pipelines as LangChain Tools (`Tool`) and runs an autonomous AgentExecutor loop with conversational memory.
-- **Metadata Filtering**: Extracts exact pages or page ranges from user queries dynamically (e.g. *"read page 12"*) to execute page-scoped metadata lookups in ChromaDB.
-- **NOT FOUND Fallback**: Evaluates similarity match scores against strict thresholds (e.g. `score < 0.25`) to return human-friendly explicit failure responses.
+- **Frontend**: Glassmorphism Streamlit UI (`app.py`)
+- **Retrieval**: ChromaDB + multilingual sentence-transformers → Cross-Encoder Re-ranker → Confidence Guardrail
+- **LLM Chain**: LangChain LCEL with Gemini → Sarvam → Groq fallback
+- **Evaluation**: RAGAS pipeline + before/after re-ranking comparison
 
 ---
 
-### Pipeline Walkthrough: Streamlit vs Vercel
-| Pipeline Phase | Vercel Deployment (Serverless API) | Streamlit Deployment (Semantic App) |
+### Pipeline Comparison: Streamlit vs Vercel
+
+| Pipeline Phase | Vercel (Serverless) | Streamlit (Semantic App) |
 |:---|:---|:---|
-| **1 · OCR Ingestion** | Surya OCR (Kannada + English, CPU) | Surya OCR (Kannada + English, CPU) |
-| **2 · Chunking** | Page-level indexing | 400-char semantic chunks (50 overlap) |
-| **3 · Vector Indexing** | NumPy Cosine Similarity (`vectors.npz`) | ChromaDB + Multilingual Sentence-Transformers |
-| **4 · Query Routing** | Fallback Chain (Gemini -> Groq) with Memory | LangChain ReAct Agent with Tool wrappers |
-| **5 · Metadata Filter** | Direct page parser + NumPy slice | LangChain Chroma metadata filters |
-| **6 · Primary Brain** | Gemini 1.5 Flash (Auto-Discovery) | Gemini 1.5 Flash |
-| **7 · Secondary Brain** | Groq Llama 3.3 Versatile (Safety Net) | Groq Llama 3.3 Versatile |
-| **8 · Speech Synthesis** | Sarvam AI bulbul:v3 + gTTS Fallback | Sarvam AI bulbul:v3 + gTTS Fallback |
-| **9 · Front-End UI** | Premium Sanskrit/Indic HTML5 + CSS3 | Glassmorphism Streamlit UI |
-| **10 · Hosting** | Vercel Serverless | Streamlit Cloud |
+| **1 · OCR Ingestion** | Surya OCR (CPU) | Surya OCR (CPU) |
+| **2 · Chunking** | Page-level | 400-char semantic (50 overlap) |
+| **3 · Vector Indexing** | NumPy (`vectors.npz`) | ChromaDB + Multilingual ST |
+| **4 · Re-Ranking** | — | CrossEncoder `bge-reranker-v2-m3` top-15→4 |
+| **5 · Confidence Check** | — | Score mapping + Very Low guardrail |
+| **6 · Query Routing** | Fallback chain + memory | LangChain LCEL + metadata filters |
+| **7 · Primary LLM** | Gemini Flash | Gemini Flash Lite |
+| **8 · Fallback LLM** | Groq Llama 3.3 | Groq Llama 3.1 |
+| **9 · Speech** | Sarvam bulbul:v3 + gTTS | Sarvam bulbul:v3 + gTTS |
+| **10 · Evaluation** | — | RAGAS (Faithfulness, Relevancy, Precision, Recall) |
+| **11 · Hosting** | Vercel Serverless | Streamlit Cloud |
 
 </details>
 
@@ -279,13 +321,15 @@ This project is deployed across two environments with customized retrieval mecha
 |:--|:--|:--|
 | 📄 PDF Processing | Page extraction | pdf2image + Poppler |
 | 👁️ OCR | Text extraction | Surya OCR (Kannada + English) |
-| 🧠 Primary Brain | Large Language Model | **Gemini 1.5 Flash (via Official Google SDK)** |
-| 🧠 Secondary Brain | Multilingual LLM | **Groq Llama 3.3 Versatile (Safety Net)** |
-| 🦜 Orchestration | Agent & LCEL Chain | **LangChain (Tools, ReAct Agent, Custom Fallback Model)** |
-| 🤗 Embeddings | Multilingual Vectorization | **Hugging Face (`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`)** |
+| 🤗 Embeddings | Multilingual vectorization | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` |
 | 🗄️ Vector DB | Semantic search | ChromaDB (cosine similarity) |
-| 💾 Cloud DB | Permanent storage | **Vercel KV / Upstash Redis (Logs & Feedback persistence)** |
-| 🤖 Routing | Stability Architecture | **Auto-Discovery + Rate Limit Armor** |
+| 🔁 Re-Ranker | Cross-Encoder precision | **`BAAI/bge-reranker-v2-m3`** (multilingual, CPU, local) |
+| 🛡️ Guardrail | Confidence gating | Custom score mapping + Very Low threshold |
+| 🧠 Primary LLM | Language model | **Gemini Flash Lite (Google GenAI SDK)** |
+| 🧠 Secondary LLM | Multilingual fallback | **Groq Llama 3.1 (Safety Net)** |
+| 🦜 Orchestration | Agent & LCEL chain | **LangChain (LCEL, Custom Fallback ChatModel)** |
+| 💾 Cloud DB | Permanent storage | **Vercel KV / Upstash Redis (Logs & Feedback)** |
+| 📊 Evaluation | RAG quality metrics | **RAGAS (Faithfulness · Relevancy · Precision · Recall)** |
 | 🔊 TTS | Audio synthesis | Sarvam bulbul:v3 · priya speaker |
 | 🎨 UI & API | Product | Streamlit + FastAPI (Deployed on Vercel) |
 | ☁️ Hosting | Cloud | Vercel (API) + Streamlit Cloud (UI) |
@@ -327,14 +371,19 @@ kannada-rag-agent/
 ├── 📂 rag/
 │   └── rag_agent.py             # CLI RAG pipeline
 │
-├── app.py                       # ✅ Main Streamlit app
+├── app.py                       # ✅ Main Streamlit app (UI + guardrail + debug mode)
+├── rag_agent_v2.py              # ✅ Retrieval engine (ChromaDB + CrossEncoder reranker)
+├── eval_ragas.py                # ✅ RAGAS evaluation pipeline
+├── eval_reranking.py            # ✅ Before/after re-ranking comparison script
+├── evaluation_dataset.json      # ✅ Evaluation Q&A samples
 ├── banner.svg                   # ✅ Banner image
 ├── architecture.svg             # ✅ Architecture diagram
 ├── vercel.json                  # ✅ Vercel routing config
+├── streamlit_requirements.txt   # ✅ Streamlit/local deps (includes sentence-transformers)
+├── requirements.txt             # ✅ Vercel serverless deps
 ├── LICENSE                      # ✅ MIT License
 ├── .env                         # API keys (not committed)
 ├── .gitignore
-├── requirements.txt
 └── README.md
 ```
 
@@ -346,6 +395,8 @@ kannada-rag-agent/
 - Python 3.10+
 - Poppler (for pdf2image)
 - [Sarvam AI API key](https://dashboard.sarvam.ai)
+- [Gemini API key](https://aistudio.google.com)
+- [Groq API key](https://console.groq.com)
 
 ### Setup
 
@@ -359,31 +410,41 @@ python -m venv kannada-rag-env
 kannada-rag-env\Scripts\activate        # Windows
 # source kannada-rag-env/bin/activate   # Mac/Linux
 
-# 3. Install
-pip install -r requirements.txt
+# 3. Install (Streamlit / local)
+pip install -r streamlit_requirements.txt
 
-# 4. Create .env file with your API keys
+# 4. Create .env file
 SARVAM_API_KEY=your_sarvam_api_key
 GEMINI_API_KEY=your_gemini_api_key
 GROQ_API_KEY=your_groq_api_key
 ADMIN_PASSWORD=your_admin_password
 
-# 5. Run locally (Streamlit)
+# 5. Run locally
 kannada-rag-env\Scripts\python.exe -m streamlit run app.py
 ```
 
 Open **[http://localhost:8501](http://localhost:8501)** 🎉
 
+> **Note on first run:** The re-ranker model (`BAAI/bge-reranker-v2-m3`, ~570 MB) will be downloaded automatically from HuggingFace and cached. Subsequent starts are instant.
+
+### Run RAGAS Evaluation
+
+```bash
+# Evaluate RAG quality (Faithfulness, Relevancy, Precision, Recall)
+python eval_ragas.py
+
+# Compare before vs after re-ranking
+python eval_reranking.py
+```
+
 ### Vercel Deployment (FastAPI)
 
 ```bash
-# Deploy to Vercel
 npm i -g vercel
 vercel --prod
-
-# Add the following Environment Variables in Vercel Dashboard → Settings → Environment Variables:
+# Add Environment Variables in Vercel Dashboard:
 # SARVAM_API_KEY, GEMINI_API_KEY, GROQ_API_KEY, ADMIN_PASSWORD
-# Then connect Vercel KV (Storage tab) for persistent data storage
+# Then connect Vercel KV (Storage tab) for persistent data
 ```
 
 ---
@@ -398,7 +459,7 @@ vercel --prod
 ```bash
 python pdf_to_images.py        # Phase 1 — PDF → 346 PNGs     (~5 min)
 python preprocess_images.py    # Phase 2 — OpenCV denoise      (~3 min)
-python ocr_surya.py            # Phase 3 — Surya OCR             (~3 hrs CPU)
+python ocr_surya.py            # Phase 3 — Surya OCR           (~3 hrs CPU)
 python clean_text.py           # Phase 4 — Unicode normalize   (~1 min)
 python chunker.py              # Phase 5 — 687 chunks          (~1 min)
 python embed_and_store.py      # Phase 6 — Embed → ChromaDB   (~40 min)
@@ -451,13 +512,18 @@ A complete, production-deployed AI system — built from scratch with no starter
 |:--|:------------|:-------|
 | ✅ | Full OCR pipeline | Scanned PDF → clean Kannada + English text |
 | ✅ | Vector search engine | 687 chunks · ChromaDB · cosine similarity |
-| ✅ | Smart RAG agent | 4-strategy router · Sarvam-M LLM · memory |
+| ✅ | Smart RAG agent | 4-strategy router · LangChain LCEL · Gemini/Groq |
+| ✅ | Cross-Encoder Re-ranking | ChromaDB top-15 → `BAAI/bge-reranker-v2-m3` → top-4 · multilingual · CPU-only |
+| ✅ | Retrieval Confidence Scoring | Cosine-to-percentage mapping · 4-tier label (High/Medium/Low/Very Low) |
+| ✅ | Low Confidence Guardrail | Very Low (<60%) blocks LLM call · bilingual warning card · sources still shown |
+| ✅ | RAGAS Evaluation | Faithfulness · Answer Relevancy · Context Precision · Recall · CSV + JSON + report |
+| ✅ | Re-Ranking Comparison | Baseline vs reranked RAGAS metrics · Δ improvement report |
 | ✅ | Bilingual TTS | WAV stitching · kn-IN + en-IN · bulbul:v3 |
-| ✅ | Production UI | Glassmorphism dark mode · chips · progress bar · feedback |
-| ✅ | Interactive E-Book Suite | Compiled Kannada, English & Bilingual HTML readers with scroll-spy page tracking |
+| ✅ | Production UI | Glassmorphism dark mode · chips · progress bar · debug mode · feedback |
+| ✅ | Interactive E-Book Suite | Compiled Kannada, English & Bilingual HTML readers with scroll-spy |
 | ✅ | Durable Cloud DB | Vercel KV / Upstash Redis REST — persists logs & feedback across cold starts |
 | ✅ | Geolocation Analytics | Background-thread IP-to-location resolver (city, region, country) |
-| ✅ | User Session Tracking | Persistent browser UUID (`localStorage`) + optional name — no sign-up required |
+| ✅ | User Session Tracking | Persistent browser UUID (`localStorage`) + optional name |
 | ✅ | Admin Dashboard | Password-protected · 3 tabs: Users, Activity Log, Feedback |
 | ✅ | Live deployment | Vercel Serverless + Streamlit Cloud · fully managed secrets |
 
@@ -470,10 +536,11 @@ A complete, production-deployed AI system — built from scratch with no starter
 | 🤖 | [Sarvam AI](https://sarvam.ai) | Indic LLM (Sarvam-M) + TTS (bulbul:v3) |
 | 👁️ | [Surya OCR](https://github.com/vikpar/surya) | Kannada + English OCR |
 | 🦜 | [LangChain](https://github.com/langchain-ai/langchain) | Agent & RAG orchestration, custom ChatModel fallback |
-| 🤗 | [Hugging Face](https://huggingface.co/) | Multilingual embeddings (`sentence-transformers` & Feature Extraction API) |
+| 🤗 | [Hugging Face](https://huggingface.co/) | Multilingual embeddings + `BAAI/bge-reranker-v2-m3` Cross-Encoder |
 | 🗄️ | [ChromaDB](https://www.trychroma.com/) | Vector database |
+| 📊 | [RAGAS](https://github.com/explodinggradients/ragas) | RAG evaluation framework |
 | 🔤 | [indic-nlp-library](https://github.com/anoopkunchukuttan/indic_nlp_library) | Kannada Unicode normalization |
-| 🧠 | [sentence-transformers](https://www.sbert.net/) | Multilingual embeddings |
+| 🧠 | [sentence-transformers](https://www.sbert.net/) | Multilingual embeddings + CrossEncoder reranking |
 | 📚 | Ravi Belagere | Author of *ಹೇಳಿ ಹೋಗು ಕಾರಣ* |
 
 ---

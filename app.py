@@ -8,6 +8,8 @@ import requests
 import streamlit as st
 import google.generativeai as genai
 from dotenv import load_dotenv
+import csv
+import datetime
 
 # v2: LangChain-backed retrieval with metadata filtering + fallback
 from rag_agent_v2 import (
@@ -25,6 +27,29 @@ GROQ_API_KEY   = os.getenv("GROQ_API_KEY", "").strip()
 
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
+
+def save_inline_feedback(feedback_type, assistant_msg, user_msg):
+    feedback_file = os.path.join(BASE_DIR, "feedback.csv")
+    file_exists = os.path.isfile(feedback_file)
+    
+    question = user_msg["content"] if user_msg and user_msg["role"] == "user" else "N/A"
+    answer = assistant_msg.get("content", "")
+    confidence_score = assistant_msg.get("confidence_pct", "N/A")
+    pages = assistant_msg.get("pages", [])
+    
+    with open(feedback_file, mode="a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(["Timestamp", "Question", "Generated Answer", "Confidence Score", "Retrieved Pages", "Feedback Type"])
+        
+        writer.writerow([
+            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            question,
+            answer,
+            confidence_score,
+            ",".join(map(str, pages)) if pages else "None",
+            feedback_type
+        ])
 
 def check_and_compile_ebooks():
     ebook_dir = os.path.join(BASE_DIR, "data", "ebooks")
@@ -612,7 +637,7 @@ with st.sidebar:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-for msg in st.session_state.messages:
+for i, msg in enumerate(st.session_state.messages):
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
         if msg.get("confidence_pct") is not None:
@@ -641,6 +666,24 @@ for msg in st.session_state.messages:
                 st.markdown(f"**Page {snip['page']}:**  \n> \"{snip['text']}\"")
         if msg.get("audio"):
             st.audio(msg["audio"])
+            
+        if msg["role"] == "assistant":
+            if not msg.get("inline_feedback_submitted"):
+                col1, col2, _ = st.columns([1, 1, 8])
+                with col1:
+                    if st.button("👍 Helpful", key=f"helpful_{i}"):
+                        user_msg = st.session_state.messages[i-1] if i > 0 else None
+                        save_inline_feedback("Helpful", msg, user_msg)
+                        msg["inline_feedback_submitted"] = True
+                        st.rerun()
+                with col2:
+                    if st.button("👎 Not Helpful", key=f"not_helpful_{i}"):
+                        user_msg = st.session_state.messages[i-1] if i > 0 else None
+                        save_inline_feedback("Not Helpful", msg, user_msg)
+                        msg["inline_feedback_submitted"] = True
+                        st.rerun()
+            else:
+                st.caption("Thank you for your feedback.")
 
 # ── Suggestion chips ──────────────────────────────────────────────────────────
 CHIPS = [
@@ -937,3 +980,30 @@ with st.sidebar:
                 st.divider()
         except:
             st.info("No feedback yet.")
+
+        st.divider()
+        st.markdown("**📊 Inline Feedback Analytics**")
+        csv_file = os.path.join(BASE_DIR, "feedback.csv")
+        if os.path.exists(csv_file):
+            try:
+                import csv
+                total = 0
+                helpful = 0
+                with open(csv_file, "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        total += 1
+                        if row.get("Feedback Type") == "Helpful":
+                            helpful += 1
+                
+                not_helpful = total - helpful
+                pct = (helpful / total * 100) if total > 0 else 0
+                
+                st.markdown(f"- **Total Feedback**: {total}")
+                st.markdown(f"- **Helpful Count**: {helpful}")
+                st.markdown(f"- **Not Helpful Count**: {not_helpful}")
+                st.markdown(f"- **Helpful Percentage**: {pct:.1f}%")
+            except Exception as e:
+                st.error(f"Error reading feedback: {e}")
+        else:
+            st.info("No inline feedback yet.")
