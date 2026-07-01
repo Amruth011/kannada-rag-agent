@@ -129,7 +129,7 @@ def detect_page_filter(question: str):
             return None, (int(groups[0]), int(groups[1]))
 
     page_match = re.search(
-        r'page\s*(\d+)|ಪುಟ\s*(\d+)|(\d+)\s*(?:page|ಪುಟ)',
+        r'page\s*(?:number|no\.?|#)?\s*(\d+)|ಪುಟ\s*(?:ಸಂಖ್ಯೆ)?\s*(\d+)|(\d+)\s*(?:page|ಪುಟ)',
         question, re.IGNORECASE
     )
     if page_match:

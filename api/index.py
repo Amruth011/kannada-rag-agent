@@ -437,11 +437,63 @@ def call_sarvam_tts(text, language="kn-IN"):
     # 2. Fallback to Google TTS (gTTS)
     return call_gtts_parallel(clean, language=language)
 
+def detect_page_filter_simple(question: str):
+    range_match = re.search(
+        r'pages?\s*(\d+)\s*(?:to|through|–|-)\s*(\d+)|ಪುಟಗಳು?\s*(\d+)\s*(?:ರಿಂದ|ಇಂದ|-)\s*(\d+)',
+        question, re.IGNORECASE
+    )
+    if range_match:
+        groups = [g for g in range_match.groups() if g is not None]
+        if len(groups) == 2:
+            return None, (int(groups[0]), int(groups[1]))
+
+    page_match = re.search(
+        r'page\s*(?:number|no\.?|#)?\s*(\d+)|ಪುಟ\s*(?:ಸಂಖ್ಯೆ)?\s*(\d+)|(\d+)\s*(?:page|ಪುಟ)',
+        question, re.IGNORECASE
+    )
+    if page_match:
+        return int(next(g for g in page_match.groups() if g)), None
+
+    return None, None
+
+def is_page_only_query_simple(query: str) -> bool:
+    query = query.lower().strip(" ?.")
+    query = re.sub(r'\b(what|is|on|summarize|explain|tell|me|about|the|content|of|in|page|number|ಪುಟ|ದಲ್ಲಿ|ಏನಿದೆ|ಬಗ್ಗೆ|ಹೇಳಿ)\b', '', query).strip()
+    return bool(re.fullmatch(r'\d+', query))
+
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     try:
-        # Use globally loaded BOOK_DATA
-        chunks = search_text(request.question, BOOK_DATA, top_k=4) 
+        # 1. Detect page/range filter
+        exact_page, page_range = detect_page_filter_simple(request.question)
+        
+        chunks = []
+        is_page_only = False
+        
+        if exact_page is not None:
+            is_page_only = is_page_only_query_simple(request.question)
+            for item in BOOK_DATA:
+                if item.get("page") == exact_page:
+                    chunks.append({
+                        "page": exact_page,
+                        "text": item.get("text", ""),
+                        "score": 1.0
+                    })
+        elif page_range is not None:
+            start_p, end_p = page_range
+            for item in BOOK_DATA:
+                p_num = item.get("page", 0)
+                if start_p <= p_num <= end_p:
+                    chunks.append({
+                        "page": p_num,
+                        "text": item.get("text", ""),
+                        "score": 0.8
+                    })
+                    
+        # Fallback to standard search if no page match was found
+        if not chunks:
+            chunks = search_text(request.question, BOOK_DATA, top_k=4)
+            
         retrieved_pages = [str(c['page']) for c in chunks]
         
         # Implement safe character capping (approx 5,000 chars for Groq)
