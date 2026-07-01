@@ -6,6 +6,9 @@
 [![Streamlit Cloud](https://img.shields.io/badge/Streamlit-Community_Cloud-FF4B4B?logo=streamlit)](#deployment)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+**Tech Stack**: 
+![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python) ![FastAPI](https://img.shields.io/badge/FastAPI-Serverless-009688?logo=fastapi) ![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-FF4B4B?logo=streamlit) ![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-FF6F00) ![Google Gemini](https://img.shields.io/badge/Google_Gemini-LLM-4285F4?logo=google) ![Groq](https://img.shields.io/badge/Groq-Llama_3-F55036)
+
 ## Live Demo
 
 🚀 **[Access the Vercel Production Deployment](https://heli-hogu-kaarana.vercel.app/)**
