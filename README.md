@@ -1,17 +1,28 @@
+<div align="center">
+
 # Kannada RAG Agent & Voice Assistant
 
-> **An enterprise-grade, memory-optimized Retrieval-Augmented Generation (RAG) agent specialized in Kannada literature and seamless voice synthesis.**
+**An enterprise-grade, memory-optimized Retrieval-Augmented Generation (RAG) agent specialized in Kannada literature and seamless voice synthesis. Built solo, designed for scale.**
 
 [![Vercel Deployment](https://img.shields.io/badge/Deployed_on-Vercel-black?logo=vercel)](https://heli-hogu-kaarana.vercel.app/)
 [![Streamlit Cloud](https://img.shields.io/badge/Streamlit-Community_Cloud-FF4B4B?logo=streamlit)](#deployment)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**Tech Stack**: 
-![RAG](https://img.shields.io/badge/RAG-Architecture-8A2BE2) ![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python) ![FastAPI](https://img.shields.io/badge/FastAPI-Serverless-009688?logo=fastapi) ![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-FF4B4B?logo=streamlit) ![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-FF6F00) ![Google Gemini](https://img.shields.io/badge/Google_Gemini-LLM-4285F4?logo=google) ![Groq](https://img.shields.io/badge/Groq-Llama_3-F55036)
+<br/>
 
-## Live Demo
+![RAG](https://img.shields.io/badge/RAG-Architecture-8A2BE2)
+![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-Serverless-009688?logo=fastapi)
+![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-FF4B4B?logo=streamlit)
+![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-FF6F00)
+![Google Gemini](https://img.shields.io/badge/Google_Gemini-LLM-4285F4?logo=google)
+![Groq](https://img.shields.io/badge/Groq-Llama_3-F55036)
 
-🚀 **[Access the Vercel Production Deployment](https://heli-hogu-kaarana.vercel.app/)**
+<br/>
+
+### [🚀 Try the Live Demo](https://heli-hogu-kaarana.vercel.app/) • [💻 Fork & Run](#getting-started-fork--use) • [📖 Read the Docs](docs/architecture.md)
+
+</div>
 
 ---
 
