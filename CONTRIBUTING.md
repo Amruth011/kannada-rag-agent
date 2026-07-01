@@ -1,36 +1,27 @@
 # Contributing to Kannada RAG Agent
 
-First off, thank you for considering contributing to the Kannada RAG Agent project! It's people like you that make the open-source AI community such a fantastic place to learn, inspire, and create.
+Thank you for your interest in the Kannada RAG Agent project! This is currently a solo-maintained repository, but I'm always open to feedback, bug reports, and suggestions.
 
 ## How Can I Contribute?
 
 ### Reporting Bugs
-This section guides you through submitting a bug report. Following these guidelines helps maintainers and the community understand your report, reproduce the behavior, and find related reports.
-- Ensure the bug was not already reported by searching on GitHub under Issues.
-- If you're unable to find an open issue addressing the problem, open a new one. Be sure to include a title and clear description, as much relevant information as possible, and a code sample or an executable test case demonstrating the expected behavior that is not occurring.
+If you find a bug, please check the existing GitHub Issues first. 
+- If you're unable to find an open issue addressing the problem, open a new one. 
+- Be sure to include a clear description, as much relevant information as possible, and a code sample or steps demonstrating the expected behavior that is not occurring.
 
 ### Suggesting Enhancements
-This section guides you through submitting an enhancement suggestion, including completely new features and minor improvements to existing functionality.
 - Open a new issue with the `enhancement` label.
 - Provide a clear and detailed explanation of the feature.
-- Explain why this enhancement would be useful to most users.
+- Explain why this enhancement would be useful.
 
 ### Pull Requests
-The process described here has several goals:
-- Maintain Kannada RAG Agent's quality.
-- Fix problems that are important to users.
-- Engage the community in working toward the best possible product.
+Since I maintain this project solo, I greatly appreciate pull requests that fix bugs or add value.
 
 1. Fork the repo and create your branch from `main`.
 2. If you've added code that should be tested, add tests to the `scripts/eval/` directory.
-3. If you've changed APIs, update the documentation.
-4. Ensure the test suite passes (`python scripts/eval/eval_ragas.py`).
-5. Make sure your code lints.
-6. Issue that pull request!
-
-## Code Style
-- **Python**: Follow PEP 8 guidelines. Use Black for formatting.
-- **Markdown**: Ensure your documentation changes are clear, concise, and spell-checked.
+3. Ensure the test suite passes (`python scripts/eval/eval_ragas.py`).
+4. Make sure your code is clean and follows standard Python conventions (PEP 8).
+5. Submit the pull request!
 
 ## Architecture Guidelines
-Please review the `docs/architecture.md` file before proposing any major changes to the Retrieval pipeline or LLM routing logic. We maintain strict latency and memory thresholds (see `docs/benchmarks.md`).
+Please review the `docs/architecture.md` file before proposing any major changes to the Retrieval pipeline or LLM routing logic. The project maintains strict latency and memory thresholds (see `docs/benchmarks.md`).

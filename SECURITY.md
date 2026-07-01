@@ -15,12 +15,12 @@ Security is a priority for this repository, particularly regarding prompt inject
 
 If you discover a security vulnerability, please DO NOT open a public issue. Instead, please report it privately:
 
-1. **Email the Maintainers:** Send a detailed report to the core maintainers.
+1. **Email the Maintainer:** Send a detailed report directly to me.
 2. **Details to Include:** Provide detailed steps to reproduce the vulnerability, including any relevant code snippets or screenshots. Please state the potential impact of the vulnerability.
-3. **Response Time:** We will acknowledge receipt of your vulnerability report within 48 hours and strive to provide a timeline for a fix.
+3. **Response Time:** Since I maintain this project solo, I will do my best to acknowledge receipt of your vulnerability report as soon as possible and strive to provide a timeline for a fix.
 
 ### Areas of Interest
-We are particularly interested in vulnerabilities related to:
+I am particularly interested in vulnerabilities related to:
 - Prompt Injection / Jailbreaking that bypasses the deterministic page router.
 - Remote Code Execution (RCE) in the FastAPI backend or Streamlit frontend.
 - API Key exfiltration vulnerabilities in the deployment configuration.
