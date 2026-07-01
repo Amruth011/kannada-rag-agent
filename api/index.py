@@ -4037,12 +4037,12 @@ async def root():
                     if (lastConf) {
                         try {
                             const conf = JSON.parse(lastConf);
-                            if (conf && conf.pct !== undefined) {
+                            if (conf && conf.pct !== undefined && !conf.is_deterministic) {
                                 let color = '#dc2626'; // Low
                                 if (conf.lbl === 'High') color = '#16a34a';
                                 else if (conf.lbl === 'Medium') color = '#ea580c';
                                 confVal.innerHTML = `<span style="color: ${color};">${conf.lbl}</span> <span style="color: #6b7280; font-size: 0.95rem;">(${conf.pct}%)</span>`;
-                                if (conf.pct < 60 && !conf.is_deterministic) {
+                                if (conf.pct < 60) {
                                     confWarn.style.display = 'block';
                                 } else {
                                     confWarn.style.display = 'none';
@@ -4291,7 +4291,7 @@ async def root():
                     const confRes = document.getElementById('confidence-res');
                     const confVal = document.getElementById('confidence-val');
                     const confWarn = document.getElementById('confidence-warn');
-                    if (d.confidence_pct !== undefined && d.confidence_pct > 0) {
+                    if (d.confidence_pct !== undefined && d.confidence_pct > 0 && !d.is_deterministic) {
                         const pct = Math.round(d.confidence_pct);
                         const lbl = d.confidence_label;
                         let color = '#dc2626'; // Low
@@ -4300,7 +4300,7 @@ async def root():
                         
                         confVal.innerHTML = `<span style="color: ${color};">${lbl}</span> <span style="color: #6b7280; font-size: 0.95rem;">(${pct}%)</span>`;
                         
-                        if (pct < 60 && !d.is_deterministic) {
+                        if (pct < 60) {
                             confWarn.style.display = 'block';
                         } else {
                             confWarn.style.display = 'none';

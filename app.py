@@ -697,11 +697,12 @@ for i, msg in enumerate(st.session_state.messages):
         if msg.get("confidence_pct") is not None:
             pct = msg["confidence_pct"]
             lbl = msg["confidence_label"]
-            conf_color = "#22c55e" if pct >= 85 else ("#f59e0b" if pct >= 70 else ("#f97316" if pct >= 60 else "#ef4444"))
-            st.markdown(
-                f"<span style='font-weight:600;color:{conf_color};'>Confidence: {lbl} ({int(pct)}%)</span>",
-                unsafe_allow_html=True
-            )
+            if not msg.get("deterministic"):
+                conf_color = "#22c55e" if pct >= 85 else ("#f59e0b" if pct >= 70 else ("#f97316" if pct >= 60 else "#ef4444"))
+                st.markdown(
+                    f"<span style='font-weight:600;color:{conf_color};'>Confidence: {lbl} ({int(pct)}%)</span>",
+                    unsafe_allow_html=True
+                )
             if msg.get("guardrail"):
                 st.markdown("""
 <div style='background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.35);
@@ -950,14 +951,13 @@ if question:
                     f"<span style='font-weight:600;color:{conf_color};'>Page Retrieval: {page_status}</span>",
                     unsafe_allow_html=True
                 )
-            elif not general and chunks:
+            elif not general and chunks and not (final_page or final_range or page_only):
                 conf_color = "#22c55e" if confidence_pct >= 85 else ("#f59e0b" if confidence_pct >= 70 else ("#f97316" if confidence_pct >= 60 else "#ef4444"))
                 st.markdown(
                     f"<span style='font-weight:600;color:{conf_color};'>Confidence: {confidence_label} ({int(confidence_pct)}%)</span>",
                     unsafe_allow_html=True
                 )
-                # Suppress warning for metadata/deterministic paths
-                if confidence_pct < 70 and not (final_page or final_range or page_only):
+                if confidence_pct < 70:
                     st.warning("Low confidence: Retrieved evidence may be insufficient.")
             
             msg_snippets = []
