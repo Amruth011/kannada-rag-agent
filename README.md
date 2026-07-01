@@ -51,14 +51,14 @@ graph TD
     User((User)) -->|Input Query| QR[Query Router]
     
     %% Routing Logic
-    QR -->|Regex Match| MR{Metadata Route?}
+    QR -->|Regex Match| MR{"Metadata Route?"}
     
     %% Deterministic Path
-    MR -->|Yes (Exact Page)| PR[Page Router / Exact Match]
+    MR -->|"Yes (Exact Page)"| PR["Page Router / Exact Match"]
     PR --> Context[Context Builder]
     
     %% Semantic Path
-    MR -->|No (Semantic)| HS[Hybrid Search]
+    MR -->|"No (Semantic)"| HS[Hybrid Search]
     
     %% Hybrid Search Components
     HS --> Dense[Dense Retrieval ChromaDB]
@@ -155,11 +155,6 @@ For detailed local, Docker, and cloud deployments, see `docs/deployment.md`.
 
 ---
 
-## Screenshots
-
-*(Coming Soon - Refer to `docs/assets/` for UI diagrams)*
-
----
 
 ## Roadmap
 
