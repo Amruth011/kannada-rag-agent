@@ -138,7 +138,42 @@ See detailed memory footprints and latency testing in `docs/benchmarks.md`.
 
 ---
 
+## Getting Started (Fork & Use)
+
+Since this is an open-source project, you can easily fork and run this on your own infrastructure.
+
+### 1. Fork & Clone
+1. Fork the repository via the GitHub UI.
+2. Clone your fork locally:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/kannada-rag-agent.git
+   cd kannada-rag-agent
+   ```
+
+### 2. Environment Setup
+1. Create a Python 3.11+ virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Windows: venv\Scripts\activate
+   ```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Copy the environment variables template and add your API keys (Gemini, Groq, Sarvam):
+   ```bash
+   cp .env.example .env
+   ```
+
+### 3. Run Locally (Streamlit)
+```bash
+streamlit run app.py
+```
+
+---
+
 ## Deployment
+
 
 ### Vercel Serverless (Recommended)
 This repository is optimized for Vercel's Edge/Serverless functions. 
