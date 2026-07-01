@@ -91,7 +91,7 @@ def main():
             chunks = []
             rag_section = "General question — answered from general book knowledge."
         else:
-            chunks, _ = retrieve_v2(question, page=page, page_range=page_range, is_character=is_char, language=lang)
+            chunks, _, _ = retrieve_v2(question, page=page, page_range=page_range, is_character=is_char, language=lang)
             if chunks:
                 rag_section = "\n\n---\n\n".join(f"[Page {c['page']}]:\n{c['text']}" for c in chunks)
             else:

@@ -1,4 +1,9 @@
 # api/index.py - FastAPI version for Vercel deployment Final v5 (Stable)
+import sys
+from unittest.mock import MagicMock
+sys.modules['transformers'] = MagicMock()
+sys.modules['torch'] = MagicMock()
+
 from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
@@ -106,54 +111,7 @@ TRANSLIT_MAP = {
     "hogu": "ಹೋಗು"
 }
 
-def load_data():
-    paths = [
-        os.path.join(os.path.dirname(__file__), "data.json"),
-        "api/data.json", 
-        "data.json", 
-        "/var/task/api/data.json", 
-        "/var/task/data.json"
-    ]
-    for p in paths:
-        if os.path.exists(p):
-            try:
-                with open(p, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except Exception:
-                continue
-    return []
-
-# Load data once at startup to prevent Vercel timeouts
-BOOK_DATA = load_data()
-
-def search_text(query, data, top_k=5):
-    """Retrieves full pages for Gemini's large context window."""
-    query_words = set(query.lower().split())
-    results = []
-    
-    for item in data:
-        page_num = item.get('page', 0)
-        text = item.get('text', '')
-        text_lower = text.lower()
-        score = 0
-        for word in query_words:
-            if word in text_lower:
-                score += 5
-            # Simple transliteration bridge for English queries
-            mapped = TRANSLIT_MAP.get(word, "")
-            if mapped and mapped in text_lower:
-                score += 10
-        
-        if score > 0:
-            results.append({
-                'page': page_num,
-                'text': text,
-                'score': score
-            })
-                
-    # Rank by score and pick top_k full pages for Gemini
-    results.sort(key=lambda x: x['score'], reverse=True)
-    return results[:top_k]
+# BOOK_DATA and search_text removed to optimize memory usage (unreferenced dead code)
 
 def call_groq(prompt, history=None, system_instruction=None, retries=1):
     """Fallback to Groq with active model fallbacks (Llama 3.3 -> Llama 3.1 -> Llama 4 Scout)."""

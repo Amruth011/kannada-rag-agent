@@ -58,7 +58,7 @@ EVAL_DATASET = [
 
 def run_pipeline(question, history, lang):
     page, page_range = detect_page_filter(question)
-    chunks, _ = retrieve_v2(question, page=page, page_range=page_range, is_character=False, language=lang)
+    chunks, _, _ = retrieve_v2(question, page=page, page_range=page_range, is_character=False, language=lang)
     if chunks:
         rag_section = "\n\n---\n\n".join(f"[Page {c['page']}]:\n{c['text']}" for c in chunks)
     else:

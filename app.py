@@ -1,6 +1,11 @@
 # app.py — Kannada Book AI Agent v2
 # Run: kannada-rag-env\Scripts\python.exe -m streamlit run app.py
 
+import sys
+from unittest.mock import MagicMock
+sys.modules['transformers'] = MagicMock()
+sys.modules['torch'] = MagicMock()
+
 import os
 import re
 import base64

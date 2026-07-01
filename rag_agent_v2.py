@@ -16,11 +16,7 @@ from typing import Optional, List, Any
 
 # LangChain 1.x imports
 from langchain_core.tools import Tool
-from langchain_classic.agents import AgentExecutor, create_react_agent
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
-from langchain_groq import ChatGroq
-from langchain_community.vectorstores import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import BaseMessage, AIMessage, HumanMessage, SystemMessage
 from langchain_core.outputs import ChatResult, ChatGeneration
@@ -67,12 +63,47 @@ NOT_FOUND_MSG_KN = (
 # 1.  VECTOR STORE
 # ══════════════════════════════════════════════════════════════════════════════
 
+_pytorch_tuned = False
+
+def unmock_transformers():
+    """Unmock transformers and torch if mocked at startup, and apply PyTorch thread limits."""
+    global _pytorch_tuned
+    if _pytorch_tuned:
+        return
+        
+    import sys
+    for mod in ['transformers', 'torch']:
+        if mod in sys.modules:
+            if 'mock' in str(type(sys.modules[mod])).lower():
+                del sys.modules[mod]
+    
+    try:
+        import torch
+        torch.set_num_threads(4)
+    except Exception as e:
+        print(f"[WARN] Failed to set PyTorch num_threads: {e}")
+        
+    try:
+        import torch
+        torch.set_num_interop_threads(1)
+    except Exception as e:
+        pass
+        
+    _pytorch_tuned = True
+
+_embeddings_cache = None
+
 def get_vectorstore():
     """Load existing ChromaDB via LangChain wrapper."""
-    embeddings = HuggingFaceEmbeddings(model_name=MODEL_NAME)
+    global _embeddings_cache
+    unmock_transformers()
+    from langchain_huggingface import HuggingFaceEmbeddings
+    from langchain_community.vectorstores import Chroma
+    if _embeddings_cache is None:
+        _embeddings_cache = HuggingFaceEmbeddings(model_name=MODEL_NAME)
     return Chroma(
         collection_name  = COLLECTION,
-        embedding_function = embeddings,
+        embedding_function = _embeddings_cache,
         persist_directory  = CHROMA_DIR,
     )
 
@@ -118,12 +149,22 @@ def is_page_only_query(query: str) -> bool:
     return bool(re.fullmatch(r'\d+', query))
 
 
+_chroma_collection = None
+
+def _get_collection():
+    global _chroma_collection
+    if _chroma_collection is None:
+        import chromadb
+        client = chromadb.PersistentClient(path=CHROMA_DIR)
+        _chroma_collection = client.get_collection(COLLECTION)
+    return _chroma_collection
+
 def retrieve_exact_page(page: int) -> list[dict]:
     """
     Retrieve all chunks for an exact page bypassing vector/semantic search.
     """
-    vs = _get_vs()
-    data = vs.get(where={"page": page})
+    collection = _get_collection()
+    data = collection.get(where={"page": page})
     
     chunks = []
     for doc, meta in zip(data.get("documents", []), data.get("metadatas", [])):
@@ -146,6 +187,7 @@ def _get_reranker():
     """Lazy-load the cross-encoder re-ranker (cached after first call)."""
     global _reranker
     if _reranker is None:
+        unmock_transformers()
         try:
             from sentence_transformers import CrossEncoder
             _reranker = CrossEncoder(RERANK_MODEL, max_length=512)
@@ -547,7 +589,7 @@ def _rag_search_tool_fn(query: str) -> str:
         r'himavant|prarthana|ಹಿಮವಂತ|ಪ್ರಾರ್ಥನಾ|who is|character|ಪಾತ್ರ',
         query, re.IGNORECASE
     ))
-    chunks, fallback = retrieve_v2(
+    chunks, fallback, _ = retrieve_v2(
         query        = query,
         page         = page,
         page_range   = page_range,
@@ -617,9 +659,12 @@ Final Answer: your complete answer
 Question: {input}
 Thought:{agent_scratchpad}"""
 
-def get_agent(language: str = "English") -> AgentExecutor:
+def get_agent(language: str = "English") -> "AgentExecutor":
     if not GROQ_API_KEY:
         raise ValueError("GROQ_API_KEY not set")
+
+    from langchain_groq import ChatGroq
+    from langchain_classic.agents import AgentExecutor, create_react_agent
 
     llm = ChatGroq(
         model       = "llama-3.3-70b-versatile",
