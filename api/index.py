@@ -516,6 +516,7 @@ async def chat(request: ChatRequest):
                 "Note that Ravi Belagere is the author and narrator of the story; he is not a character inside the novel itself. "
                 "If the user asks about 'Ravi' or 'Ravi Belagere' or 'Ravi\'s role', explain that he is the author and narrator of the novel, and describe his narrative style and connection as the author. "
                 "Use the retrieved passages and this context to answer the user's question. "
+                "CRITICAL GROUNDING RULE: Answer ONLY using the facts literally present in the RETRIEVED NOVEL PASSAGES. Do NOT invent, make up, or hallucinate any story narrative, plot points, events, or character details. If the retrieved passage is extremely short or contains only a heading, title, or page number (such as 'ಹೇಳಿ ಹೋಗು ಕಾರಣ / 05'), you MUST state clearly and literally that the page contains only that heading, and list exactly what is written. Do NOT extrapolate or assume any story events. "
                 "CRITICAL RULE: You must answer ONLY in English. Do NOT write in Kannada, and do NOT mix Kannada and English in your reply. "
                 "All explanations, analysis, and text must be in English. "
                 "If the conversation history contains messages in Kannada, ignore their language and reply only in English. "
@@ -529,7 +530,7 @@ async def chat(request: ChatRequest):
 RETRIEVED NOVEL PASSAGES:
 {pagetext}
 
-Answer the user's question in detail using the retrieved passages and the novel metadata context. Follow the instructions to write the entire answer in English.
+Answer the user's question in detail using ONLY the retrieved passages and the novel metadata context. Follow the instructions to write the entire answer in English. Do NOT make up any details that are not in the passages.
 
 QUESTION: {request.question}
 ANSWER in English:"""
@@ -539,6 +540,7 @@ ANSWER in English:"""
                 "ರವಿ ಬೆಳಗೆರೆ ಅವರು ಈ ಕಾದಂಬರಿಯ ಕರ್ತೃ ಮತ್ತು ಸೂತ್ರಧಾರ/ನಿರೂಪಕರಾಗಿದ್ದಾರೆ; ಅವರು ಕಥೆಯ ಒಳಗಿನ ಪಾತ್ರವಲ್ಲ ಎಂಬುದನ್ನು ಗಮನಿಸಿ. "
                 "ಬಳಕೆದಾರರು 'ರವಿ' ಅಥವಾ 'ರವಿ ಬೆಳಗೆರೆ' ಅಥವಾ ಅವರ ಪಾತ್ರದ ಬಗ್ಗೆ ಕೇಳಿದರೆ, ಅವರು ಕಾದಂಬರಿಯ ಕರ್ತೃ/ನಿರೂಪಕರು ಎಂದು ವಿವರಿಸಿ. "
                 "ಹಿಂಪಡೆದ ಪುಸ್ತಕದ ಭಾಗಗಳನ್ನು ಮತ್ತು ಈ ಹಿನ್ನೆಲೆಯನ್ನು ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರಿಸಿ. "
+                "ಪ್ರಮುಖ ಗ್ರೌಂಡಿಂಗ್ ನಿಯಮ (CRITICAL GROUNDING RULE): ಹಿಂಪಡೆದ ಪಠ್ಯದಲ್ಲಿ (RETRIEVED NOVEL PASSAGES) ನೇರವಾಗಿ ಇರುವ ವಿಷಯಗಳನ್ನು ಮಾತ್ರ ಆಧರಿಸಿ ಉತ್ತರಿಸಿ. ನಿಮ್ಮ ಸ್ವಂತ ಕಲ್ಪನೆ ಅಥವಾ ಕಥೆಯನ್ನು ಸೇರಿಸಬೇಡಿ. ಹಿಂಪಡೆದ ಭಾಗದಲ್ಲಿ ಕೇವಲ ಶೀರ್ಷಿಕೆ ಅಥವಾ ಪುಟದ ಸಂಖ್ಯೆ ಇದ್ದರೆ (ಉದಾಹರಣೆಗೆ 'ಹೇಳಿ ಹೋಗು ಕಾರಣ / 05'), ಆ ಪುಟದಲ್ಲಿ ಕೇವಲ ಅದೇ ಶೀರ್ಷಿಕೆ ಇದೆ ಎಂದು ಸ್ಪಷ್ಟವಾಗಿ ತಿಳಿಸಿ. ಕಥೆಯ ವಿಷಯಗಳನ್ನು ಊಹಿಸಬೇಡಿ. "
                 "ಪ್ರಮುಖ ನಿಯಮ: ನೀವು ಕಡ್ಡಾಯವಾಗಿ ಮತ್ತು ಸಂಪೂರ್ಣವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಉತ್ತರಿಸಬೇಕು. "
                 "ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ಇಂಗ್ಲಿಷ್ ಬಳಸಬೇಡಿ, ಮತ್ತು ಇಂಗ್ಲಿಷ್ ಮತ್ತು ಕನ್ನಡದ ಮಿಶ್ರಣವನ್ನು ಬಳಸಬೇಡಿ. "
                 "ಎಲ್ಲಾ ವಿವರಣೆಗಳು, ವಿಶ್ಲೇಷಣೆಗಳು ಮತ್ತು ಪಠ್ಯಗಳು ಕಡ್ಡಾಯವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಇರಬೇಕು. "
@@ -553,24 +555,33 @@ ANSWER in English:"""
 ಪುಸ್ತಕದಿಂದ ತೆಗೆದ ವಿಷಯ (RETRIEVED NOVEL PASSAGES):
 {pagetext}
 
-ಹಿಂಪಡೆದ ಭಾಗಗಳನ್ನು ಮತ್ತು ಕಾದಂಬರಿಯ ಮಾಹಿತಿಯನ್ನು ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ. ಸಂಪೂರ್ಣ ಉತ್ತರವನ್ನು ಕನ್ನಡದಲ್ಲೇ ಬರೆಯುವ ನಿಯಮವನ್ನು ಪಾಲಿಸಿ.
+ಹಿಂಪಡೆದ ಭಾಗಗಳನ್ನು ಮತ್ತು ಕಾದಂಬರಿಯ ಮಾಹಿತಿಯನ್ನು ಮಾತ್ರ ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ. ಉತ್ತರದಲ್ಲಿ ಯಾವುದೇ ಕಲ್ಪಿತ ಮಾಹಿತಿಯನ್ನು ಸೇರಿಸಬೇಡಿ. ಸಂಪೂರ್ಣ ಉತ್ತರವನ್ನು ಕನ್ನಡದಲ್ಲೇ ಬರೆಯುವ ನಿಯಮವನ್ನು ಪಾಲಿಸಿ.
 
 ಪ್ರಶ್ನೆ (QUESTION): {request.question}
 ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ (ANSWER in Kannada):"""
         
-        # Extract source snippets
-        seen_pages = set()
-        snippets = []
+        # Extract source snippets dynamically by combining chunks and filtering out short headers
+        snippets_dict = {}
         for c in chunks:
-            page = c['page']
-            if page not in seen_pages:
-                seen_pages.add(page)
-                text = c['text']
-                snippet_text = text[:150] + "..." if len(text) > 150 else text
-                snippets.append({
-                    "page": str(page),
-                    "text": snippet_text
-                })
+            page = str(c['page'])
+            text = c['text'].strip()
+            if not text:
+                continue
+            if page not in snippets_dict:
+                snippets_dict[page] = []
+            snippets_dict[page].append(text)
+            
+        snippets = []
+        for page, texts in snippets_dict.items():
+            filtered_texts = [t for t in texts if len(t) > 30]
+            if not filtered_texts:
+                filtered_texts = texts
+            combined_text = " | ".join(filtered_texts)
+            snippet_text = combined_text[:250] + "..." if len(combined_text) > 250 else combined_text
+            snippets.append({
+                "page": page,
+                "text": snippet_text
+            })
 
         # Calculate retrieval confidence score
         confidence_pct = 0.0
