@@ -1,12 +1,12 @@
 services:
   - type: web
-    name: kannada-rag-api
+    name: kannada-rag-agent
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "streamlit run app.py --server.port $PORT --server.address 0.0.0.0"
+    startCommand: "streamlit run app.py --server.address=0.0.0.0 --server.port=$PORT"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.12
+        value: 3.11.9
       - key: SARVAM_API_KEY
         sync: false
       - key: GEMINI_API_KEY

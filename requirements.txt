@@ -25,9 +25,8 @@ langchain-huggingface
 langchain-classic
 rank-bm25
 
-# Optional OCR / processing dependencies (can be removed if not ingesting on Render)
+# OCR & Processing Dependencies
 pdf2image
 opencv-python
 surya-ocr
 indic-nlp-library
-wave
