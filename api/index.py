@@ -437,142 +437,123 @@ def call_sarvam_tts(text, language="kn-IN"):
     # 2. Fallback to Google TTS (gTTS)
     return call_gtts_parallel(clean, language=language)
 
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from rag_agent_v2 import (
-    detect_page_filter, is_page_only_query, retrieve_exact_page,
-    rewrite_query, is_general_question, is_character_question, retrieve_v2,
-    get_rag_chain, BOOK_CONTEXT
-)
-
-def calculate_confidence(chunks):
-    if not chunks:
-        return 0.0
-    avg_score = sum(c.get("score", 0.0) for c in chunks) / len(chunks)
-    if avg_score >= 0.35:
-        p = 85 + (avg_score - 0.35) * 23.0 
-    elif avg_score >= 0.25:
-        p = 70 + (avg_score - 0.25) * 150.0 
-    else:
-        p = 50 + (avg_score - 0.20) * 400.0 
-    return min(100.0, max(0.0, p))
-
-def get_confidence_label(pct: float) -> str:
-    if pct >= 85:  return "High"
-    if pct >= 70:  return "Medium"
-    if pct >= 60:  return "Low"
-    return "Very Low"
-
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     try:
-        current_lang = request.language
-        question = request.question
+        # Use globally loaded BOOK_DATA
+        chunks = search_text(request.question, BOOK_DATA, top_k=4) 
+        retrieved_pages = [str(c['page']) for c in chunks]
         
-        # 1. Routing
-        auto_page, auto_range = detect_page_filter(question)
-        page_only = is_page_only_query(question) if auto_page else False
-        
-        if page_only and auto_page:
-            rewritten_q = "Please summarize the provided page."
-            chunks = retrieve_exact_page(auto_page)
-            fallback_msg = "" if chunks else f"Page {auto_page} not found in the book."
-            general = False
-        else:
-            from langchain_core.messages import HumanMessage, AIMessage
-            history_objs = []
-            if request.history:
-                for msg in request.history[-4:]:
-                    if msg.get("role") == "user":
-                        history_objs.append(HumanMessage(content=msg.get("content", "")))
-                    else:
-                        clean = re.sub(r'\[Page \d+\]:', '', msg.get("content", "")).strip()
-                        history_objs.append(AIMessage(content=clean))
-                        
-            rewritten_q = rewrite_query(question, history_objs)
-            general = is_general_question(rewritten_q)
-            is_char = is_character_question(rewritten_q)
+        # Implement safe character capping (approx 5,000 chars for Groq)
+        pagetext = ""
+        current_len = 0
+        for c in chunks:
+            text_block = f"[Passage from Page {c['page']}]: {c['text']}\n\n"
+            if current_len + len(text_block) > 5000:
+                break
+            pagetext += text_block
+            current_len += len(text_block)
             
-            if not auto_page and not auto_range:
-                auto_page, auto_range = detect_page_filter(rewritten_q)
-                
-            chunks, fallback_msg, _ = retrieve_v2(
-                query        = rewritten_q,
-                page         = auto_page if not general else None,
-                page_range   = auto_range if not general else None,
-                is_character = is_char,
-                language     = current_lang,
+        if not pagetext: pagetext = "No direct passages found."
+        
+        # Build prompt based on requested language
+        if request.language == "English":
+            sys_instruction = (
+                "You are a professional literary assistant for the Kannada novel 'Heli Hogu Kaarana'. "
+                "The novel was written by the famous Kannada author and journalist Ravi Belagere (ರವಿ ಬೆಳಗೆರೆ). "
+                "Note that Ravi Belagere is the author and narrator of the story; he is not a character inside the novel itself. "
+                "If the user asks about 'Ravi' or 'Ravi Belagere' or 'Ravi\'s role', explain that he is the author and narrator of the novel, and describe his narrative style and connection as the author. "
+                "Use the retrieved passages and this context to answer the user's question. "
+                "CRITICAL RULE: You must answer ONLY in English. Do NOT write in Kannada, and do NOT mix Kannada and English in your reply. "
+                "All explanations, analysis, and text must be in English. "
+                "If the conversation history contains messages in Kannada, ignore their language and reply only in English. "
+                "Always cite the exact page numbers from the passages in your answer when referencing the text."
             )
-            
-        # 2. Guardrails & Confidence
-        confidence_pct = calculate_confidence(chunks) if not general else 100.0
-        confidence_label = get_confidence_label(confidence_pct)
-        is_very_low = (confidence_pct < 60) and not general and chunks
+            full_prompt = f"""NOVEL METADATA:
+- Title: Heli Hogu Kaarana (ಹೇಳಿ ಹೋಗು ಕಾರಣ)
+- Author: Ravi Belagere (ರವಿ ಬೆಳಗೆರೆ) (Note: Ravi Belagere is the author and narrator of the novel, not a character in the story.)
+- Main Characters: Himavant (ಹಿಮವಂತ್), Prarthana (ಪ್ರಾರ್ಥನಾ)
+
+RETRIEVED NOVEL PASSAGES:
+{pagetext}
+
+Answer the user's question in detail using the retrieved passages and the novel metadata context. Follow the instructions to write the entire answer in English.
+
+QUESTION: {request.question}
+ANSWER in English:"""
+        else:
+            sys_instruction = (
+                "ನೀವು ರವಿ ಬೆಳಗೆರೆ ಅವರು ಬರೆದ 'ಹೇಳಿ ಹೋಗು ಕಾರಣ' ಕಾದಂಬರಿಯ ವೃತ್ತಿಪರ ಸಾಹಿತ್ಯ ಸಹಾಯಕರು. "
+                "ರವಿ ಬೆಳಗೆರೆ ಅವರು ಈ ಕಾದಂಬರಿಯ ಕರ್ತೃ ಮತ್ತು ಸೂತ್ರಧಾರ/ನಿರೂಪಕರಾಗಿದ್ದಾರೆ; ಅವರು ಕಥೆಯ ಒಳಗಿನ ಪಾತ್ರವಲ್ಲ ಎಂಬುದನ್ನು ಗಮನಿಸಿ. "
+                "ಬಳಕೆದಾರರು 'ರವಿ' ಅಥವಾ 'ರವಿ ಬೆಳಗೆರೆ' ಅಥವಾ ಅವರ ಪಾತ್ರದ ಬಗ್ಗೆ ಕೇಳಿದರೆ, ಅವರು ಕಾದಂಬರಿಯ ಕರ್ತೃ/ನಿರೂಪಕರು ಎಂದು ವಿವರಿಸಿ. "
+                "ಹಿಂಪಡೆದ ಪುಸ್ತಕದ ಭಾಗಗಳನ್ನು ಮತ್ತು ಈ ಹಿನ್ನೆಲೆಯನ್ನು ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರಿಸಿ. "
+                "ಪ್ರಮುಖ ನಿಯಮ: ನೀವು ಕಡ್ಡಾಯವಾಗಿ ಮತ್ತು ಸಂಪೂರ್ಣವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಉತ್ತರಿಸಬೇಕು. "
+                "ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ಇಂಗ್ಲಿಷ್ ಬಳಸಬೇಡಿ, ಮತ್ತು ಇಂಗ್ಲಿಷ್ ಮತ್ತು ಕನ್ನಡದ ಮಿಶ್ರಣವನ್ನು ಬಳಸಬೇಡಿ. "
+                "ಎಲ್ಲಾ ವಿವರಣೆಗಳು, ವಿಶ್ಲೇಷಣೆಗಳು ಮತ್ತು ಪಠ್ಯಗಳು ಕಡ್ಡಾಯವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಇರಬೇಕು. "
+                "ಸಂಭಾಷಣೆಯ ಇತಿಹಾಸದಲ್ಲಿ (history) ಇಂಗ್ಲಿಷ್ ಸಂದೇಶಗಳಿದ್ದರೂ ಸಹ, ಅವುಗಳನ್ನು ನಿರ್ಲಕ್ಷಿಸಿ ಮತ್ತು ಈ ಪ್ರಸ್ತುತ ಪ್ರಶ್ನೆಗೆ ಸಂಪೂರ್ಣವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಉತ್ತರಿಸಿ. "
+                "ಉತ್ತರದಲ್ಲಿ ಕಡ್ಡಾಯವಾಗಿ ಸೂಕ್ತ ಪುಟ ಸಂಖ್ಯೆಗಳನ್ನು ಉಲ್ಲೇಖಿಸಿ."
+            )
+            full_prompt = f"""ಕಾದಂಬರಿಯ ಮಾಹಿತಿ (NOVEL METADATA):
+- ಶೀರ್ಷಿಕೆ: ಹೇಳಿ ಹೋಗು ಕಾರಣ
+- ಲೇಖಕರು: ರವಿ ಬೆಳಗೆರೆ (ಗಮನಿಸಿ: ರವಿ ಬೆಳಗೆರೆ ಅವರು ಕಾದಂಬರಿಯ ಲೇಖಕ ಮತ್ತು ನಿರೂಪಕರಾಗಿದ್ದಾರೆ; ಅವರು ಕಥೆಯ ಒಳಗಿನ ಪಾತ್ರವಲ್ಲ.)
+- ಮುಖ್ಯ ಪಾತ್ರಗಳು: ಹಿಮವಂತ್ (ಹಿಮವಂತ), ಪ್ರಾರ್ಥನಾ
+
+ಪುಸ್ತಕದಿಂದ ತೆಗೆದ ವಿಷಯ (RETRIEVED NOVEL PASSAGES):
+{pagetext}
+
+ಹಿಂಪಡೆದ ಭಾಗಗಳನ್ನು ಮತ್ತು ಕಾದಂಬರಿಯ ಮಾಹಿತಿಯನ್ನು ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ. ಸಂಪೂರ್ಣ ಉತ್ತರವನ್ನು ಕನ್ನಡದಲ್ಲೇ ಬರೆಯುವ ನಿಯಮವನ್ನು ಪಾಲಿಸಿ.
+
+ಪ್ರಶ್ನೆ (QUESTION): {request.question}
+ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ (ANSWER in Kannada):"""
         
-        if is_very_low:
-            fallback_msg = "I could not find sufficient evidence in the novel to answer this question reliably." if current_lang == "English" else "ಈ ಪ್ರಶ್ನೆಗೆ ಪುಸ್ತಕದಲ್ಲಿ ಸಾಕಷ್ಟು ಆಧಾರ ಸಿಗಲಿಲ್ಲ."
-            
-        # Extract snippets and sources
+        # Extract source snippets
         seen_pages = set()
         snippets = []
-        retrieved_pages = []
         for c in chunks:
             page = c['page']
             if page not in seen_pages:
                 seen_pages.add(page)
-                retrieved_pages.append(str(page))
                 text = c['text']
                 snippet_text = text[:150] + "..." if len(text) > 150 else text
                 snippets.append({
                     "page": str(page),
                     "text": snippet_text
                 })
-                
-        if fallback_msg and not general:
-            return ChatResponse(
-                answer=fallback_msg, 
-                sources=retrieved_pages, 
-                snippets=snippets, 
-                confidence_pct=confidence_pct, 
-                confidence_label=confidence_label
-            )
+
+        # Calculate retrieval confidence score
+        confidence_pct = 0.0
+        confidence_label = "Low"
+        
+        general_patterns = [
+            r'what is (this|the) book', r'about (this|the) book',
+            r'book (about|summary|theme)', r'who (is|wrote|is the author).*ravi',
+            r'ravi belagere', r'author', r'ಪುಸ್ತಕ(ದ|ವು|ದ ಬಗ್ಗೆ)', r'ಕಾದಂಬರಿ',
+            r'ರವಿ ಬೆಳಗೆರೆ', r'ವಿಷಯ ಏನು', r'ಯಾರು ಬರೆದ', r'ಮುಖ್ಯ ವಿಷಯ',
+            r'summary', r'theme', r'title mean', r'ಶೀರ್ಷಿಕೆ',
+        ]
+        is_general = any(re.search(pat, request.question, re.IGNORECASE) for pat in general_patterns)
+        
+        if is_general:
+            confidence_pct = 100.0
+            confidence_label = "High"
+        elif chunks:
+            stop_words = {"what", "is", "this", "the", "in", "of", "to", "who", "whom", "about", "and", "or", "a", "an", "page", "pages", "ಪುಟ", "ಪುಟಗಳು"}
+            query_words = [w for w in re.sub(r'[^\w\s]', '', request.question.lower()).split() if w not in stop_words]
+            expected = max(10, 10 * len(query_words))
+            avg_score = sum(c.get("score", 0.0) for c in chunks) / len(chunks)
+            ratio = avg_score / expected
             
-        # 3. LLM Answer Generation
-        capped, cur_len = [], 0
-        for c in chunks:
-            if cur_len + len(c["text"]) > 5000: break
-            capped.append(c); cur_len += len(c["text"])
-            
-        rag_section = "\n\n".join([f"[Page {c['page']}]: {c['text']}" for c in capped]) if capped else "(No specific passages retrieved.)"
-        
-        from langchain_core.messages import HumanMessage, AIMessage
-        history = []
-        if request.history:
-            for msg in request.history[-4:]:
-                if msg.get("role") == "user":
-                    history.append(HumanMessage(content=msg.get("content", "")))
-                else:
-                    clean = re.sub(r'\[Page \d+\]:', '', msg.get("content", "")).strip()
-                    history.append(AIMessage(content=clean))
-        
-        chain = get_rag_chain(current_lang, is_page_summary=page_only)
-        
-        answer = chain.invoke({
-            "book_context": BOOK_CONTEXT if not page_only else "",
-            "context": rag_section,
-            "history": history,
-            "question": rewritten_q
-        })
-        
-        return ChatResponse(
-            answer=answer, 
-            sources=retrieved_pages, 
-            snippets=snippets, 
-            confidence_pct=confidence_pct, 
-            confidence_label=confidence_label
-        )
+            if ratio >= 1.0:
+                p = 90 + min(10.0, (ratio - 1.0) * 5)
+            elif ratio >= 0.5:
+                p = 70 + (ratio - 0.5) * 40.0
+            else:
+                p = ratio * 140.0
+            confidence_pct = min(100.0, max(0.0, p))
+            confidence_label = "High" if confidence_pct >= 85 else ("Medium" if confidence_pct >= 70 else "Low")
+
+        answer = call_gemini(full_prompt, history=request.history, system_instruction=sys_instruction)
+        return ChatResponse(answer=answer, sources=retrieved_pages, snippets=snippets, confidence_pct=confidence_pct, confidence_label=confidence_label)
     except Exception:
         return ChatResponse(answer=f"[BACKEND ERROR]: {traceback.format_exc()[:500]}", sources=[], snippets=[], confidence_pct=0.0, confidence_label="Low")
 
