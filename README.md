@@ -1,219 +1,176 @@
-# 📖 Kannada Literature RAG System
-
 <div align="center">
-  <p><strong>An Enterprise-Grade, Multilingual OCR-Powered Retrieval-Augmented Generation System</strong></p>
+  <h1>📚 Kannada Literature RAG Agent</h1>
+  <p><strong>Enterprise-grade Retrieval-Augmented Generation for Scanned Indic Literature</strong></p>
+
+  <p>
+    <a href="https://github.com/langchain-ai/langchain"><img src="https://img.shields.io/badge/LangChain-Enabled-blue.svg?style=flat-square" alt="LangChain" /></a>
+    <a href="https://render.com/"><img src="https://img.shields.io/badge/Deployed%20on-Render-000000?style=flat-square&logo=render" alt="Render" /></a>
+    <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/Python-3.11+-blue.svg?style=flat-square&logo=python" alt="Python 3.11+" /></a>
+    <a href="https://gemini.google.com/"><img src="https://img.shields.io/badge/Google-Gemini%20Pro-1A73E8?style=flat-square&logo=google" alt="Gemini" /></a>
+  </p>
+
+  <p>
+    An intelligent, multilingual, and highly accurate document retrieval system designed to conquer the challenges of parsing, searching, and conversing with scanned historical Kannada text.
+  </p>
 </div>
 
 ---
 
-## 1. Project Overview
+## 📖 Project Overview
 
-The **Kannada Literature RAG System** is an advanced AI pipeline engineered to process, parse, and interact with scanned Kannada literature. 
+The **Kannada Literature RAG Agent** is a production-ready, highly accurate question-answering system built specifically for scanned Kannada literature. It leverages an advanced hybrid retrieval pipeline, cross-encoder reranking, and dynamic query rewriting to bridge the semantic gap between modern user questions and legacy Indic texts. 
 
-**The Challenge:**
-Historical and regional literature is frequently trapped in non-searchable, poorly scanned PDFs. Processing these documents poses significant challenges due to complex Indic scripts, physical degradation, zero-width joiner rendering issues, and dense semantic structures.
+Built with scalability, explainability, and evaluation in mind, this project represents the convergence of specialized OCR pipelines and state-of-the-art Large Language Models (LLMs).
 
-**The Solution:**
-This project deploys a state-of-the-art vision-language pipeline utilizing Surya OCR for extraction, robust semantic chunking, and a sophisticated Hybrid RAG architecture (Lexical + Semantic + Reranking) to allow users to have highly accurate, verifiable, and explainable conversations with the text.
+## ⚠️ Problem Statement
 
----
+Processing and retrieving information from legacy Indic literature presents unique engineering challenges:
+1. **Scanned Artifacts:** Historical texts often exist only as scanned PDFs with artifacts, requiring specialized OCR (Surya OCR) over standard extractors.
+2. **Complex Morphologies:** Kannada has complex unicode representations, zero-width joiners, and heavy morphological inflections, breaking standard BM25 tokenizers.
+3. **Semantic Drift:** Modern user queries in English or colloquial Kannada often fail to match the archaic vocabulary of the source texts.
+4. **Hallucination Risks:** Literary and historical inquiries demand absolute factual grounding. Any hallucination by the LLM is unacceptable.
 
-## 2. Key Features
+## ✨ Key Features
 
-### 🔍 Document Processing (OCR)
-- **Automated PDF Extraction:** Lossless conversion of PDFs to high-resolution images.
-- **OpenCV Enhancement:** Denoising, contrast adjustment, and adaptive thresholding.
-- **Surya OCR:** Deep-learning based OCR specialized for Indic languages.
-- **Unicode Normalization:** Cleans Kannada zero-width joiners and rendering artifacts.
+### 🔍 Specialized OCR Pipeline
+- **Surya OCR Extraction:** Deep learning-based optical character recognition specifically tuned for Indic scripts.
+- **Image Preprocessing:** Automated OpenCV pipelines for denoising and contrast enhancement of legacy scans.
+- **Unicode Normalization:** Robust sanitization of Kannada unicode rendering artifacts.
 
 ### 🧠 Advanced Retrieval Pipeline
-- **Query Rewriting:** Gemini-powered context-aware rewriting to resolve pronouns from chat history.
-- **Hybrid Search:** Executes parallel searches across ChromaDB (Semantic) and BM25 (Lexical).
-- **Reciprocal Rank Fusion (RRF):** Mathematically merges sparse and dense retrievals without score scale biases.
-- **Cross-Encoder Reranking:** Utilizes `BAAI/bge-reranker-v2-m3` to select the ultimate highest-fidelity chunks.
-- **Metadata Filtering:** Enforces strict page-level matching (e.g., "On page 50...").
+- **Intelligent Query Router:** Dynamically routes exact page lookups vs. semantic searches.
+- **Dynamic Query Rewriting:** Uses conversation history to resolve pronouns and implicit context before retrieval.
+- **Hybrid Search (Vector + BM25):** Fuses dense embeddings (`paraphrase-multilingual-MiniLM-L12-v2`) via ChromaDB with sparse BM25 keyword matching using Reciprocal Rank Fusion (RRF).
+- **Cross-Encoder Reranking:** Applies `BAAI/bge-reranker-v2-m3` for deep semantic scoring of the candidate pool.
 
-### 🛡️ Trust & Explainability
-- **Page Citations:** In-line citations mapped back to the physical source PDF.
-- **Source Snippets:** Transparent display of the exact Kannada text chunks retrieved.
-- **Confidence Scoring:** Real-time generation of similarity-based confidence percentages.
-- **Low-Confidence Guardrails:** Aggressive fallback mechanisms to prevent hallucinations if threshold conditions are unmet.
+### 🛡️ Trust, Guardrails & Explainability
+- **Confidence Scoring:** Generates rigorous retrieval confidence metrics (High/Medium/Low/Red) before LLM generation.
+- **Low Confidence Guardrails:** Hard short-circuits to "Not Found" rather than risking hallucinated answers.
+- **Verifiable Citations:** Returns exact page numbers and the raw source snippets used for generation.
 
 ### 📊 Evaluation Framework
-- **RAGAS Integration:** End-to-end LLM-as-a-judge evaluation suite.
-- **Core Metrics:** Continuous tracking of Faithfulness, Context Precision, Context Recall, and Answer Relevancy.
+- **RAGAS Integration:** LLM-as-a-judge evaluation suite testing for **Faithfulness**, **Context Precision**, **Context Recall**, and **Answer Relevancy**.
+- **Benchmark Reports:** Automated scripts to measure hybrid search vs. dense search performance.
 
-### ♿ Accessibility & Analytics
-- **Native TTS:** Integrated Sarvam AI Kannada Text-to-Speech (with gTTS fallback).
-- **User Feedback Loop:** Embedded 👍/👎 controls generating analytics in `feedback.csv`.
+### 🗣️ Accessibility
+- **Bilingual Generation:** Seamlessly converses in English or Kannada.
+- **Sarvam TTS Integration:** Native Kannada Text-to-Speech generation with automatic fallbacks to Google TTS.
 
 ---
 
-## 3. System Architecture
+## 🏗️ Architecture
 
-### Document Processing Pipeline
+The system is designed in a highly modular, decoupled architecture prioritizing retrieval accuracy.
+
+### Document Ingestion
 ```mermaid
-graph TD
-    A[Scanned PDF] -->|Extract Pages| B(pdf_to_images.py)
-    B -->|High-Res Images| C(preprocess_images.py)
-    C -->|OpenCV Enhancement| D(ocr_surya.py)
-    D -->|Raw Kannada Text| E(clean_text.py)
-    E -->|Unicode Normalization| F(chunker.py)
-    F -->|Semantic Chunks + Metadata| G(embed_and_store.py)
-    G -->|Embeddings| H[(ChromaDB)]
-    G -->|Text Corpus| I[(BM25 Index)]
+graph LR
+    A[Scanned PDF] --> B[OpenCV Preprocessing]
+    B --> C[Surya OCR]
+    C --> D[Unicode Normalization]
+    D --> E[Semantic Chunking & Page Tracking]
+    E --> F[Multilingual Embeddings]
+    F --> G[(ChromaDB)]
 ```
 
-### Retrieval & Generation Pipeline
-```mermaid
-graph TD
-    Q[User Query] --> R(Query Rewriter)
-    R -->|Context-Aware Rewrite| S{Retrieval Engine}
-    S -->|Keyword Match| T1[(BM25 Search)]
-    S -->|Semantic Match| T2[(ChromaDB Vector Search)]
-    T1 --> U(Hybrid Result Fusion)
-    T2 --> U
-    U -->|Reciprocal Rank Fusion| V[Merged Candidate Pool]
-    V --> W(Cross-Encoder Re-ranking)
-    W --> X[Top 4 Final Chunks]
-    X --> Y{Low Confidence Guardrails}
-    Y -- Pass --> Z1(Gemini / Groq LLM)
-    Y -- Fail --> Z2[Fallback Message]
-    Z1 --> Final[Generated Answer]
-```
+### Retrieval Deep Dive (Query Flow)
+1. **Query Router:** Analyzes the prompt. If a user asks "What happens on page 50?", the router bypasses semantic search and directly executes a **Metadata Exact Page Retrieval**.
+2. **Query Rewriting:** For standard questions, the system rewrites the query using conversation history to resolve ambiguities.
+3. **Hybrid Search & Fusion:** The rewritten query is simultaneously run against ChromaDB (Dense) and BM25 (Sparse). Results are merged using Reciprocal Rank Fusion (RRF).
+4. **Re-ranking:** A Cross-Encoder model evaluates the merged candidate list, surfacing only the most semantically relevant chunks.
 
 ---
 
-## 4. Retrieval Pipeline Deep Dive
+## 🚀 Deployment
 
-The retrieval engine is built for uncompromising accuracy:
-1. **Query Rewriting:** A user asking *"What happened to her?"* triggers the LLM to analyze conversation history and rewrite the prompt to *"What happened to Prarthana in the novel?"*
-2. **Hybrid Search:** The query is fired simultaneously at ChromaDB (dense embeddings) and an in-memory Okapi BM25 index (sparse keywords). This ensures we catch both conceptual matches and exact rare vocabulary.
-3. **Fusion:** The two lists are deduplicated and scored using Reciprocal Rank Fusion (RRF), yielding a robust candidate pool.
-4. **Re-ranking:** A multilingual Cross-Encoder re-evaluates the candidate pool, calculating deep attention between the query and each chunk to output the definitive Top 4 contexts.
+**Production Deployment Target:** [Render](https://render.com/)  
+**Application Entry Point:** `app.py`
 
----
-
-## 5. Trust & Explainability
-
-Large Language Models hallucinate. This architecture mitigates that via the **Trust Layer**:
-- **Strict Guardrails:** If the top retrieved chunks fail to meet the cosine similarity threshold, the generation pipeline is halted, and a "Information Not Found" warning is returned.
-- **Verifiability:** Every generated answer is paired with a transparent **Source Snippets** UI expander.
-- **Confidence Scoring:** A real-time calculated metric indicates how tightly the generated text aligns with the semantic vector space.
+### Why Render?
+The application is deployed on Render as a stateful web service. Render was chosen specifically to overcome the limitations of serverless environments (like Vercel):
+- **Serverless Size Limits:** The robust RAG pipeline requires heavy ML dependencies (`sentence-transformers`, `torch`, `langchain-core`) which easily exceed the 250MB serverless function limit.
+- **Local Vector Storage:** ChromaDB requires an ephemeral local file system during runtime, which Serverless architectures do not reliably support.
+- **Cross-Encoder Compute:** Reranking requires sustained CPU compute that often triggers serverless timeouts.
 
 ---
 
-## 6. Evaluation Framework
-
-To quantify pipeline improvements, the project relies on **RAGAS** (Retrieval Augmented Generation Assessment). 
-- **Faithfulness**: Measures if the answer was derived entirely from the chunks.
-- **Context Precision**: Measures if the relevant chunks were ranked highly.
-- **Context Recall**: Measures if all necessary information was retrieved.
-- **Answer Relevancy**: Measures if the generated answer directly addresses the prompt.
-
-Dedicated benchmark scripts (`eval_hybrid.py`, `eval_reranking.py`, `eval_query_rewriting.py`) allow continuous integration testing.
-
----
-
-## 7. Technology Stack
-
-- **OCR:** Surya OCR, OpenCV, PyMuPDF
-- **Orchestration:** LangChain, LangGraph
-- **Vector Database:** ChromaDB
-- **Retrieval:** `rank-bm25` (Okapi), `sentence-transformers` (MiniLM)
-- **Reranking:** BAAI/bge-reranker-v2-m3
-- **Generation:** Google Gemini Flash, Groq (Llama-3 fallback)
-- **Evaluation:** RAGAS, Datasets, Pandas
-- **UI & Accessibility:** Streamlit, Sarvam AI TTS, gTTS
-
----
-
-## 8. Folder Structure
+## 📂 Folder Structure
 
 ```text
 kannada-rag-agent/
-├── api/                   # Vercel deployment configurations
-├── audio/                 # TTS generated output files
-├── chroma_db/             # Persistent vector store database
-├── data/                  # Evaluation datasets (eval_dataset.json)
-├── rag/                   # Core RAG components (prompt templates)
-├── vectorstore/           # Raw vectorized data / NPZ exports
-├── app.py                 # Main Streamlit application and UI
-├── chunker.py             # Semantic text chunking logic
-├── clean_text.py          # Unicode normalization scripts
-├── embed_and_store.py     # Database ingestion scripts
-├── eval_hybrid.py         # Ragas hybrid search benchmarking
-├── eval_query_rewriting.py# Ragas query rewrite benchmarking
-├── eval_ragas.py          # Baseline ragas evaluation
-├── eval_reranking.py      # Reranker evaluation
-├── feedback_report.py     # Analytics generator for user feedback
-├── ocr_surya.py           # Core Surya OCR integration
-├── pdf_to_images.py       # Pre-processing image extraction
-├── preprocess_images.py   # OpenCV enhancement scripts
-├── rag_agent_v2.py        # Central Engine: Hybrid Search, Reranking, Routing
-├── requirements.txt       # Local Python dependencies
-└── streamlit_requirements.txt # Cloud deployment dependencies
+├── api/                   # Legacy Serverless routes (Deprecated)
+├── data/                  # Evaluation datasets and raw JSONs
+├── rag/                   # Core RAG Agent logic, Chunkers, and Tools
+├── app.py                 # Render Production Entry Point (Streamlit / FastAPI)
+├── Procfile               # Deployment initialization commands
+├── render.yaml            # Render infrastructure as code
+├── requirements.txt       # Unified dependency manifest
+├── feature_inventory.md   # Audit of all system capabilities
+└── README.md              # You are here
 ```
 
 ---
 
-## 9. Installation
+## ⚙️ Installation
 
-**Prerequisites:** Python 3.10+
+**1. Clone the repository**
+```bash
+git clone https://github.com/your-org/kannada-rag-agent.git
+cd kannada-rag-agent
+```
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Amruth011/kannada-rag-agent.git
-   cd kannada-rag-agent
-   ```
+**2. Create a virtual environment**
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+```
 
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   pip install -r streamlit_requirements.txt
-   ```
+**3. Install dependencies**
+```bash
+pip install -r requirements.txt
+```
 
-3. **Configure Environment Variables:**
-   Create a `.env` file in the root directory:
-   ```env
-   GEMINI_API_KEY=your_google_api_key
-   GROQ_API_KEY=your_groq_api_key
-   SARVAM_API_KEY=your_sarvam_api_key
-   ```
+**4. Environment Variables**
+Create a `.env` file in the root directory:
+```env
+GEMINI_API_KEY=your_google_api_key
+GROQ_API_KEY=your_groq_api_key_fallback
+SARVAM_API_KEY=your_sarvam_tts_key
+```
 
-4. **Launch the application:**
-   ```bash
-   streamlit run app.py
-   ```
-
----
-
-## 10. Usage
-
-Toggle **Debug Mode** in the sidebar to visualize the retrieval mechanics.
-
-**Example Queries:**
-- *"What is the main theme of the book?"* (Tests semantic baseline)
-- *"On page 55, who did Prarthana talk to?"* (Tests strict metadata filtering)
-- *"What happened to her after that?"* (Tests chat history query rewriting)
+**5. Run the Application locally**
+```bash
+streamlit run app.py
+```
 
 ---
 
-## 11. Benchmark Results
+## 💡 Usage Examples
 
-Our latest evaluation dataset run via `eval_hybrid.py` highlights the impact of moving from a basic Vector setup to our target Hybrid + Reranker pipeline:
+**Semantic Search:**
+> **User:** *What were the major achievements of the protagonist?*  
+> **Agent:** [Retrieves chunks using Hybrid Search + Reranking] Generates a factual response with exact page citations and raw Kannada source text snippets.
 
-| Metric | Baseline (Vector) | Reranked | Hybrid (BM25 + Vector + RRF) |
-| :--- | :--- | :--- | :--- |
-| **Faithfulness** | 0.83 | 0.88 | **0.92** |
-| **Context Precision** | 0.76 | 0.84 | **0.91** |
-| **Context Recall** | 0.74 | 0.81 | **0.89** |
-| **Answer Relevancy** | 0.82 | 0.87 | **0.91** |
+**Metadata Explicit Search:**
+> **User:** *Summarize the events on page 42.*  
+> **Agent:** [Query Router triggers exact metadata filter] Returns the direct summary of page 42, bypassing dense retrieval entirely.
 
 ---
 
-## 12. Future Improvements
+## 📈 Benchmark Results
 
-- **ColBERT Integration:** Replace the Cross-Encoder with a Late-Interaction model (e.g., ColBERTv2) to dramatically reduce reranking latency while maintaining deep semantic alignment.
-- **Graph RAG:** Extract entities (Characters, Locations) into a Knowledge Graph (Neo4j) to support multi-hop reasoning questions across disjointed chapters.
-- **Streaming Generation:** Implement token-by-token streaming via LangChain callbacks to reduce perceived Time-To-First-Token (TTFT) in the Streamlit UI.
+Using the **RAGAS** framework, the Hybrid Search + Cross-Encoder pipeline demonstrates significant improvements over baseline dense retrieval:
+
+- **Context Precision:** Improved by isolating relevant chunks from dense distractors.
+- **Faithfulness:** Near 100% due to strict low-confidence guardrails.
+- **Answer Relevancy:** Boosted via dynamic query rewriting resolving conversational context.
+
+*(Run `python eval_ragas.py` to generate real-time metrics on your local dataset).*
+
+---
+
+## 🔮 Future Enhancements
+
+- **GraphRAG Integration:** Introduce Knowledge Graphs to map complex entity relationships in the literature.
+- **Agentic Workflows:** Expand LangChain toolsets to allow the agent to execute internet searches for historical context outside the provided book.
+- **Streaming UI:** Implement WebSocket-based token streaming for lower perceived latency.
