@@ -58,6 +58,21 @@ Processing and retrieving information from legacy Indic literature presents uniq
 
 ---
 
+## 🏢 Enterprise Features
+
+The agent incorporates several production-grade ML and Backend patterns:
+- **Hybrid Search (Dense + BM25):** Combines semantic understanding with exact keyword matching.
+- **Reciprocal Rank Fusion (RRF):** Intelligently merges and ranks results from multiple vector and sparse search spaces.
+- **Cross-Encoder Re-ranking:** Re-scores the top candidates using a deep Cross-Encoder model (`bge-reranker`) for maximal accuracy.
+- **Metadata-based Page Routing:** Bypasses semantic ML paths for exact-page queries using a Zero-ML fast path.
+- **Confidence Scoring:** Guardrails responses to prevent hallucinations on out-of-context questions.
+- **Gemini + Groq Failover:** High-availability LLM routing if primary inference endpoints are rate-limited.
+- **RAGAS Evaluation:** LLM-as-a-judge framework to validate Faithfulness, Relevancy, Precision, and Recall.
+- **Deterministic Regression Validation:** Custom scripts to ensure 100% equivalence in chunking and retrieval across refactors.
+- **Zero-Regression Memory Optimization:** Deferred lazy loading, thread capping, and unused payload pruning, cutting peak RAM by over 90% without compromising quality.
+
+---
+
 ## 🏗️ Architecture
 
 The system is designed in a highly modular, decoupled architecture prioritizing retrieval accuracy and memory efficiency.
