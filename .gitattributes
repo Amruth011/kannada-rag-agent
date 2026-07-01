@@ -1,1 +1,8 @@
 *.onnx filter=lfs diff=lfs merge=lfs -text
+
+# Ignore data, HTML, and assets from GitHub language statistics
+*.html linguist-vendored
+*.json linguist-vendored
+*.csv linguist-vendored
+data/* linguist-vendored
+assets/* linguist-vendored
