@@ -72,6 +72,7 @@ class ChatResponse(BaseModel):
     confidence_pct: float = 0.0
     confidence_label: str = ""
     audio_base64: str = "" # New: returned if voice is requested
+    is_deterministic: Optional[bool] = False
 
 class VoiceRequest(BaseModel):
     text: str
@@ -615,10 +616,11 @@ ANSWER in English:"""
             confidence_pct = min(100.0, max(0.0, p))
             confidence_label = "High" if confidence_pct >= 85 else ("Medium" if confidence_pct >= 70 else "Low")
 
+        is_det = (exact_page is not None or page_range is not None)
         answer = call_gemini(full_prompt, history=request.history, system_instruction=sys_instruction)
-        return ChatResponse(answer=answer, sources=retrieved_pages, snippets=snippets, confidence_pct=confidence_pct, confidence_label=confidence_label)
+        return ChatResponse(answer=answer, sources=retrieved_pages, snippets=snippets, confidence_pct=confidence_pct, confidence_label=confidence_label, is_deterministic=is_det)
     except Exception:
-        return ChatResponse(answer=f"[BACKEND ERROR]: {traceback.format_exc()[:500]}", sources=[], snippets=[], confidence_pct=0.0, confidence_label="Low")
+        return ChatResponse(answer=f"[BACKEND ERROR]: {traceback.format_exc()[:500]}", sources=[], snippets=[], confidence_pct=0.0, confidence_label="Low", is_deterministic=False)
 
 @app.post("/voice")
 async def voice(request: VoiceRequest):
@@ -4040,7 +4042,7 @@ async def root():
                                 if (conf.lbl === 'High') color = '#16a34a';
                                 else if (conf.lbl === 'Medium') color = '#ea580c';
                                 confVal.innerHTML = `<span style="color: ${color};">${conf.lbl}</span> <span style="color: #6b7280; font-size: 0.95rem;">(${conf.pct}%)</span>`;
-                                if (conf.pct < 60) {
+                                if (conf.pct < 60 && !conf.is_deterministic) {
                                     confWarn.style.display = 'block';
                                 } else {
                                     confWarn.style.display = 'none';
@@ -4298,7 +4300,7 @@ async def root():
                         
                         confVal.innerHTML = `<span style="color: ${color};">${lbl}</span> <span style="color: #6b7280; font-size: 0.95rem;">(${pct}%)</span>`;
                         
-                        if (pct < 60) {
+                        if (pct < 60 && !d.is_deterministic) {
                             confWarn.style.display = 'block';
                         } else {
                             confWarn.style.display = 'none';
@@ -4327,7 +4329,7 @@ async def root():
                                 localStorage.removeItem('lastSnippets');
                             }
                             if (d.confidence_pct !== undefined) {
-                                localStorage.setItem('lastConfidence', JSON.stringify({pct: d.confidence_pct, lbl: d.confidence_label}));
+                                localStorage.setItem('lastConfidence', JSON.stringify({pct: d.confidence_pct, lbl: d.confidence_label, is_deterministic: d.is_deterministic}));
                             } else {
                                 localStorage.removeItem('lastConfidence');
                             }

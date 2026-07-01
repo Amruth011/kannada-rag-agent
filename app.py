@@ -710,7 +710,7 @@ for i, msg in enumerate(st.session_state.messages):
   <p style='color:#fca5a5;font-weight:700;margin:0 0 0.3rem 0;font-size:0.95rem;'>&#9888; Low Evidence</p>
   <p style='color:#fecaca;margin:0;font-size:0.88rem;'>Retrieved passages may not contain enough information.</p>
 </div>""", unsafe_allow_html=True)
-            elif pct < 70:
+            elif pct < 70 and not msg.get("deterministic"):
                 st.warning("Low confidence: Retrieved evidence may be insufficient.")
         if msg.get("pages"):
             st.caption(f"📄 Sources: Pages {', '.join(map(str, msg['pages']))}")
@@ -838,7 +838,8 @@ if question:
             # ── Compute confidence BEFORE LLM (guardrail decision) ───────────
             confidence_pct   = calculate_confidence(chunks) if not general else 100.0
             confidence_label = get_confidence_label(confidence_pct)
-            is_very_low      = (confidence_pct < VERY_LOW_THRESHOLD) and not general and chunks
+            # Suppress guardrail for deterministic paths
+            is_very_low      = (confidence_pct < VERY_LOW_THRESHOLD) and not general and chunks and not (final_page or final_range or page_only)
             guardrail_msg    = GUARDRAIL_MSG_EN if current_lang == "English" else GUARDRAIL_MSG_KN
 
             if is_very_low:
@@ -955,7 +956,8 @@ if question:
                     f"<span style='font-weight:600;color:{conf_color};'>Confidence: {confidence_label} ({int(confidence_pct)}%)</span>",
                     unsafe_allow_html=True
                 )
-                if confidence_pct < 70:
+                # Suppress warning for metadata/deterministic paths
+                if confidence_pct < 70 and not (final_page or final_range or page_only):
                     st.warning("Low confidence: Retrieved evidence may be insufficient.")
             
             msg_snippets = []
@@ -1023,6 +1025,7 @@ if question:
                 "confidence_pct": confidence_pct if not general and chunks else None,
                 "confidence_label": confidence_label if not general and chunks else None,
                 "guardrail": False,
+                "deterministic": bool(final_page or final_range or page_only),
                 "audio": audio_bytes,
                 "original_query": question if is_rewritten else None,
                 "rewritten_query": rewritten_q if is_rewritten else None
