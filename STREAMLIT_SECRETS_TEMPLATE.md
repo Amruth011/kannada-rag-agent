@@ -6,13 +6,13 @@ Copy the TOML contents below and paste them into the **Secrets** section under *
 
 ```toml
 # Required: Google Gemini API Key
-GEMINI_API_KEY = "your_gemini_api_key_here"
+GEMINI_API_KEY = "YOUR_KEY_HERE"
 
 # Required: Groq API Key (Fallback and ReAct Agent)
-GROQ_API_KEY = "your_groq_api_key_here"
+GROQ_API_KEY = "YOUR_KEY_HERE"
 
 # Optional: Sarvam AI API Key (Bilingual generation and High-fidelity TTS)
-SARVAM_API_KEY = "your_sarvam_api_key_here"
+SARVAM_API_KEY = "YOUR_KEY_HERE"
 
 # Optional: E-Book and Administration Passwords
 EBOOK_PASSWORD = "readkarana"

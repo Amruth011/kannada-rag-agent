@@ -1,5 +1,43 @@
+# Environment variables
 .env
+.env.*
+!.env.example
+
+# Secrets
+secrets.toml
+.streamlit/secrets.toml
+
+# API keys
+*.key
+*.pem
+*.p12
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.venv/
+env/
 kannada-rag-env/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Vercel / Deploy
+.vercel
+deploy_dist/
+api/vectors.npz
+
+# Project-specific ignored data directories
 data/raw_images/
 data/processed_images/
 data/cleaned_text/
@@ -8,13 +46,4 @@ data/*.pdf
 data/*.json
 poppler-*/
 audio/
-__pycache__/
-*.pyc
-.DS_Store
-Thumbs.db
-.vscode/
-.vercel
 scratch/
-deploy_dist/
-api/vectors.npz
-
