@@ -17,6 +17,7 @@
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-FF6F00)
 ![Google Gemini](https://img.shields.io/badge/Google_Gemini-LLM-4285F4?logo=google)
 ![Groq](https://img.shields.io/badge/Groq-Llama_3-F55036)
+![LangChain](https://img.shields.io/badge/LangChain-Orchestration-1C3C3C?logo=langchain)
 
 <br/>
 
@@ -49,6 +50,7 @@ The architecture is built for high-throughput, accurate semantic retrieval, and 
 - ✓ **ChromaDB**: Lightweight, memory-mapped vector storage.
 - ✓ **OCR Pipeline**: High-accuracy Surya OCR for original document ingestion.
 - ✓ **Gemini & Groq**: Dynamic fallback between models for high availability.
+- ✓ **LangChain Orchestration**: Manages the end-to-end prompt chain, LLM routing, and conversational memory.
 - ✓ **RAGAS Evaluation**: Automated CI/CD metrics for Answer Relevancy and Faithfulness.
 - ✓ **Memory Optimization**: Batched query processing for constrained Vercel/Streamlit instances.
 
