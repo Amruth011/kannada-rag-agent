@@ -1564,6 +1564,9 @@ async def root():
     html_content = r"""    <!DOCTYPE html>
     <html lang="kn">
     <head>
+        <!-- Google AdSense -->
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8603377426918332" crossorigin="anonymous"></script>
+
         <!-- {{GOOGLE_SITE_VERIFICATION}} -->
         <!-- {{GOOGLE_ANALYTICS_SCRIPT}} -->
         
