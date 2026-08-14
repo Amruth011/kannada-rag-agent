@@ -62,14 +62,13 @@ app = FastAPI(title="Kannada Book AI Agent + Voice")
 
 @app.middleware("http")
 async def fix_vercel_rewrites(request: Request, call_next):
-    if request.scope["path"] == "/api/index.py":
-        vercel_path = request.query_params.get("vercel_path")
-        if vercel_path is not None:
-            # Reconstruct the original path based on the capture group
-            request.scope["path"] = "/" + vercel_path
-        else:
-            # Fallback for unexpected cases
-            request.scope["path"] = "/"
+    raw_path = request.scope.get("path", "")
+    vercel_path = request.query_params.get("vercel_path")
+    if vercel_path is not None:
+        request.scope["path"] = "/" + vercel_path.lstrip("/")
+    elif raw_path.startswith("/api/index.py"):
+        sub = raw_path[len("/api/index.py"):]
+        request.scope["path"] = sub if sub else "/"
     return await call_next(request)
 
 
@@ -477,6 +476,9 @@ def is_page_only_query_simple(query: str) -> bool:
     return bool(re.fullmatch(r'\d+', query))
 
 @app.post("/chat", response_model=ChatResponse)
+@app.post("/api/chat", response_model=ChatResponse)
+@app.post("/chat/", response_model=ChatResponse)
+@app.post("/api/chat/", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     try:
         # 1. Detect page/range filter
@@ -637,6 +639,9 @@ ANSWER in English:"""
         return ChatResponse(answer=f"[BACKEND ERROR]: {traceback.format_exc()[:500]}", sources=[], snippets=[], confidence_pct=0.0, confidence_label="Low", is_deterministic=False)
 
 @app.post("/voice")
+@app.post("/api/voice")
+@app.post("/voice/")
+@app.post("/api/voice/")
 async def voice(request: VoiceRequest):
     # Map requested language option to ISO code
     lang_code = "kn-IN" if request.language == "Kannada" else "en-IN"
