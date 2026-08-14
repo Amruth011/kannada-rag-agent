@@ -140,6 +140,30 @@ def load_data():
 # Load data once at startup to prevent Vercel timeouts
 BOOK_DATA = load_data()
 
+def load_favicon_bytes():
+    paths = [
+        os.path.join(os.path.dirname(__file__), "favicon.png"),
+        os.path.join(os.path.dirname(__file__), "assets", "favicon.png"),
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "favicon.png"),
+        "api/favicon.png",
+        "assets/favicon.png",
+        "favicon.png",
+        "/var/task/api/favicon.png",
+        "/var/task/assets/favicon.png"
+    ]
+    for p in paths:
+        if os.path.exists(p):
+            try:
+                with open(p, "rb") as f:
+                    data = f.read()
+                    if data:
+                        return data
+            except Exception:
+                continue
+    return None
+
+FAVICON_BYTES = load_favicon_bytes()
+
 def search_text(query, data, top_k=5):
     """Retrieves full pages for Gemini's large context window."""
     query_words = set(query.lower().split())
@@ -1494,7 +1518,12 @@ async def admin_feedback_redirect(password: Optional[str] = None):
     return RedirectResponse(url=url)
 
 @app.get('/favicon.ico', include_in_schema=False)
+@app.get('/favicon.png', include_in_schema=False)
+@app.get('/assets/favicon.png', include_in_schema=False)
+@app.get('/api/favicon.png', include_in_schema=False)
 async def favicon():
+    if FAVICON_BYTES:
+        return Response(content=FAVICON_BYTES, media_type="image/png")
     icon_b64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAC2klEQVR4nO2WzWtcVRjGf885d2YySaY6lmibSiG0xS8QUXDRnVBxVXAhSPeuXAru+y+o4MJF/wClq9KFIFTNSkHBryIUS6tFK2mCmWk+Zu4953GRyUczM0kUsih6uJzFfS/P7zznfc99j9Z7f3KYIxyq+v+A/wag2CvojDMSaDDviGEPZgU0dqHjAc7Up1EdMi6peqQ+IQLkRKxTa6AaBNynf38cYxzA1Fvc+kyLN33kOK0nac8xMUPVBai3WV/g3s/q3qF71+055s5R3n/Q4t6AVLlail+/p++vMQVF8JGTPn3eZ9/B6POL8cZVd26TMqv4+VfSsRcVAqF2EICJDTq/8c2HnmiHyUijcO5r+ZaufZDTClB8cYlHUAiE6CaeaGv+Ii+9TfsUqbfLxxDAgMilcikyOdkAKuqaTO4tYWhGZOWcJo9qfVHO5ApXILx7n4YysxGW0FbdKADO5KRQSNEBt57IbuSz73LslMoVQsQjEjAK4N0wgcFy3gimvqceTS+8lS5cZnVRS79TTOA8KsEjAUMwgTHeVhCJ1qwWfqB1wiSPF9gPAIYsDw7aJkGpdH2a7z721IxytZP8DwACFB0iikiADdkUdXVX4rcfceZc/Op9ShEamMEzNIaqaHMVRu53tJpQAqhnQiQIk2tRN+fj9XlHKKG3TG0KjXYwskwB4exn36R4jLRM5w6dX/VXh/4KFmspP97OJ07SmkUtP/Uqt78c1OhBHUis3OWZN/z06+REuUb3D//yKXIGZl/W6deYPk6tSQhWwfVPdiZpPwe5ojkjRS5fIAQABWpNcvbMc0gs/Mi9n6jWcQaUMyrcPEoqhxkadaswigDV2uYxAEWtLnDjCsCZ856cwWnTrymawI43+wC2gjtrzIQasQWQuuTyAS3ncRp7NBzjtIUCqHqUqxtuNsXHHN+DAYa3U2jr+6G/2pjxr3vy3urbBXtITX8b//BfWx5+wN+tZC4TtUtAXgAAAABJRU5ErkJggg=="
     return Response(content=base64.b64decode(icon_b64), media_type="image/x-icon")
 
@@ -1545,7 +1574,7 @@ async def privacy_policy():
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Privacy Policy — Heli Hogu Kaarana</title>
     <meta name="description" content="Privacy Policy for Heli Hogu Kaarana AI Literary Guide. Learn how we collect and use data including Google AdSense and Google Analytics.">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -1871,9 +1900,9 @@ async def root():
         <title>ಹೇಳಿ ಹೋಗು ಕಾರಣ — Bilingual AI Book Guide</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" type="image/x-icon" href="/favicon.ico">
-        <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-        <link rel="apple-touch-icon" href="/favicon.ico">
+        <link rel="icon" type="image/png" href="/favicon.png">
+        <link rel="shortcut icon" type="image/png" href="/favicon.png">
+        <link rel="apple-touch-icon" href="/favicon.png">
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
         <style>
             :root {
