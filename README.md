@@ -4,7 +4,7 @@
 
 **An enterprise-grade, memory-optimized Retrieval-Augmented Generation (RAG) agent specialized in Kannada literature and seamless voice synthesis. Built solo, designed for scale.**
 
-[![Vercel Deployment](https://img.shields.io/badge/Deployed_on-Vercel-black?logo=vercel)](https://heli-hogu-kaarana.vercel.app/)
+[![Vercel Deployment](https://img.shields.io/badge/Deployed_on-Vercel-black?logo=vercel)](https://kannada-rag-agent.vercel.app/)
 [![Streamlit Cloud](https://img.shields.io/badge/Streamlit-Community_Cloud-FF4B4B?logo=streamlit)](#deployment)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -21,7 +21,7 @@
 
 <br/>
 
-### [🚀 Try the Live Demo](https://heli-hogu-kaarana.vercel.app/) • [💻 Fork & Run](#getting-started-fork--use) • [📖 Read the Docs](docs/architecture.md)
+### [🚀 Try the Live Demo](https://kannada-rag-agent.vercel.app/) • [💻 Fork & Run](#getting-started-fork--use) • [📖 Read the Docs](docs/architecture.md)
 
 </div>
 
