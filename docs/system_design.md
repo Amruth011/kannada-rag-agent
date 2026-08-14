@@ -217,7 +217,7 @@ Fallback 3: Groq Llama 4 Scout
 | RRF + Cross-Encoder Rerank | 450 ms | 800 ms | ~ 250 MB |
 | Gemini Generation | 1,200 ms | 2,500 ms | API Call |
 | Sarvam TTS Synthesis | 800 ms | 2,000 ms | API Call |
-| **Total End-to-End** | **~ 2.8 s** | **~ 5.0 s** | **Peak < 600 MB** |
+| **Total End-to-End** | **~2.8s** | **~5.0s** | **Peak < 600 MB** |
 
 ---
 
