@@ -3,11 +3,11 @@
   "rewrites": [
     {
       "source": "/chat",
-      "destination": "/api/index.py"
+      "destination": "/api/index.py?vercel_path=chat"
     },
     {
       "source": "/(.*)",
-      "destination": "/api/index.py"
+      "destination": "/api/index.py?vercel_path=$1"
     }
   ],
   "env": {

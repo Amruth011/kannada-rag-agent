@@ -63,11 +63,12 @@ app = FastAPI(title="Kannada Book AI Agent + Voice")
 @app.middleware("http")
 async def fix_vercel_rewrites(request: Request, call_next):
     if request.scope["path"] == "/api/index.py":
-        original_path = request.headers.get("x-invoke-path") or request.headers.get("x-vercel-forwarded-path")
-        if original_path:
-            request.scope["path"] = original_path
+        vercel_path = request.query_params.get("vercel_path")
+        if vercel_path is not None:
+            # Reconstruct the original path based on the capture group
+            request.scope["path"] = "/" + vercel_path
         else:
-            # If no original path is provided but it was rewritten to /api/index.py, assume root
+            # Fallback for unexpected cases
             request.scope["path"] = "/"
     return await call_next(request)
 
