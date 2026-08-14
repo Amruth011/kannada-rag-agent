@@ -60,6 +60,18 @@ BOOK_CONTEXT = "You are a professional literary assistant. Use these Kannada boo
 
 app = FastAPI(title="Kannada Book AI Agent + Voice")
 
+@app.middleware("http")
+async def fix_vercel_rewrites(request: Request, call_next):
+    if request.scope["path"] == "/api/index.py":
+        original_path = request.headers.get("x-invoke-path") or request.headers.get("x-vercel-forwarded-path")
+        if original_path:
+            request.scope["path"] = original_path
+        else:
+            # If no original path is provided but it was rewritten to /api/index.py, assume root
+            request.scope["path"] = "/"
+    return await call_next(request)
+
+
 class ChatRequest(BaseModel):
     question: str
     language: str = "English"
