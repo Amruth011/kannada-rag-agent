@@ -97,8 +97,9 @@ class FeedbackRequest(BaseModel):
     comment: str
     uid: Optional[str] = None
 
-class PaymentLog(BaseModel):
-    payer_name: str
+# PaymentLog removed
+class _Unused(BaseModel):
+    _stub: str = ""
     amount: str
     utr_ref: Optional[str] = None
     note: Optional[str] = None
@@ -951,45 +952,7 @@ async def save_feedback(request: FeedbackRequest, req_obj: Request):
         print(f"[ERROR]: Feedback submission failed: {e}")
         return {"status": "error", "message": str(e)}
 
-@app.post("/api/log-payment")
-async def log_payment(req: PaymentLog, req_obj: Request):
-    """Log a payment acknowledgment from a user after they paid via UPI."""
-    from datetime import datetime, timezone
-    import socket
-    try:
-        ip = req_obj.headers.get("x-forwarded-for", req_obj.client.host if req_obj.client else "Unknown")
-        if ip and "," in ip:
-            ip = ip.split(",")[0].strip()
-    except Exception:
-        ip = "Unknown"
-
-    entry = {
-        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-        "payer_name": req.payer_name.strip() or "Anonymous",
-        "amount": req.amount.strip(),
-        "utr_ref": req.utr_ref.strip() if req.utr_ref else "Not provided",
-        "note": req.note.strip() if req.note else "",
-        "uid": req.uid or "Unknown",
-        "ip": ip,
-    }
-
-    # Load existing, append, save back to KV
-    existing = get_kv_data("kannada_rag_payments", [])
-    if not isinstance(existing, list):
-        existing = []
-    existing.append(entry)
-    # Also try /tmp fallback
-    try:
-        set_kv_data("kannada_rag_payments", existing)
-    except Exception:
-        pass
-    try:
-        with open("/tmp/payments.json", "w", encoding="utf-8") as f:
-            json.dump(existing, f)
-    except Exception:
-        pass
-
-    return {"status": "success", "message": "Thank you! Payment noted."}
+# /api/log-payment route removed
 
 
 @app.get("/admin", response_class=HTMLResponse)
