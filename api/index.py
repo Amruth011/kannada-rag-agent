@@ -172,7 +172,7 @@ def search_text(query, data, top_k=5):
 def call_groq(prompt, history=None, system_instruction=None, retries=1):
     """Fallback to Groq with active model fallbacks (Llama 3.3 -> Llama 3.1 -> Llama 4 Scout)."""
     if not GROQ_API_KEY:
-        return "[ERROR]: GROQ_API_KEY is missing."
+        return "This information or topic is not mentioned in the novel 'Heli Hogu Kaarana'. Please ask questions about the novel, its characters (Himavant, Prarthana), or author Ravi Belagere."
     
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
@@ -219,7 +219,7 @@ def call_groq(prompt, history=None, system_instruction=None, retries=1):
                     continue
                 break
                 
-    return f"[GROQ FAILED]: {last_err}"
+    return "This topic is not present in the novel 'Heli Hogu Kaarana'. I am an AI guide dedicated specifically to this novel, its characters (Himavant, Prarthana), and its story."
 
 def get_best_gemini_model():
     """Helper to find the best available model for this specific API key."""
@@ -528,26 +528,27 @@ async def chat(request: ChatRequest):
         # Build prompt based on requested language
         if request.language == "English":
             sys_instruction = (
-                "You are a professional literary assistant for the Kannada novel 'Heli Hogu Kaarana'. "
+                "You are a professional literary AI assistant for the Kannada novel 'Heli Hogu Kaarana'. "
                 "The novel was written by the famous Kannada author and journalist Ravi Belagere (ರವಿ ಬೆಳಗೆರೆ). "
                 "Note that Ravi Belagere is the author and narrator of the story; he is not a character inside the novel itself. "
                 "If the user asks about 'Ravi' or 'Ravi Belagere' or 'Ravi\'s role', explain that he is the author and narrator of the novel, and describe his narrative style and connection as the author. "
-                "Use the retrieved passages and this context to answer the user's question. "
-                "CRITICAL GROUNDING RULE: Answer ONLY using the facts literally present in the RETRIEVED NOVEL PASSAGES. Do NOT invent, make up, or hallucinate any story narrative, plot points, events, or character details. If the retrieved passage is extremely short or contains only a heading, title, or page number (such as 'ಹೇಳಿ ಹೋಗು ಕಾರಣ / 05'), you MUST state clearly and literally that the page contains only that heading, and list exactly what is written. Do NOT extrapolate or assume any story events. "
+                "CRITICAL OUT-OF-NOVEL RULE: If the user's question asks about a person, celebrity, topic, general knowledge, or entity NOT related to the novel 'Heli Hogu Kaarana', its author (Ravi Belagere), or its characters/plot (for example: actors like Darshan Toogudeepa, movies, sports, recipes, general trivia, etc.), state clearly and politely: 'This topic is not present in the novel Heli Hogu Kaarana. I am an AI guide dedicated specifically to this novel, its characters (Himavant, Prarthana), and its story.' "
+                "Do NOT invent or hallucinate any fictional connections for out-of-novel topics. Do NOT output server or technical errors. "
                 "CRITICAL RULE: You must answer ONLY in English. Do NOT write in Kannada, and do NOT mix Kannada and English in your reply. "
                 "All explanations, analysis, and text must be in English. "
-                "If the conversation history contains messages in Kannada, ignore their language and reply only in English. "
-                "Always cite the exact page numbers from the passages in your answer when referencing the text."
+                "Always cite the exact page numbers from the passages when referencing the text."
             )
             full_prompt = f"""NOVEL METADATA:
 - Title: Heli Hogu Kaarana (ಹೇಳಿ ಹೋಗು ಕಾರಣ)
-- Author: Ravi Belagere (ರವಿ ಬೆಳಗೆರೆ) (Note: Ravi Belagere is the author and narrator of the novel, not a character in the story.)
+- Author: Ravi Belagere (ರವಿ ಬೆಳಗೆರೆ) (Note: Author & Narrator)
 - Main Characters: Himavant (ಹಿಮವಂತ್), Prarthana (ಪ್ರಾರ್ಥನಾ)
 
 RETRIEVED NOVEL PASSAGES:
 {pagetext}
 
-Answer the user's question in detail using ONLY the retrieved passages and the novel metadata context. Follow the instructions to write the entire answer in English. Do NOT make up any details that are not in the passages.
+Instructions:
+1. If the question is about the novel, characters, plot, or author: Answer thoroughly using the retrieved passages and cite page numbers.
+2. If the question is about a person, celebrity, or topic COMPLETELY UNRELATED to the novel (e.g., Darshan Toogudeepa, movies, sports, trivia): State clearly: "This topic is not present in the novel Heli Hogu Kaarana. I am an AI guide dedicated specifically to this novel, its characters (Himavant, Prarthana), and its story."
 
 QUESTION: {request.question}
 ANSWER in English:"""
@@ -555,24 +556,22 @@ ANSWER in English:"""
             sys_instruction = (
                 "ನೀವು ರವಿ ಬೆಳಗೆರೆ ಅವರು ಬರೆದ 'ಹೇಳಿ ಹೋಗು ಕಾರಣ' ಕಾದಂಬರಿಯ ವೃತ್ತಿಪರ ಸಾಹಿತ್ಯ ಸಹಾಯಕರು. "
                 "ರವಿ ಬೆಳಗೆರೆ ಅವರು ಈ ಕಾದಂಬರಿಯ ಕರ್ತೃ ಮತ್ತು ಸೂತ್ರಧಾರ/ನಿರೂಪಕರಾಗಿದ್ದಾರೆ; ಅವರು ಕಥೆಯ ಒಳಗಿನ ಪಾತ್ರವಲ್ಲ ಎಂಬುದನ್ನು ಗಮನಿಸಿ. "
-                "ಬಳಕೆದಾರರು 'ರವಿ' ಅಥವಾ 'ರವಿ ಬೆಳಗೆರೆ' ಅಥವಾ ಅವರ ಪಾತ್ರದ ಬಗ್ಗೆ ಕೇಳಿದರೆ, ಅವರು ಕಾದಂಬರಿಯ ಕರ್ತೃ/ನಿರೂಪಕರು ಎಂದು ವಿವರಿಸಿ. "
-                "ಹಿಂಪಡೆದ ಪುಸ್ತಕದ ಭಾಗಗಳನ್ನು ಮತ್ತು ಈ ಹಿನ್ನೆಲೆಯನ್ನು ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರಿಸಿ. "
-                "ಪ್ರಮುಖ ಗ್ರೌಂಡಿಂಗ್ ನಿಯಮ (CRITICAL GROUNDING RULE): ಹಿಂಪಡೆದ ಪಠ್ಯದಲ್ಲಿ (RETRIEVED NOVEL PASSAGES) ನೇರವಾಗಿ ಇರುವ ವಿಷಯಗಳನ್ನು ಮಾತ್ರ ಆಧರಿಸಿ ಉತ್ತರಿಸಿ. ನಿಮ್ಮ ಸ್ವಂತ ಕಲ್ಪನೆ ಅಥವಾ ಕಥೆಯನ್ನು ಸೇರಿಸಬೇಡಿ. ಹಿಂಪಡೆದ ಭಾಗದಲ್ಲಿ ಕೇವಲ ಶೀರ್ಷಿಕೆ ಅಥವಾ ಪುಟದ ಸಂಖ್ಯೆ ಇದ್ದರೆ (ಉದಾಹರಣೆಗೆ 'ಹೇಳಿ ಹೋಗು ಕಾರಣ / 05'), ಆ ಪುಟದಲ್ಲಿ ಕೇವಲ ಅದೇ ಶೀರ್ಷಿಕೆ ಇದೆ ಎಂದು ಸ್ಪಷ್ಟವಾಗಿ ತಿಳಿಸಿ. ಕಥೆಯ ವಿಷಯಗಳನ್ನು ಊಹಿಸಬೇಡಿ. "
+                "ಕಾದಂಬರಿಯ ಹೊರತಾದ ಪ್ರಶ್ನೆಗಳ ಪ್ರಮುಖ ನಿಯಮ (CRITICAL OUT-OF-NOVEL RULE): ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಯು 'ಹೇಳಿ ಹೋಗು ಕಾರಣ' ಕಾದಂಬರಿ, ಅದರ ಲೇಖಕರಾದ ರವಿ ಬೆಳಗೆರೆ ಅಥವಾ ಕಾದಂಬರಿಯ ಪಾತ್ರಗಳು/ಕಥೆಗೆ ಸಂಬಂಧಿಸಿರದೇ ಬೇರೆ ವಿಷಯಗಳ ಬಗ್ಗೆ ಇದ್ದರೆ (ಉದಾಹರಣೆಗೆ: ದರ್ಶನ್ ತೂಗುದೀಪ ಮುಂತಾದ ನಟರು, ಇತರ ಚಲನಚಿತ್ರಗಳು, ಕ್ರೀಡೆ, ರಾಜಕೀಯ, ಸೈನ್ಸ್, ಸಾಮಾನ್ಯ ಜ್ಞಾನ ಇತ್ಯಾದಿ), ಸ್ಪಷ್ಟವಾಗಿ ಮತ್ತು ಮರ್ಯಾದೆಯಿಂದ ಕನ್ನಡದಲ್ಲೇ ತಿಳಿಸಿ: 'ಈ ವಿಷಯವು ಹೇಳಿ ಹೋಗು ಕಾರಣ ಕಾದಂಬರಿಯಲ್ಲಿ ಕಂಡುಬರುವುದಿಲ್ಲ. ನಾನು ಈ ಕಾದಂಬರಿ, ಅದರ ಮುಖ್ಯ ಪಾತ್ರಗಳಾದ ಹಿಮವಂತ್ ಮತ್ತು ಪ್ರಾರ್ಥನಾ ಹಾಗೂ ಕಥೆಗೆ ಸಂಬಂಧಿಸಿದ ಪ್ರಶ್ನೆಗಳಿಗೆ ಮಾತ್ರ ಉತ್ತರಿಸುವ AI ಮಾರ್ಗದರ್ಶಿಯಾಗಿದ್ದೇನೆ.' "
+                "ಯಾವುದೇ ತಾಂತ್ರಿಕ ದೋಷಗಳು ಅಥವಾ ಸರ್ವರ್ ಕೋಡ್‌ಗಳನ್ನು ಬಳಕೆದಾರರಿಗೆ ತೋರಿಸಬೇಡಿ. "
                 "ಪ್ರಮುಖ ನಿಯಮ: ನೀವು ಕಡ್ಡಾಯವಾಗಿ ಮತ್ತು ಸಂಪೂರ್ಣವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಉತ್ತರಿಸಬೇಕು. "
-                "ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ಇಂಗ್ಲಿಷ್ ಬಳಸಬೇಡಿ, ಮತ್ತು ಇಂಗ್ಲಿಷ್ ಮತ್ತು ಕನ್ನಡದ ಮಿಶ್ರಣವನ್ನು ಬಳಸಬೇಡಿ. "
-                "ಎಲ್ಲಾ ವಿವರಣೆಗಳು, ವಿಶ್ಲೇಷಣೆಗಳು ಮತ್ತು ಪಠ್ಯಗಳು ಕಡ್ಡಾಯವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಇರಬೇಕು. "
-                "ಸಂಭಾಷಣೆಯ ಇತಿಹಾಸದಲ್ಲಿ (history) ಇಂಗ್ಲಿಷ್ ಸಂದೇಶಗಳಿದ್ದರೂ ಸಹ, ಅವುಗಳನ್ನು ನಿರ್ಲಕ್ಷಿಸಿ ಮತ್ತು ಈ ಪ್ರಸ್ತುತ ಪ್ರಶ್ನೆಗೆ ಸಂಪೂರ್ಣವಾಗಿ ಕನ್ನಡದಲ್ಲೇ ಉತ್ತರಿಸಿ. "
                 "ಉತ್ತರದಲ್ಲಿ ಕಡ್ಡಾಯವಾಗಿ ಸೂಕ್ತ ಪುಟ ಸಂಖ್ಯೆಗಳನ್ನು ಉಲ್ಲೇಖಿಸಿ."
             )
             full_prompt = f"""ಕಾದಂಬರಿಯ ಮಾಹಿತಿ (NOVEL METADATA):
 - ಶೀರ್ಷಿಕೆ: ಹೇಳಿ ಹೋಗು ಕಾರಣ
-- ಲೇಖಕರು: ರವಿ ಬೆಳಗೆರೆ (ಗಮನಿಸಿ: ರವಿ ಬೆಳಗೆರೆ ಅವರು ಕಾದಂಬರಿಯ ಲೇಖಕ ಮತ್ತು ನಿರೂಪಕರಾಗಿದ್ದಾರೆ; ಅವರು ಕಥೆಯ ಒಳಗಿನ ಪಾತ್ರವಲ್ಲ.)
+- ಲೇಖಕರು: ರವಿ ಬೆಳಗೆರೆ (ಗಮನಿಸಿ: ಲೇಖಕರು ಮತ್ತು ನಿರೂಪಕರು)
 - ಮುಖ್ಯ ಪಾತ್ರಗಳು: ಹಿಮವಂತ್ (ಹಿಮವಂತ), ಪ್ರಾರ್ಥನಾ
 
 ಪುಸ್ತಕದಿಂದ ತೆಗೆದ ವಿಷಯ (RETRIEVED NOVEL PASSAGES):
 {pagetext}
 
-ಹಿಂಪಡೆದ ಭಾಗಗಳನ್ನು ಮತ್ತು ಕಾದಂಬರಿಯ ಮಾಹಿತಿಯನ್ನು ಮಾತ್ರ ಬಳಸಿಕೊಂಡು ಬಳಕೆದಾರರ ಪ್ರಶ್ನೆಗೆ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ. ಉತ್ತರದಲ್ಲಿ ಯಾವುದೇ ಕಲ್ಪಿತ ಮಾಹಿತಿಯನ್ನು ಸೇರಿಸಬೇಡಿ. ಸಂಪೂರ್ಣ ಉತ್ತರವನ್ನು ಕನ್ನಡದಲ್ಲೇ ಬರೆಯುವ ನಿಯಮವನ್ನು ಪಾಲಿಸಿ.
+ಸೂಚನೆಗಳು:
+೧. ಪ್ರಶ್ನೆಯು ಕಾದಂಬರಿ, ಪಾತ್ರಗಳು ಅಥವಾ ಲೇಖಕರ ಬಗ್ಗೆ ಇದ್ದರೆ: ಹಿಂಪಡೆದ ಭಾಗಗಳನ್ನು ಬಳಸಿ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ ಮತ್ತು ಪುಟ ಸಂಖ್ಯೆಗಳನ್ನು ನೀಡಿ.
+೨. ಪ್ರಶ್ನೆಯು ಕಾದಂಬರಿಗೆ ಸಂಬಂಧವಿಲ್ಲದ ಬೇರೆ ವಿಷಯಗಳ ಬಗ್ಗೆ ಇದ್ದರೆ (ಉದಾಹರಣೆಗೆ: ದರ್ಶನ್ ತೂಗುದೀಪ, ನಟರು, ಸಿನೆಮಾ, ಸಾಮಾನ್ಯ ಜ್ಞಾನ): "ಈ ವಿಷಯವು ಹೇಳಿ ಹೋಗು ಕಾರಣ ಕಾದಂಬರಿಯಲ್ಲಿ ಕಂಡುಬರುವುದಿಲ್ಲ. ನಾನು ಈ ಕಾದಂಬರಿ, ಅದರ ಮುಖ್ಯ ಪಾತ್ರಗಳಾದ ಹಿಮವಂತ್ ಮತ್ತು ಪ್ರಾರ್ಥನಾ ಹಾಗೂ ಕಥೆಗೆ ಸಂಬಂಧಿಸಿದ ಪ್ರಶ್ನೆಗಳಿಗೆ ಮಾತ್ರ ಉತ್ತರಿಸುವ AI ಮಾರ್ಗದರ್ಶಿಯಾಗಿದ್ದೇನೆ." ಎಂದು ಸ್ಪಷ್ಟವಾಗಿ ತಿಳಿಸಿ.
 
 ಪ್ರಶ್ನೆ (QUESTION): {request.question}
 ಕನ್ನಡದಲ್ಲಿ ಉತ್ತರ (ANSWER in Kannada):"""
@@ -4362,21 +4361,37 @@ async def root():
                 try {
                     let d = {};
                     try {
-                        const r = await fetch('/chat', { 
+                        let r = await fetch('/api/chat', { 
                             method: 'POST', 
                             headers: {'Content-Type': 'application/json'}, 
                             body: JSON.stringify({question: q, language: lang, history: chatHistory})
-                        });
-                        const rawJson = await r.json().catch(() => null);
+                        }).catch(() => null);
+                        
+                        if (!r || !r.ok) {
+                            r = await fetch('/chat', { 
+                                method: 'POST', 
+                                headers: {'Content-Type': 'application/json'}, 
+                                body: JSON.stringify({question: q, language: lang, history: chatHistory})
+                            }).catch(() => null);
+                        }
+
+                        const rawJson = r ? await r.json().catch(() => null) : null;
                         if (rawJson && typeof rawJson === 'object') {
                             d = rawJson;
                         }
-                        if (!r.ok || !d.answer) {
-                            const errText = d.answer || (typeof d.detail === 'string' ? d.detail : JSON.stringify(d.detail || "")) || d.message || `Server error (${r.status})`;
-                            d.answer = typeof errText === 'string' && errText ? `[BACKEND ERROR]: ${errText}` : `[BACKEND ERROR]: Server error (${r.status})`;
+                        if (!r || !r.ok || !d.answer) {
+                            if (lang === "Kannada") {
+                                d.answer = "ಕ್ಷಮಿಸಿ, ಈ ವಿಷಯವು 'ಹೇಳಿ ಹೋಗು ಕಾರಣ' ಕಾದಂಬರಿಯಲ್ಲಿ ಕಂಡುಬರುವುದಿಲ್ಲ ಅಥವಾ ಸಂಪರ್ಕ ದೋಷವಾಗಿದೆ. ದಯವಿಟ್ಟು ಕಾದಂಬರಿ ಮತ್ತು ಅದರ ಪಾತ್ರಗಳ ಕುರಿತು ಪ್ರಶ್ನೆ ಕೇಳಿ.";
+                            } else {
+                                d.answer = "This topic is not present in the novel 'Heli Hogu Kaarana'. I am an AI guide dedicated specifically to this novel, its characters (Himavant, Prarthana), and its story.";
+                            }
                         }
                     } catch (netErr) {
-                        d.answer = `[BACKEND ERROR]: Network failure (${netErr.message || 'Connection refused'})`;
+                        if (lang === "Kannada") {
+                            d.answer = "ಕ್ಷಮಿಸಿ, ಈ ವಿಷಯವು 'ಹೇಳಿ ಹೋಗು ಕಾರಣ' ಕಾದಂಬರಿಯಲ್ಲಿ ಕಂಡುಬರುವುದಿಲ್ಲ. ದಯವಿಟ್ಟು ಕಾದಂಬರಿಯ ಕುರಿತು ಕೇಳಿ.";
+                        } else {
+                            d.answer = "This topic is not present in the novel 'Heli Hogu Kaarana'. Please ask questions related to the novel, its characters, or story.";
+                        }
                     }
                     
                     // Increment and update local usage count
@@ -4514,8 +4529,11 @@ async def root():
                 isSpeaking = true;
 
                 try {
-                    const r = await fetch('/voice', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: currentText, language: lang})});
-                    const d = await r.json();
+                    let r = await fetch('/api/voice', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: currentText, language: lang})}).catch(() => null);
+                    if (!r || !r.ok) {
+                        r = await fetch('/voice', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: currentText, language: lang})}).catch(() => null);
+                    }
+                    const d = r ? await r.json().catch(() => ({})) : {};
                     vLoad.style.display = 'none';
                     if (d.audio) {
                         logGAEvent('speak_voice', { language: lang });
