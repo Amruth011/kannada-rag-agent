@@ -4355,23 +4355,35 @@ async def root():
                 cont.style.display = 'none';
                 
                 try {
-                    const r = await fetch('/chat', { 
-                        method: 'POST', 
-                        headers: {'Content-Type': 'application/json'}, 
-                        body: JSON.stringify({question: q, language: lang, history: chatHistory})
-                    });
-                    const d = await r.json();
+                    let d = {};
+                    try {
+                        const r = await fetch('/chat', { 
+                            method: 'POST', 
+                            headers: {'Content-Type': 'application/json'}, 
+                            body: JSON.stringify({question: q, language: lang, history: chatHistory})
+                        });
+                        const rawJson = await r.json().catch(() => null);
+                        if (rawJson && typeof rawJson === 'object') {
+                            d = rawJson;
+                        }
+                        if (!r.ok || !d.answer) {
+                            const errText = d.answer || (typeof d.detail === 'string' ? d.detail : JSON.stringify(d.detail || "")) || d.message || `Server error (${r.status})`;
+                            d.answer = typeof errText === 'string' && errText ? `[BACKEND ERROR]: ${errText}` : `[BACKEND ERROR]: Server error (${r.status})`;
+                        }
+                    } catch (netErr) {
+                        d.answer = `[BACKEND ERROR]: Network failure (${netErr.message || 'Connection refused'})`;
+                    }
                     
                     // Increment and update local usage count
                     incrementUsage();
                     
-                    currentText = d.answer;
+                    currentText = typeof d.answer === 'string' ? d.answer : String(d.answer || "");
                     logGAEvent('ask_query', { question: q, language: lang });
-                    res.innerHTML = formatMarkdown(d.answer);
+                    res.innerHTML = formatMarkdown(currentText);
                     
                     // Render sources snippets
                     const sourcesRes = document.getElementById('sources-res');
-                    if (d.snippets && d.snippets.length > 0) {
+                    if (d.snippets && Array.isArray(d.snippets) && d.snippets.length > 0) {
                         let html = '<div style="font-weight: 700; color: var(--primary); margin-bottom: 8px; font-family: var(--font-serif);">Sources:</div>';
                         d.snippets.forEach(s => {
                             html += `<div style="margin-bottom: 8px;"><span style="font-weight: bold; color: var(--text-dark);">Page ${s.page}:</span><br><span style="font-style: italic; color: #4b5563;">"${s.text}"</span></div>`;
@@ -4388,7 +4400,7 @@ async def root():
                     const confWarn = document.getElementById('confidence-warn');
                     if (d.confidence_pct !== undefined && d.confidence_pct > 0 && !d.is_deterministic) {
                         const pct = Math.round(d.confidence_pct);
-                        const lbl = d.confidence_label;
+                        const lbl = d.confidence_label || "Medium";
                         let color = '#dc2626'; // Low
                         if (lbl === 'High') color = '#16a34a';
                         else if (lbl === 'Medium') color = '#ea580c';
@@ -4406,10 +4418,14 @@ async def root():
                     }
                     
                     // Update conversational memory if it is a successful non-error response
-                    const isError = d.answer.startsWith('[GROQ FAILED]') || d.answer.startsWith('[BACKEND ERROR]') || d.answer.startsWith('[ERROR]');
+                    const isError = typeof currentText === 'string' && (
+                        currentText.startsWith('[GROQ FAILED]') || 
+                        currentText.startsWith('[BACKEND ERROR]') || 
+                        currentText.startsWith('[ERROR]')
+                    );
                     if (!isError) {
                         chatHistory.push({role: "user", content: q});
-                        chatHistory.push({role: "assistant", content: d.answer});
+                        chatHistory.push({role: "assistant", content: currentText});
                         // Limit to last 10 messages (5 turns)
                         if (chatHistory.length > 10) {
                             chatHistory = chatHistory.slice(chatHistory.length - 10);
@@ -4417,7 +4433,7 @@ async def root():
                         try {
                             localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
                             localStorage.setItem('lastQuestion', q);
-                            localStorage.setItem('lastAnswer', d.answer);
+                            localStorage.setItem('lastAnswer', currentText);
                             if (d.snippets && d.snippets.length > 0) {
                                 localStorage.setItem('lastSnippets', JSON.stringify(d.snippets));
                             } else {
@@ -4478,11 +4494,12 @@ async def root():
                 }
                 
                 // Block speech if the output is an error message
-                const isError = currentText.startsWith('[GROQ FAILED]') || 
+                const isError = typeof currentText === 'string' && (
+                                currentText.startsWith('[GROQ FAILED]') || 
                                 currentText.startsWith('[BACKEND ERROR]') || 
                                 currentText.startsWith('[ERROR]') || 
                                 currentText.includes('exceeded your current quota') || 
-                                currentText.includes('error:');
+                                currentText.includes('error:'));
                                 
                 if (isError) {
                     return;
