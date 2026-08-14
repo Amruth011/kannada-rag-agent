@@ -43,3 +43,10 @@ Automated benchmarks run on a golden dataset of 50 complex Kannada literary ques
 - **Vercel Timeout**: Max 60 seconds (Pro Tier) / 10 seconds (Hobby).
 - **Vercel Payload**: Max 4.5 MB response size.
 - **Streamlit Timeout**: None (WebSocket based), but subject to 1GB RAM OOM kills.
+
+## Technical Interview & Architectural Insights
+
+- **RRF vs. Cosine Score Merging**: Cosine vector scores and BM25 scores cannot be combined directly because they operate on completely different scales. Reciprocal Rank Fusion (RRF) normalizes ranks mathematically without scale bias:
+  $$RRF\_Score(d) = \sum_{m \in M} \frac{1}{60 + r_m(d)}$$
+- **The Kannada Morphology Barrier**: Multilingual embeddings alone are insufficient for Indic scripts due to morphological complexity. Lexical search (BM25) is a mandatory complement to prevent dropping proper nouns (e.g., *Himavant*, *Prarthana*).
+- **Query Routing Pattern**: Routing exact metadata requests (e.g. page-specific queries) around the semantic indexing layer prevents vector mismatch and guarantees 100% precision for locational queries.
