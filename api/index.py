@@ -1560,8 +1560,248 @@ async def sitemap_xml():
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
+    <url>
+        <loc>https://heli-hogu-kaarana.vercel.app/privacy</loc>
+        <lastmod>2026-08-14</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.3</priority>
+    </url>
 </urlset>""".strip()
     return Response(content=content, media_type="application/xml")
+
+@app.get("/privacy", response_class=HTMLResponse)
+async def privacy_policy():
+    privacy_html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Privacy Policy — Heli Hogu Kaarana</title>
+    <meta name="description" content="Privacy Policy for Heli Hogu Kaarana AI Literary Guide. Learn how we collect and use data including Google AdSense and Google Analytics.">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #c2410c;
+            --bg: #fffcf8;
+            --bg-secondary: #fdf5ee;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: rgba(194, 65, 12, 0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-banner {
+            width: 100%;
+            background: linear-gradient(90deg, #b45309, #c2410c, #b45309);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 0.55rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .nav-header {
+            width: 100%;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.9rem 2rem;
+        }
+        .nav-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .logo span { color: var(--primary); }
+        .back-btn {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0.4rem 0.9rem;
+            border: 1.5px solid var(--primary);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: #ffedd5; }
+        main {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 3rem 2rem 4rem;
+            flex: 1;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: var(--text);
+            margin-bottom: 0.4rem;
+        }
+        .last-updated {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #ffedd5;
+        }
+        h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 2rem 0 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        p, li {
+            font-size: 0.94rem;
+            line-height: 1.8;
+            color: #374151;
+        }
+        ul { padding-left: 1.5rem; margin-top: 0.5rem; }
+        li { margin-bottom: 0.4rem; }
+        a { color: var(--primary); }
+        .highlight-box {
+            background: #ffedd5;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.2rem;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+        footer {
+            width: 100%;
+            background: linear-gradient(90deg, #b45309, #c2410c, #b45309);
+            color: #fff;
+            padding: 1.2rem 1.5rem;
+            text-align: center;
+            font-size: 0.78rem;
+        }
+        footer a { color: #ffedd5; }
+        @media (max-width: 600px) {
+            main { padding: 2rem 1.2rem 3rem; }
+            h1 { font-size: 1.7rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-banner">✦ CELEBRATING KANNADA LITERATURE WITH ADVANCED AI VOICE AGENT ✦</div>
+    <nav class="nav-header">
+        <div class="nav-inner">
+            <a href="/" class="logo">ಹೇಳಿ ಹೋಗು <span>ಕಾರಣ</span></a>
+            <a href="/" class="back-btn">← Back to Home</a>
+        </div>
+    </nav>
+
+    <main>
+        <h1>Privacy Policy</h1>
+        <p class="last-updated">Last Updated: <strong>August 14, 2026</strong> &nbsp;|&nbsp; Effective Date: August 14, 2026</p>
+
+        <div class="highlight-box">
+            This Privacy Policy describes how <strong>Heli Hogu Kaarana</strong> ("we", "us", or "our") collects, uses, and shares information when you visit <strong>heli-hogu-kaarana.vercel.app</strong>. By using this website, you agree to the collection and use of information in accordance with this policy.
+        </div>
+
+        <h2>📌 1. Who We Are</h2>
+        <p>Heli Hogu Kaarana is an AI-powered literary guide for the Kannada novel "Heli Hogu Kaarana" by Ravi Belagere. This website is operated by <strong>Amruth</strong>. For questions, contact us at <a href="mailto:amruth.belagere@gmail.com">amruth.belagere@gmail.com</a>.</p>
+
+        <h2>📊 2. Information We Collect</h2>
+        <p>We collect the following types of information:</p>
+        <ul>
+            <li><strong>Usage Data:</strong> Pages visited, time spent, browser type, device type, and referring URLs — collected automatically via Google Analytics.</li>
+            <li><strong>AI Query Data:</strong> Questions you ask the AI Guide are sent to our server to generate answers. We do not store these queries permanently.</li>
+            <li><strong>Feedback Data:</strong> If you submit feedback via the Feedback tab, we store your rating and text to improve the service.</li>
+            <li><strong>Cookies:</strong> We use cookies for advertising (Google AdSense) and analytics (Google Analytics). See Section 4 for details.</li>
+        </ul>
+        <p>We do <strong>not</strong> collect your name, email address, or any personally identifiable information (PII) unless you contact us directly.</p>
+
+        <h2>🎯 3. How We Use Your Information</h2>
+        <ul>
+            <li>To operate and improve the AI Guide and literary features</li>
+            <li>To display personalised advertisements via Google AdSense</li>
+            <li>To analyse site traffic and user behaviour via Google Analytics</li>
+            <li>To respond to feedback and improve content quality</li>
+        </ul>
+
+        <h2>🍪 4. Cookies & Advertising</h2>
+        <p>This site uses cookies. Cookies are small text files stored on your device. We use:</p>
+        <ul>
+            <li><strong>Google AdSense Cookies:</strong> Used to serve relevant advertisements. Google may use cookies to personalise ads based on your visits to this and other websites. You can opt out at <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener">Google Ad Settings</a>.</li>
+            <li><strong>Google Analytics Cookies:</strong> Used to collect anonymous information about how visitors use the site (e.g. page views, session duration). This helps us improve the website.</li>
+            <li><strong>Consent Cookie:</strong> We store your cookie consent choice in your browser's local storage.</li>
+        </ul>
+        <p>Google AdSense uses the DoubleClick cookie to serve ads. Third-party vendors, including Google, use cookies to serve ads based on prior visits. For more information, visit the <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">Google Advertising Privacy Policy</a>.</p>
+
+        <h2>🔗 5. Third-Party Services</h2>
+        <p>We use the following third-party services that may collect data independently:</p>
+        <ul>
+            <li><strong>Google AdSense</strong> — Advertising platform. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></li>
+            <li><strong>Google Analytics</strong> — Website analytics. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></li>
+            <li><strong>Vercel</strong> — Hosting platform. <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a></li>
+            <li><strong>Google Fonts</strong> — Web typography. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></li>
+        </ul>
+        <p>We do not sell your personal data to any third parties.</p>
+
+        <h2>🌍 6. EU / GDPR Users</h2>
+        <p>If you are located in the European Union or European Economic Area, you have the following rights under the General Data Protection Regulation (GDPR):</p>
+        <ul>
+            <li>The right to access, rectify, or erase your personal data</li>
+            <li>The right to restrict or object to processing</li>
+            <li>The right to data portability</li>
+            <li>The right to withdraw consent at any time</li>
+        </ul>
+        <p>To exercise these rights, contact us at <a href="mailto:amruth.belagere@gmail.com">amruth.belagere@gmail.com</a>. When you first visit this site, you are presented with a cookie consent banner allowing you to accept or decline non-essential cookies.</p>
+
+        <h2>👶 7. Children's Privacy</h2>
+        <p>This website is not directed at children under the age of 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, please contact us immediately.</p>
+
+        <h2>🔒 8. Data Security</h2>
+        <p>We take reasonable technical measures to protect information transmitted through our services. However, no method of transmission over the Internet is 100% secure. We encourage you not to share sensitive personal information through the AI Guide chat.</p>
+
+        <h2>🔄 9. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated "Last Updated" date. We encourage you to review this policy periodically.</p>
+
+        <h2>📬 10. Contact Us</h2>
+        <p>If you have any questions or concerns about this Privacy Policy, please contact us:</p>
+        <ul>
+            <li>Email: <a href="mailto:amruth.belagere@gmail.com">amruth.belagere@gmail.com</a></li>
+            <li>Website: <a href="https://heli-hogu-kaarana.vercel.app">heli-hogu-kaarana.vercel.app</a></li>
+        </ul>
+    </main>
+
+    <footer>
+        <div style="max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0.5rem 1.5rem;">
+            <span>© 2026 <strong>Heli Hogu Kaarana</strong> — AI Literary Guide</span>
+            <span style="opacity:0.4;">|</span>
+            <a href="/privacy">Privacy Policy</a>
+            <span style="opacity:0.4;">|</span>
+            <a href="mailto:amruth.belagere@gmail.com">Contact Us</a>
+        </div>
+    </footer>
+</body>
+</html>"""
+    return HTMLResponse(content=privacy_html)
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -4504,6 +4744,64 @@ async def root():
                 <span>Feedback</span>
             </button>
         </div>
+
+    <!-- ===== SITE FOOTER ===== -->
+    <footer style="width:100%;background:linear-gradient(90deg,#b45309,#c2410c,#b45309);color:#fff;padding:1.2rem 1.5rem;box-sizing:border-box;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.78rem;margin-top:auto;">
+        <div style="max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0.5rem 1.5rem;">
+            <span>© 2026 <strong>Heli Hogu Kaarana</strong> — AI Literary Guide</span>
+            <span style="opacity:0.4;">|</span>
+            <a href="/privacy" style="color:#ffedd5;text-decoration:underline;font-weight:600;">Privacy Policy</a>
+            <span style="opacity:0.4;">|</span>
+            <span>Built with ❤️ for Kannada Literature</span>
+            <span style="opacity:0.4;">|</span>
+            <a href="mailto:amruth.belagere@gmail.com" style="color:#ffedd5;text-decoration:underline;">Contact Us</a>
+        </div>
+        <div style="margin-top:0.5rem;opacity:0.75;font-size:0.7rem;">
+            This site uses cookies and Google AdSense to serve personalised ads. By continuing, you agree to our <a href="/privacy" style="color:#ffedd5;text-decoration:underline;">Privacy Policy</a>.
+        </div>
+    </footer>
+
+    <!-- ===== COOKIE CONSENT BANNER ===== -->
+    <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;
+        background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);
+        color:#f8fafc;padding:1rem 1.5rem;
+        box-shadow:0 -4px 30px rgba(0,0,0,0.3);
+        border-top:2px solid #c2410c;
+        font-family:'Plus Jakarta Sans',sans-serif;
+        display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;">
+        <div style="flex:1;min-width:200px;font-size:0.82rem;line-height:1.5;">
+            🍪 <strong>We use cookies</strong> to personalise ads (Google AdSense) and analyse traffic (Google Analytics).
+            By clicking <em>Accept</em>, you consent to our use of cookies.
+            <a href="/privacy" style="color:#fb923c;text-decoration:underline;margin-left:4px;">Learn more</a>
+        </div>
+        <div style="display:flex;gap:0.7rem;flex-shrink:0;">
+            <button onclick="setCookieConsent('declined')" style="
+                background:transparent;border:1.5px solid rgba(248,250,252,0.3);
+                color:#94a3b8;padding:0.45rem 1.1rem;border-radius:8px;
+                cursor:pointer;font-size:0.8rem;font-family:inherit;font-weight:600;
+                transition:all 0.2s;">Decline</button>
+            <button onclick="setCookieConsent('accepted')" style="
+                background:linear-gradient(135deg,#c2410c,#b45309);
+                border:none;color:#fff;padding:0.45rem 1.4rem;border-radius:8px;
+                cursor:pointer;font-size:0.8rem;font-family:inherit;font-weight:700;
+                box-shadow:0 4px 12px rgba(194,65,12,0.35);
+                transition:all 0.2s;">Accept All</button>
+        </div>
+    </div>
+    <script>
+    (function() {
+        var consent = localStorage.getItem('cookie_consent');
+        if (!consent) {
+            document.getElementById('cookie-banner').style.display = 'flex';
+        }
+    })();
+    function setCookieConsent(val) {
+        localStorage.setItem('cookie_consent', val);
+        document.getElementById('cookie-banner').style.display = 'none';
+    }
+    </script>
+    <!-- {{COOKIE_BANNER_PLACEHOLDER}} -->
+
     </body>
     </html>
 
