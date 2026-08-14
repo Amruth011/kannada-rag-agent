@@ -1530,6 +1530,12 @@ Sitemap: https://heli-hogu-kaarana.vercel.app/sitemap.xml
 """
     return PlainTextResponse(content=content)
 
+@app.get("/ads.txt")
+async def ads_txt():
+    from fastapi.responses import PlainTextResponse
+    content = "google.com, pub-8603377426918332, DIRECT, f08c47fec0942fa0\n"
+    return PlainTextResponse(content=content)
+
 @app.get("/sitemap.xml")
 async def sitemap_xml():
     from fastapi.responses import Response
