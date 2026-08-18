@@ -1052,7 +1052,8 @@ with st.expander("💬 Share Feedback", expanded=False):
             feedback_rating = st.selectbox("Rating", ["⭐⭐⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐", "⭐⭐", "⭐"])
         feedback_text = st.text_area("Your feedback", placeholder="What did you like? What can be improved?", height=100)
         submitted = st.form_submit_button("Submit Feedback ✨")
-        if submitted and feedback_text.strip():
+        if submitted:
+            # Allow submission with rating only; feedback text is optional
             import json, datetime
             feedback_file = os.path.join(BASE_DIR, "feedback.json")
             try:
@@ -1069,8 +1070,9 @@ with st.expander("💬 Share Feedback", expanded=False):
             with open(feedback_file, "w", encoding="utf-8") as f:
                 json.dump(all_feedback, f, ensure_ascii=False, indent=2)
             st.success("✅ Thank you!")
-        elif submitted:
-            st.warning("Please write something before submitting.")
+        else:
+            # No submission
+            pass
 
 # ── Admin ─────────────────────────────────────────────────────────────────────
 with st.sidebar:
