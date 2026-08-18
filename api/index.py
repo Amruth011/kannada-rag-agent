@@ -3232,7 +3232,7 @@ async def root():
                     <form id="feedback-form" onsubmit="submitFeedback(event)" style="max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2rem;">
                         <div style="text-align: left;">
                             <label for="fb-name" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Your Name / ನಿಮ್ಮ ಹೆಸರು</label>
-                            <input type="text" id="fb-name" placeholder="Enter your name" required style="width: 100%; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-family: inherit; font-size: 0.95rem; outline: none; box-sizing: border-box; background: var(--bg-secondary);">
+                            <input type="text" id="fb-name" placeholder="Enter your name" style="width: 100%; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-family: inherit; font-size: 0.95rem; outline: none; box-sizing: border-box; background: var(--bg-secondary);">
                         </div>
                         
                         <div style="text-align: left;">
@@ -3249,7 +3249,7 @@ async def root():
                         
                         <div style="text-align: left;">
                             <label for="fb-comment" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Comment / ಅನಿಸಿಕೆ</label>
-                            <textarea id="fb-comment" placeholder="Write your feedback here..." required style="width: 100%; height: 100px; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-family: inherit; font-size: 0.95rem; outline: none; box-sizing: border-box; resize: vertical; background: var(--bg-secondary);"></textarea>
+                            <textarea id="fb-comment" placeholder="Write your feedback here..." style="width: 100%; height: 100px; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; font-family: inherit; font-size: 0.95rem; outline: none; box-sizing: border-box; resize: vertical; background: var(--bg-secondary);"></textarea>
                         </div>
                         
                         <button type="submit" id="fb-submit-btn" style="width: 100%; background: var(--primary); color: white; padding: 12px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s; outline: none; box-shadow: 0 4px 12px rgba(194, 65, 12, 0.25);">Submit Feedback / ಅನಿಸಿಕೆ ಕಳುಹಿಸಿ</button>
