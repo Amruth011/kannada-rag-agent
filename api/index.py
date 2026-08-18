@@ -1448,10 +1448,7 @@ async def admin_dashboard(password: Optional[str] = None):
                         <div class="stat-val">{total_downloads}</div>
                         <div class="stat-label">Downloads</div>
                     </div>
-                    <div class="stat-card" style="border-color:#16a34a33; grid-column: span 2;">
-                        <div class="stat-val" style="color:#16a34a;">{total_payments} (&#8377;{total_amount:,.2f})</div>
-                        <div class="stat-label">💰 Total Payments</div>
-                    </div>
+
                 </div>
                 
                 <!-- Ratings Distribution (Right) -->
@@ -1464,7 +1461,7 @@ async def admin_dashboard(password: Optional[str] = None):
             <!-- Search / Filter Bar -->
             <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 0.8rem 1.2rem; margin-bottom: 1.8rem; display: flex; gap: 12px; align-items: center; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.02);">
                 <span style="font-size: 1.2rem; color: var(--primary);">🔍</span>
-                <input type="text" id="admin-search" oninput="filterTable()" placeholder="Search feedbacks, activities, logs, or payments..." style="flex-grow: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-size: 0.95rem; background: var(--bg-main); color: var(--text-main); font-family: inherit; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
+                <input type="text" id="admin-search" oninput="filterTable()" placeholder="Search feedbacks, activities, or logs..." style="flex-grow: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-size: 0.95rem; background: var(--bg-main); color: var(--text-main); font-family: inherit; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
                 <button onclick="clearSearch()" style="background: var(--primary-light); color: var(--primary); border: 1px solid rgba(194, 65, 12, 0.15); padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;">Clear</button>
             </div>
             
@@ -1473,7 +1470,7 @@ async def admin_dashboard(password: Optional[str] = None):
                 <button class="tab-btn active" onclick="showTab(this, 'tab-feedback')">Feedbacks ({total_fb})</button>
                 <button class="tab-btn" onclick="showTab(this, 'tab-users')">User Activity ({len(user_activities)})</button>
                 <button class="tab-btn" onclick="showTab(this, 'tab-logs')">Read & Download ({total_logs})</button>
-                <button class="tab-btn" onclick="showTab(this, 'tab-payments')" style="color:#16a34a;">💰 Payments ({total_payments})</button>
+
             </div>
             
             <!-- Feedback Tab -->
@@ -1496,13 +1493,7 @@ async def admin_dashboard(password: Optional[str] = None):
                 {logs_html}
             </div>
 
-            <!-- Payments Tab -->
-            <div id="tab-payments" class="tab-content">
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
-                    <button onclick="exportJSON('payments')" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(194,65,12,0.15); transition: all 0.2s; outline: none;">📥 Export Payments JSON</button>
-                </div>
-                {payments_html}
-            </div>
+
         </div>
     </body>
     </html>
