@@ -433,6 +433,46 @@ def call_sarvam_tts(text, language="kn-IN"):
         print(f"Google TTS fallback failed: {e}")
         return None
 
+def normalize_query(user_query: str) -> str:
+    """
+    Normalize the user query to Kannada script before retrieval.
+    - Already Kannada script  → returned unchanged
+    - Kannada in Latin/English letters → transliterated to Kannada script
+    - English query            → translated to Kannada
+    Falls back to original query if the LLM call fails.
+    """
+    # Fast-path: if the query already contains Kannada Unicode characters, skip LLM
+    if any('\u0c80' <= ch <= '\u0cff' for ch in user_query):
+        return user_query
+
+    system_prompt = (
+        "You are a Kannada language assistant. "
+        "If the input is Kannada written in Latin/English letters (transliteration), "
+        "convert it to Kannada script. "
+        "If the input is English, translate it to Kannada. "
+        "If the input is already in Kannada script, return it unchanged. "
+        "Return ONLY the Kannada text, no explanation, no punctuation added."
+    )
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user",   "content": user_query},
+    ]
+    try:
+        normalized = call_gemini_llm(messages, retries=0)
+        if normalized and normalized.strip():
+            return normalized.strip()
+    except Exception:
+        pass
+    # Fallback: try Groq
+    try:
+        normalized = call_groq_llm(messages, retries=0)
+        if normalized and not normalized.startswith(("❌", "⚠️")):
+            return normalized.strip()
+    except Exception:
+        pass
+    return user_query  # safe fallback — never break retrieval
+
+
 def rewrite_query(current_query, chat_history):
     if not chat_history:
         return current_query
@@ -796,7 +836,15 @@ if question:
                 progress.progress(10, text="✍️ Rewriting query...")
                 rewritten_q = rewrite_query(question, st.session_state.messages[:-1])
                 is_rewritten = (rewritten_q.lower() != question.lower())
-                
+
+                # ── Normalize query to Kannada script before retrieval ──────
+                # This converts Latin-transliterated Kannada or English to
+                # Kannada script so BM25 / keyword scores work correctly.
+                # We normalize the rewritten query (so pronoun resolution
+                # happens first), then use the normalized form for retrieval
+                # while the original question drives the final response language.
+                normalized_q = normalize_query(rewritten_q)
+
                 progress.progress(20, text="📖 Retrieving passages...")
                 general = is_general_question(rewritten_q)
                 is_char = is_character_question(rewritten_q)
@@ -810,7 +858,7 @@ if question:
                     if final_page: final_range = None
 
                 chunks, fallback_msg, retrieval_meta = retrieve_v2(
-                    query        = rewritten_q,
+                    query        = normalized_q,
                     page         = final_page if not general else None,
                     page_range   = final_range if not general else None,
                     is_character = is_char,
@@ -944,14 +992,17 @@ if question:
             st.write(answer)
 
             # Display confidence (already computed above)
-            if page_only:
+            # For deterministic paths (exact page, page range, page_only) we
+            # always hide the numeric confidence and show retrieval status
+            # instead — a correct answer with "0% confidence" confuses users.
+            if page_only or final_page or final_range:
                 page_status = "Success" if chunks else "Failed"
                 conf_color = "#22c55e" if chunks else "#ef4444"
                 st.markdown(
                     f"<span style='font-weight:600;color:{conf_color};'>Page Retrieval: {page_status}</span>",
                     unsafe_allow_html=True
                 )
-            elif not general and chunks and not (final_page or final_range or page_only):
+            elif not general and chunks:
                 conf_color = "#22c55e" if confidence_pct >= 85 else ("#f59e0b" if confidence_pct >= 70 else ("#f97316" if confidence_pct >= 60 else "#ef4444"))
                 st.markdown(
                     f"<span style='font-weight:600;color:{conf_color};'>Confidence: {confidence_label} ({int(confidence_pct)}%)</span>",
