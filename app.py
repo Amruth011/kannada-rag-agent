@@ -832,6 +832,8 @@ if question:
                 retrieval_meta = {"fetched": len(chunks), "final": len(chunks), "exact_page": True}
                 general = False
                 is_char = False
+                # ── Routing complete: exact-page deterministic path ────────────
+                used_deterministic_path = True
             else:
                 progress.progress(10, text="✍️ Rewriting query...")
                 rewritten_q = rewrite_query(question, st.session_state.messages[:-1])
@@ -848,7 +850,7 @@ if question:
                 progress.progress(20, text="📖 Retrieving passages...")
                 general = is_general_question(rewritten_q)
                 is_char = is_character_question(rewritten_q)
-                
+
                 # Update auto-detect just in case rewrite stripped it but sidebar didn't
                 # Actually, we rely on original question for auto_page, but fallback to rewritten for edge cases
                 if not auto_page and not auto_range:
@@ -864,6 +866,10 @@ if question:
                     is_character = is_char,
                     language     = current_lang,
                 )
+                # ── Routing complete: record whether a page filter was applied ─
+                # Read final_page / final_range AFTER both possible mutations
+                # (sidebar override + rewritten-query re-detection above).
+                used_deterministic_path = bool(final_page or final_range)
 
             # ── v2: explicit NOT FOUND fallback ──────────────────────────────
             if fallback_msg and not general:
@@ -888,7 +894,7 @@ if question:
             confidence_pct   = calculate_confidence(chunks) if not general else 100.0
             confidence_label = get_confidence_label(confidence_pct)
             # Suppress guardrail for deterministic paths
-            is_very_low      = (confidence_pct < VERY_LOW_THRESHOLD) and not general and chunks and not (final_page or final_range or page_only)
+            is_very_low      = (confidence_pct < VERY_LOW_THRESHOLD) and not general and chunks and not used_deterministic_path
             guardrail_msg    = GUARDRAIL_MSG_EN if current_lang == "English" else GUARDRAIL_MSG_KN
 
             if is_very_low:
@@ -995,7 +1001,10 @@ if question:
             # For deterministic paths (exact page, page range, page_only) we
             # always hide the numeric confidence and show retrieval status
             # instead — a correct answer with "0% confidence" confuses users.
-            if page_only or final_page or final_range:
+            # used_deterministic_path is set INSIDE each routing branch, after
+            # retrieval, so it reflects what actually happened — not pre-routing
+            # predicates that may have been mutated mid-flight.
+            if used_deterministic_path:
                 page_status = "Success" if chunks else "Failed"
                 conf_color = "#22c55e" if chunks else "#ef4444"
                 st.markdown(
@@ -1076,7 +1085,7 @@ if question:
                 "confidence_pct": confidence_pct if not general and chunks else None,
                 "confidence_label": confidence_label if not general and chunks else None,
                 "guardrail": False,
-                "deterministic": bool(final_page or final_range or page_only),
+                "deterministic": used_deterministic_path,
                 "audio": audio_bytes,
                 "original_query": question if is_rewritten else None,
                 "rewritten_query": rewritten_q if is_rewritten else None
