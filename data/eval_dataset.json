@@ -1,0 +1,32 @@
+[
+  {
+    "question": "Who is the author of Heli Hogu Karana?",
+    "ground_truth": "Ravi Belagere is the author of Heli Hogu Karana.",
+    "language": "English"
+  },
+  {
+    "question": "Who is Himavant?",
+    "ground_truth": "Himavant is the main protagonist of the Kannada novel Heli Hogu Karana.",
+    "language": "English"
+  },
+  {
+    "question": "Who is Prarthana?",
+    "ground_truth": "Prarthana is Himavant's wife and a central character in the Kannada novel Heli Hogu Karana.",
+    "language": "English"
+  },
+  {
+    "question": "ಹಿಮವಂತ ಯಾರು?",
+    "ground_truth": "ಹಿಮವಂತ ಹೇಳಿ ಹೋಗು ಕಾರಣ ಕಾದಂಬರಿಯ ಮುಖ್ಯ ಪಾತ್ರ.",
+    "language": "Kannada"
+  },
+  {
+    "question": "ಪ್ರಾರ್ಥನಾ ಯಾರು?",
+    "ground_truth": "ಪ್ರಾರ್ಥನಾ ಹಿಮವಂತನ ಪತ್ನಿ ಹಾಗೂ ಕಾದಂಬರಿಯ ಪ್ರಮುಖ ಪಾತ್ರಗಳಲ್ಲೊಬ್ಬರು.",
+    "language": "Kannada"
+  },
+  {
+    "question": "ಈ ಕಾದಂಬರಿಯ ಲೇಖಕರು ಯಾರು?",
+    "ground_truth": "ಹೇಳಿ ಹೋಗು ಕಾರಣ ಕಾದಂಬರಿಯ ಲೇಖಕರು ಪ್ರಸಿದ್ಧ ಪತ್ರಕರ್ತ ಮತ್ತು ಬರಹಗಾರ ರವಿ ಬೆಳಗೆರೆ.",
+    "language": "Kannada"
+  }
+]
