@@ -2,7 +2,7 @@
 
 <a href="https://trendshift.io/repositories/14618?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-14618" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/14618/daily?language=Python" alt="pipeshub-ai%2Fpipeshub-ai | Trendshift" width="250" height="55"/></a>
 
-# Kannada RAG Agent & Voice Assistant
+# **Kannada RAG Agent & Voice Assistant**
 
 **An enterprise-grade, memory-optimized Retrieval-Augmented Generation (RAG) agent specialized in Kannada literature and seamless voice synthesis. Built solo, designed for scale.**
 
