@@ -40,10 +40,10 @@ api/vectors.npz
 # Project-specific ignored data directories
 data/raw_images/
 data/processed_images/
-data/cleaned_text/
-data/normalized_text/
 data/*.pdf
-data/*.json
+data/feedback.json
 poppler-*/
 audio/
-scratch/
+*.mp3
+*.wav
+
