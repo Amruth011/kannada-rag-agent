@@ -4,6 +4,7 @@
 
 # 𝐊𝐚𝐧𝐧𝐚𝐝𝐚 𝐑𝐀𝐆 𝐀𝐠𝐞𝐧𝐭 𝐚𝐧𝐝 𝐕𝐨𝐢𝐜𝐞 𝐀𝐬𝐬𝐢𝐬𝐭𝐚𝐧𝐭
 
+
 **An enterprise-grade, memory-optimized Retrieval-Augmented Generation (RAG) agent specialized in Kannada literature and seamless voice synthesis. Built solo, designed for scale.**
 
 [![Vercel Deployment](https://img.shields.io/badge/Deployed_on-Vercel-black?logo=vercel)](https://kannada-rag-agent.vercel.app/)
