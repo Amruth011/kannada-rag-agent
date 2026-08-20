@@ -1,0 +1,149 @@
+Total pages analyzed: 345
+Pages with potential issues: 44
+--------------------------------------------------------------------------------
+Page 002 (Kannada words: 27, English words: 28):
+  - Kannada OCR noise: 22.1% (43 letters, 2 symbols)
+--------------------------------------------------------------------------------
+Page 013 (Kannada words: 242, English words: 560):
+  - Length Mismatch: English is 2.3x Kannada (560 words vs 242 words)
+--------------------------------------------------------------------------------
+Page 017 (Kannada words: 209, English words: 644):
+  - Repeated phrases: 4 (e.g. 'as they walked,' x6)
+  - Length Mismatch: English is 3.1x Kannada (644 words vs 209 words)
+--------------------------------------------------------------------------------
+Page 019 (Kannada words: 262, English words: 363):
+  - Repeated phrases: 3 (e.g. 'to go back' x5)
+--------------------------------------------------------------------------------
+Page 020 (Kannada words: 243, English words: 666):
+  - Repeated phrases: 1 (e.g. 'he didn't know' x5)
+  - Length Mismatch: English is 2.7x Kannada (666 words vs 243 words)
+--------------------------------------------------------------------------------
+Page 024 (Kannada words: 256, English words: 610):
+  - Length Mismatch: English is 2.4x Kannada (610 words vs 256 words)
+--------------------------------------------------------------------------------
+Page 027 (Kannada words: 203, English words: 598):
+  - Length Mismatch: English is 2.9x Kannada (598 words vs 203 words)
+--------------------------------------------------------------------------------
+Page 030 (Kannada words: 234, English words: 541):
+  - Length Mismatch: English is 2.3x Kannada (541 words vs 234 words)
+--------------------------------------------------------------------------------
+Page 038 (Kannada words: 261, English words: 613):
+  - Length Mismatch: English is 2.3x Kannada (613 words vs 261 words)
+--------------------------------------------------------------------------------
+Page 040 (Kannada words: 257, English words: 508):
+  - Repeated phrases: 2 (e.g. 'he knew that' x5)
+--------------------------------------------------------------------------------
+Page 045 (Kannada words: 244, English words: 593):
+  - Repeated phrases: 8 (e.g. 'the old man's' x11)
+  - Length Mismatch: English is 2.4x Kannada (593 words vs 244 words)
+--------------------------------------------------------------------------------
+Page 059 (Kannada words: 259, English words: 634):
+  - Repeated phrases: 7 (e.g. 'man who's been' x5)
+  - Length Mismatch: English is 2.4x Kannada (634 words vs 259 words)
+--------------------------------------------------------------------------------
+Page 061 (Kannada words: 265, English words: 539):
+  - Repeated phrases: 1 (e.g. 'he knew that' x5)
+--------------------------------------------------------------------------------
+Page 062 (Kannada words: 235, English words: 590):
+  - Repeated phrases: 2 (e.g. 'he had been' x7)
+  - Length Mismatch: English is 2.5x Kannada (590 words vs 235 words)
+--------------------------------------------------------------------------------
+Page 067 (Kannada words: 238, English words: 624):
+  - Repeated phrases: 4 (e.g. 'she knew that' x6)
+  - Length Mismatch: English is 2.6x Kannada (624 words vs 238 words)
+--------------------------------------------------------------------------------
+Page 072 (Kannada words: 225, English words: 515):
+  - Repeated phrases: 2 (e.g. 'a sign that' x5)
+  - Length Mismatch: English is 2.3x Kannada (515 words vs 225 words)
+--------------------------------------------------------------------------------
+Page 075 (Kannada words: 243, English words: 611):
+  - Repeated phrases: 3 (e.g. 'like she was' x5)
+  - Length Mismatch: English is 2.5x Kannada (611 words vs 243 words)
+--------------------------------------------------------------------------------
+Page 077 (Kannada words: 266, English words: 532):
+  - Repeated phrases: 2 (e.g. 'she knew that' x8)
+--------------------------------------------------------------------------------
+Page 084 (Kannada words: 244, English words: 570):
+  - Length Mismatch: English is 2.3x Kannada (570 words vs 244 words)
+--------------------------------------------------------------------------------
+Page 099 (Kannada words: 210, English words: 587):
+  - Repeated phrases: 11 (e.g. 'paused for a' x7)
+  - Length Mismatch: English is 2.8x Kannada (587 words vs 210 words)
+--------------------------------------------------------------------------------
+Page 106 (Kannada words: 255, English words: 459):
+  - Repeated phrases: 4 (e.g. 'he thought about' x6)
+--------------------------------------------------------------------------------
+Page 108 (Kannada words: 235, English words: 466):
+  - Repeated phrases: 2 (e.g. 'she looked at' x5)
+--------------------------------------------------------------------------------
+Page 109 (Kannada words: 251, English words: 538):
+  - Repeated phrases: 4 (e.g. 'deb looked at' x6)
+--------------------------------------------------------------------------------
+Page 112 (Kannada words: 264, English words: 230):
+  - Repeated phrases: 1 (e.g. 'thought to himself,' x5)
+--------------------------------------------------------------------------------
+Page 115 (Kannada words: 262, English words: 737):
+  - Length Mismatch: English is 2.8x Kannada (737 words vs 262 words)
+--------------------------------------------------------------------------------
+Page 116 (Kannada words: 265, English words: 625):
+  - Repeated phrases: 2 (e.g. 'i don't know' x7)
+  - Length Mismatch: English is 2.4x Kannada (625 words vs 265 words)
+--------------------------------------------------------------------------------
+Page 117 (Kannada words: 315, English words: 243):
+  - Repeated phrases: 1 (e.g. 'i have to' x5)
+--------------------------------------------------------------------------------
+Page 118 (Kannada words: 203, English words: 589):
+  - Repeated phrases: 5 (e.g. 'a sense of' x8)
+  - Length Mismatch: English is 2.9x Kannada (589 words vs 203 words)
+--------------------------------------------------------------------------------
+Page 119 (Kannada words: 258, English words: 581):
+  - Length Mismatch: English is 2.3x Kannada (581 words vs 258 words)
+--------------------------------------------------------------------------------
+Page 121 (Kannada words: 293, English words: 433):
+  - Repeated phrases: 2 (e.g. 'i don't know' x5)
+--------------------------------------------------------------------------------
+Page 128 (Kannada words: 256, English words: 583):
+  - Length Mismatch: English is 2.3x Kannada (583 words vs 256 words)
+--------------------------------------------------------------------------------
+Page 130 (Kannada words: 227, English words: 367):
+  - Repeated phrases: 1 (e.g. 'you're like a' x6)
+--------------------------------------------------------------------------------
+Page 132 (Kannada words: 241, English words: 491):
+  - Repeated phrases: 1 (e.g. 'she couldn't help' x5)
+--------------------------------------------------------------------------------
+Page 134 (Kannada words: 248, English words: 767):
+  - Repeated phrases: 8 (e.g. 'he felt a' x5)
+  - Length Mismatch: English is 3.1x Kannada (767 words vs 248 words)
+--------------------------------------------------------------------------------
+Page 136 (Kannada words: 254, English words: 395):
+  - Repeated phrases: 1 (e.g. 'she felt a' x5)
+--------------------------------------------------------------------------------
+Page 139 (Kannada words: 255, English words: 477):
+  - Repeated phrases: 1 (e.g. 'i felt a' x7)
+--------------------------------------------------------------------------------
+Page 145 (Kannada words: 272, English words: 456):
+  - Repeated phrases: 3 (e.g. 'i thought to' x6)
+--------------------------------------------------------------------------------
+Page 148 (Kannada words: 274, English words: 322):
+  - Repeated phrases: 1 (e.g. 'he had asked' x5)
+--------------------------------------------------------------------------------
+Page 153 (Kannada words: 276, English words: 733):
+  - Repeated phrases: 10 (e.g. 'he said, his' x5)
+  - Length Mismatch: English is 2.7x Kannada (733 words vs 276 words)
+--------------------------------------------------------------------------------
+Page 155 (Kannada words: 260, English words: 723):
+  - Length Mismatch: English is 2.8x Kannada (723 words vs 260 words)
+--------------------------------------------------------------------------------
+Page 158 (Kannada words: 236, English words: 412):
+  - Repeated phrases: 2 (e.g. 'but you're not' x5)
+--------------------------------------------------------------------------------
+Page 159 (Kannada words: 253, English words: 488):
+  - Repeated phrases: 2 (e.g. 'a sense of' x5)
+--------------------------------------------------------------------------------
+Page 161 (Kannada words: 255, English words: 607):
+  - Repeated phrases: 8 (e.g. 'had been so' x5)
+  - Length Mismatch: English is 2.4x Kannada (607 words vs 255 words)
+--------------------------------------------------------------------------------
+Page 183 (Kannada words: 246, English words: 501):
+  - Repeated phrases: 11 (e.g. 'always wanted to' x5)
+--------------------------------------------------------------------------------

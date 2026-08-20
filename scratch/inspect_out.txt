@@ -1,0 +1,4 @@
+﻿detect_page_filter args: ('question',)
+CONST: '\n    Detect page number or page range from user question.\n    Returns:\n        (int, None)    ΓÇö exact page  e.g. "page 50"\n        (None, tuple)  ΓÇö page range  e.g. "pages 10 to 30"\n        (None, Non'
+CONST: 'pages?\\s*(\\d+)\\s*(?:to|through|ΓÇô|-)\\s*(\\d+)|α▓¬α│üα▓ƒα▓ùα▓│α│ü?\\s*(\\d+)\\s*(?:α▓░α▓┐α▓éα▓ª|α▓çα▓éα▓ª|-)\\s*(\\d+)'
+CONST: 'page\\s*(\\d+)|α▓¬α│üα▓ƒ\\s*(\\d+)|(\\d+)\\s*(?:page|α▓¬α│üα▓ƒ)'
