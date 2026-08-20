@@ -1226,18 +1226,24 @@ async def admin_dashboard(password: Optional[str] = None):
         
     user_rows = ""
     sorted_users = sorted(user_activities.items(), key=lambda x: x[1]["last_active"], reverse=True)
+    users_export_list = []
     for key, info in sorted_users:
         locs = ", ".join(info["locations"]) if info["locations"] else "Unknown Location"
         history = ", ".join(info["details"][:10])
         if len(info["details"]) > 10:
             history += f" (+{len(info['details']) - 10} more)"
             
+        total_user_actions = info['reads'] + info['downloads']
         name_style = "font-weight: 600; color: var(--primary);" if info["name"] != "Anonymous" else "color: var(--text-muted);"
+        is_identified = info["name"] != "Anonymous"
+        status_badge = '<span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:700;">Subscribed / Named</span>' if is_identified else '<span style="background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:600;">Reader</span>'
         
         user_rows += f"""
         <tr>
             <td><span style="{name_style}">{info['name']}</span></td>
+            <td>{status_badge}</td>
             <td><code>{info['display_id']}</code></td>
+            <td><strong>{total_user_actions}</strong> <span style="font-size:0.8rem; color:var(--text-muted);">({info['reads']}R / {info['downloads']}D)</span></td>
             <td><strong>{info['reads']}</strong></td>
             <td><strong>{info['downloads']}</strong></td>
             <td style="font-size:0.85rem;">{locs}</td>
@@ -1245,6 +1251,23 @@ async def admin_dashboard(password: Optional[str] = None):
             <td style="font-size:0.8rem; color:var(--text-muted);" title="{history}">{history}</td>
         </tr>
         """
+        users_export_list.append({
+            "key": key,
+            "name": info["name"],
+            "display_id": info["display_id"],
+            "status": "Subscribed / Named" if is_identified else "Reader",
+            "total_actions": total_user_actions,
+            "reads": info["reads"],
+            "downloads": info["downloads"],
+            "locations": list(info["locations"]),
+            "last_active": info["last_active"],
+            "details": info["details"]
+        })
+        
+    total_users_count = len(user_activities)
+    total_combined_activity = total_reads + total_downloads
+    users_json = json.dumps(users_export_list, ensure_ascii=False)
+    logs_json = json.dumps(logs, ensure_ascii=False)
         
     if not user_activities:
         users_html = "<div class='no-data'>No active users tracked yet.</div>"
@@ -1254,7 +1277,9 @@ async def admin_dashboard(password: Optional[str] = None):
             <thead>
                 <tr>
                     <th>User / Name</th>
+                    <th>Status</th>
                     <th>Identifier</th>
+                    <th>Total Activity</th>
                     <th>Reads</th>
                     <th>Downloads</th>
                     <th>Location(s)</th>
@@ -1334,7 +1359,7 @@ async def admin_dashboard(password: Optional[str] = None):
                 --border: rgba(194, 65, 12, 0.15);
             }}
             body {{ font-family: system-ui, -apple-system, sans-serif; background: var(--bg-main); color: var(--text-main); margin: 0; padding: 2rem 1rem; }}
-            .container {{ max-width: 1000px; margin: 0 auto; }}
+            .container {{ max-width: 1060px; margin: 0 auto; }}
             h1 {{ font-family: Georgia, serif; color: var(--primary); margin-bottom: 0.5rem; }}
             .subtitle {{ color: var(--text-muted); margin-bottom: 2rem; }}
             
@@ -1345,6 +1370,7 @@ async def admin_dashboard(password: Optional[str] = None):
             .stat-card {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; text-align: center; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; }}
             .stat-val {{ font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 0.25rem; }}
             .stat-label {{ font-size: 0.82rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }}
+            .stat-sub {{ font-size: 0.76rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; }}
             
             /* Tabs */
             .tabs {{ display: flex; gap: 8px; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; flex-wrap: wrap; }}
@@ -1383,10 +1409,17 @@ async def admin_dashboard(password: Optional[str] = None):
             }}
             
             const feedbacksData = {feedbacks_json};
+            const usersData = {users_json};
+            const logsData = {logs_json};
             const paymentsData = {payments_json};
             
             function exportJSON(type) {{
-                const data = type === 'feedback' ? feedbacksData : paymentsData;
+                let data = [];
+                if (type === 'feedback') data = feedbacksData;
+                else if (type === 'users') data = usersData;
+                else if (type === 'logs') data = logsData;
+                else if (type === 'payments') data = paymentsData;
+                
                 const jsonStr = JSON.stringify(data, null, 2);
                 const blob = new Blob([jsonStr], {{ type: 'application/json' }});
                 const url = URL.createObjectURL(blob);
@@ -1409,7 +1442,7 @@ async def admin_dashboard(password: Optional[str] = None):
                     card.style.display = text.includes(query) ? '' : 'none';
                 }});
                 
-                // Filter user activity table, log table, and payments table rows
+                // Filter tables rows
                 const rows = document.querySelectorAll('table tbody tr');
                 rows.forEach(row => {{
                     const text = row.innerText.toLowerCase();
@@ -1426,7 +1459,7 @@ async def admin_dashboard(password: Optional[str] = None):
     <body>
         <div class="container">
             <h1>📚 Admin Dashboard</h1>
-            <p class="subtitle">Bilingual RAG Assistant feedback, e-book usage metrics, and logs.</p>
+            <p class="subtitle">Bilingual RAG Assistant feedback, users, e-book usage metrics, and activity logs.</p>
             
             <!-- Stats Grid & Ratings Distribution Chart Layout -->
             <div class="stats-container">
@@ -1441,14 +1474,22 @@ async def admin_dashboard(password: Optional[str] = None):
                         <div class="stat-label">Avg Rating</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-val">{total_reads}</div>
+                        <div class="stat-val">{total_users_count}</div>
+                        <div class="stat-label">Users / Subscribers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val">{total_combined_activity}</div>
+                        <div class="stat-label">Read &amp; Downloads</div>
+                        <div class="stat-sub">{total_reads} Reads &bull; {total_downloads} Downloads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" style="color: #15803d;">{total_reads}</div>
                         <div class="stat-label">Online Reads</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-val">{total_downloads}</div>
+                        <div class="stat-val" style="color: #1d4ed8;">{total_downloads}</div>
                         <div class="stat-label">Downloads</div>
                     </div>
-
                 </div>
                 
                 <!-- Ratings Distribution (Right) -->
@@ -1461,21 +1502,30 @@ async def admin_dashboard(password: Optional[str] = None):
             <!-- Search / Filter Bar -->
             <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 0.8rem 1.2rem; margin-bottom: 1.8rem; display: flex; gap: 12px; align-items: center; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.02);">
                 <span style="font-size: 1.2rem; color: var(--primary);">🔍</span>
-                <input type="text" id="admin-search" oninput="filterTable()" placeholder="Search feedbacks, activities, or logs..." style="flex-grow: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-size: 0.95rem; background: var(--bg-main); color: var(--text-main); font-family: inherit; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
+                <input type="text" id="admin-search" oninput="filterTable()" placeholder="Search users, feedbacks, activities, or logs..." style="flex-grow: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-size: 0.95rem; background: var(--bg-main); color: var(--text-main); font-family: inherit; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
                 <button onclick="clearSearch()" style="background: var(--primary-light); color: var(--primary); border: 1px solid rgba(194, 65, 12, 0.15); padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;">Clear</button>
             </div>
             
-            <!-- Navigation Tabs -->
+            <!-- Navigation Tabs (1. Users, 2. Feedback & Ratings, 3. Read & Download Activity) -->
             <div class="tabs">
-                <button class="tab-btn active" onclick="showTab(this, 'tab-feedback')">Feedbacks ({total_fb})</button>
-                <button class="tab-btn" onclick="showTab(this, 'tab-users')">User Activity ({len(user_activities)})</button>
-                <button class="tab-btn" onclick="showTab(this, 'tab-logs')">Read & Download ({total_logs})</button>
-
+                <button class="tab-btn active" onclick="showTab(this, 'tab-users')">1. Users ({total_users_count})</button>
+                <button class="tab-btn" onclick="showTab(this, 'tab-feedback')">2. Feedback &amp; Ratings ({total_fb})</button>
+                <button class="tab-btn" onclick="showTab(this, 'tab-logs')">3. Users' Activity ({total_logs})</button>
             </div>
             
-            <!-- Feedback Tab -->
-            <div id="tab-feedback" class="tab-content active">
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+            <!-- 1. Users Tab (Default / First) -->
+            <div id="tab-users" class="tab-content active">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">Tracked Users &amp; Subscribers: <strong>{total_users_count}</strong></span>
+                    <button onclick="exportJSON('users')" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(194,65,12,0.15); transition: all 0.2s; outline: none;">📥 Export Users JSON</button>
+                </div>
+                {users_html}
+            </div>
+            
+            <!-- 2. Feedback & Ratings Tab (Second) -->
+            <div id="tab-feedback" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">Total Feedback Reviews: <strong>{total_fb}</strong> (Avg: <strong>{avg_rating:.1f} ★</strong>)</span>
                     <button onclick="exportJSON('feedback')" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(194,65,12,0.15); transition: all 0.2s; outline: none;">📥 Export Feedbacks JSON</button>
                 </div>
                 <div class="fb-list">
@@ -1483,16 +1533,14 @@ async def admin_dashboard(password: Optional[str] = None):
                 </div>
             </div>
             
-            <!-- User Activity Tab -->
-            <div id="tab-users" class="tab-content">
-                {users_html}
-            </div>
-            
-            <!-- Logs Tab -->
+            <!-- 3. Users' Activity: Read & Download Logs Tab (Third) -->
             <div id="tab-logs" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">Total Recorded Events: <strong>{total_logs}</strong> ({total_reads} Reads &bull; {total_downloads} Downloads)</span>
+                    <button onclick="exportJSON('logs')" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(194,65,12,0.15); transition: all 0.2s; outline: none;">📥 Export Activity Logs JSON</button>
+                </div>
                 {logs_html}
             </div>
-
 
         </div>
     </body>
