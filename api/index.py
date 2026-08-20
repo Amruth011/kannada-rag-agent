@@ -1236,7 +1236,7 @@ async def admin_dashboard(password: Optional[str] = None):
         total_user_actions = info['reads'] + info['downloads']
         name_style = "font-weight: 600; color: var(--primary);" if info["name"] != "Anonymous" else "color: var(--text-muted);"
         is_identified = info["name"] != "Anonymous"
-        status_badge = '<span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:700;">Subscribed / Named</span>' if is_identified else '<span style="background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:600;">Reader</span>'
+        status_badge = '<span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:700;">Named User</span>' if is_identified else '<span style="background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:600;">Anonymous Reader</span>'
         
         user_rows += f"""
         <tr>
@@ -1255,7 +1255,7 @@ async def admin_dashboard(password: Optional[str] = None):
             "key": key,
             "name": info["name"],
             "display_id": info["display_id"],
-            "status": "Subscribed / Named" if is_identified else "Reader",
+            "status": "Named User" if is_identified else "Anonymous Reader",
             "total_actions": total_user_actions,
             "reads": info["reads"],
             "downloads": info["downloads"],
@@ -1475,20 +1475,12 @@ async def admin_dashboard(password: Optional[str] = None):
                     </div>
                     <div class="stat-card">
                         <div class="stat-val">{total_users_count}</div>
-                        <div class="stat-label">Users / Subscribers</div>
+                        <div class="stat-label">Users Count</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-val">{total_combined_activity}</div>
                         <div class="stat-label">Read &amp; Downloads</div>
                         <div class="stat-sub">{total_reads} Reads &bull; {total_downloads} Downloads</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-val" style="color: #15803d;">{total_reads}</div>
-                        <div class="stat-label">Online Reads</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-val" style="color: #1d4ed8;">{total_downloads}</div>
-                        <div class="stat-label">Downloads</div>
                     </div>
                 </div>
                 
@@ -1516,7 +1508,7 @@ async def admin_dashboard(password: Optional[str] = None):
             <!-- 1. Users Tab (Default / First) -->
             <div id="tab-users" class="tab-content active">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">Tracked Users &amp; Subscribers: <strong>{total_users_count}</strong></span>
+                    <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">Tracked Users: <strong>{total_users_count}</strong></span>
                     <button onclick="exportJSON('users')" style="background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(194,65,12,0.15); transition: all 0.2s; outline: none;">📥 Export Users JSON</button>
                 </div>
                 {users_html}
