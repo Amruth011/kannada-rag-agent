@@ -48,7 +48,7 @@ flowchart TD
 
     subgraph Phase 5: Voice Synthesis & Delivery
         LLM --> TextResp["Markdown Text Response"]
-        TextResp --> TTS{"Sarvam AI TTS / gTTS Fallback"}
+        TextResp --> TTS{"Sarvam AI TTS"}
         TTS --> Audio["Base64 HTML5 Audio Player"]
     end
 ```
