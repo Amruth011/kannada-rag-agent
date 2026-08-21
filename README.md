@@ -135,22 +135,22 @@ See detailed memory footprints and latency testing in `docs/benchmarks.md`.
 
 ```text
 .
-├── api/                  # Vercel Serverless API
-├── assets/               # Public UI and brand assets
-├── chroma_db/            # Persistent Vector Database
-├── data/                 # Raw and processed JSON corpus
-├── docs/                 # Enterprise documentation
+├── api/                   # Vercel Serverless API
+├── assets/                # Public UI and brand assets
+├── chroma_db/             # Persistent Vector Database
+├── data/                  # Raw and processed JSON corpus
+├── docs/                  # Enterprise documentation
 │   ├── architecture.md
 │   ├── benchmarks.md
 │   ├── deployment.md
 │   ├── evaluation.md
-│   └── archive/          # Historical audits and legacy docs
-├── scripts/              # Independent tooling
-│   ├── ingest/           # OCR and ChromaDB ingestion pipeline
-│   ├── eval/             # RAGAS evaluation scripts
-│   └── utils/            # Debugging and validation tools
-├── app.py                # Streamlit Application Entrypoint
-└── vercel.json           # Vercel Configuration
+│   └── archive/           # Historical audits and legacy docs
+├── scripts/               # Independent tooling
+│   ├── ingest/            # OCR and ChromaDB ingestion pipeline
+│   ├── eval/              # RAGAS evaluation scripts
+│   └── utils/             # Debugging and validation tools
+├── app.py                 # Streamlit Application Entrypoint
+└── vercel.json            # Vercel Configuration
 ```
 
 ---
