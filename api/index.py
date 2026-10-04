@@ -164,6 +164,32 @@ def load_favicon_bytes():
 
 FAVICON_BYTES = load_favicon_bytes()
 
+def load_cover_bytes():
+    paths = [
+        os.path.join(os.path.dirname(__file__), "cover.png"),
+        os.path.join(os.path.dirname(__file__), "data", "cover.png"),
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "cover.png"),
+        os.path.join("data", "cover.png"),
+        os.path.join("api", "cover.png"),
+        os.path.join(os.path.dirname(__file__), "data", "cover.jpg"),
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "cover.jpg"),
+        "/var/task/cover.png",
+        "/var/task/data/cover.png",
+        "/var/task/api/data/cover.png"
+    ]
+    for p in paths:
+        if os.path.exists(p):
+            try:
+                with open(p, "rb") as f:
+                    data = f.read()
+                    if data:
+                        return data
+            except Exception:
+                continue
+    return None
+
+COVER_BYTES = load_cover_bytes()
+
 def search_text(query, data, top_k=5):
     """Retrieves full pages for Gemini's large context window."""
     query_words = set(query.lower().split())
@@ -1558,6 +1584,15 @@ async def favicon():
     icon_b64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAC2klEQVR4nO2WzWtcVRjGf885d2YySaY6lmibSiG0xS8QUXDRnVBxVXAhSPeuXAru+y+o4MJF/wClq9KFIFTNSkHBryIUS6tFK2mCmWk+Zu4953GRyUczM0kUsih6uJzFfS/P7zznfc99j9Z7f3KYIxyq+v+A/wag2CvojDMSaDDviGEPZgU0dqHjAc7Up1EdMi6peqQ+IQLkRKxTa6AaBNynf38cYxzA1Fvc+kyLN33kOK0nac8xMUPVBai3WV/g3s/q3qF71+055s5R3n/Q4t6AVLlail+/p++vMQVF8JGTPn3eZ9/B6POL8cZVd26TMqv4+VfSsRcVAqF2EICJDTq/8c2HnmiHyUijcO5r+ZaufZDTClB8cYlHUAiE6CaeaGv+Ii+9TfsUqbfLxxDAgMilcikyOdkAKuqaTO4tYWhGZOWcJo9qfVHO5ApXILx7n4YysxGW0FbdKADO5KRQSNEBt57IbuSz73LslMoVQsQjEjAK4N0wgcFy3gimvqceTS+8lS5cZnVRS79TTOA8KsEjAUMwgTHeVhCJ1qwWfqB1wiSPF9gPAIYsDw7aJkGpdH2a7z721IxytZP8DwACFB0iikiADdkUdXVX4rcfceZc/Op9ShEamMEzNIaqaHMVRu53tJpQAqhnQiQIk2tRN+fj9XlHKKG3TG0KjXYwskwB4exn36R4jLRM5w6dX/VXh/4KFmspP97OJ07SmkUtP/Uqt78c1OhBHUis3OWZN/z06+REuUb3D//yKXIGZl/W6deYPk6tSQhWwfVPdiZpPwe5ojkjRS5fIAQABWpNcvbMc0gs/Mi9n6jWcQaUMyrcPEoqhxkadaswigDV2uYxAEWtLnDjCsCZ856cwWnTrymawI43+wC2gjtrzIQasQWQuuTyAS3ncRp7NBzjtIUCqHqUqxtuNsXHHN+DAYa3U2jr+6G/2pjxr3vy3urbBXtITX8b//BfWx5+wN+tZC4TtUtAXgAAAABJRU5ErkJggg=="
     return Response(content=base64.b64decode(icon_b64), media_type="image/x-icon")
 
+@app.get('/cover.png', include_in_schema=False)
+@app.get('/cover.jpg', include_in_schema=False)
+@app.get('/api/cover.png', include_in_schema=False)
+@app.get('/assets/cover.png', include_in_schema=False)
+async def book_cover_img():
+    if COVER_BYTES:
+        return Response(content=COVER_BYTES, media_type="image/png")
+    return Response(status_code=404)
+
 @app.get("/robots.txt")
 async def robots_txt():
     from fastapi.responses import PlainTextResponse
@@ -2838,6 +2873,282 @@ async def root():
                     padding-bottom: 75px !important;
                 }
             }
+
+            /* MAIN BOOK COVER STYLING */
+            .main-book-cover-container {
+                margin: 0 auto 1.4rem auto;
+                display: inline-block;
+                perspective: 1000px;
+                position: relative;
+                cursor: pointer;
+            }
+            .main-book-cover-img {
+                width: 145px;
+                height: 215px;
+                object-fit: cover;
+                border-radius: 14px;
+                box-shadow: 0 16px 36px -8px rgba(194, 65, 12, 0.35), 0 0 0 1.5px rgba(194, 65, 12, 0.15);
+                transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+                display: block;
+            }
+            .main-book-cover-container:hover .main-book-cover-img {
+                transform: translateY(-5px) scale(1.03) rotate(-1deg);
+                box-shadow: 0 22px 45px -8px rgba(194, 65, 12, 0.45), 0 0 0 2px rgba(194, 65, 12, 0.3);
+            }
+            body.dark-mode .main-book-cover-img {
+                box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.7), 0 0 20px rgba(249, 115, 22, 0.2);
+            }
+
+            /* ANTIGRAVITY FLOATING / LEVITATING ANIMATIONS */
+            @keyframes antigravityFloatBook {
+                0% {
+                    transform: translateY(0px) rotate(0deg);
+                    box-shadow: 0 16px 36px -8px rgba(194, 65, 12, 0.35);
+                }
+                50% {
+                    transform: translateY(-24px) rotate(2.5deg);
+                    box-shadow: 0 38px 60px -10px rgba(194, 65, 12, 0.55), 0 0 30px rgba(249, 115, 22, 0.4);
+                }
+                100% {
+                    transform: translateY(0px) rotate(0deg);
+                    box-shadow: 0 16px 36px -8px rgba(194, 65, 12, 0.35);
+                }
+            }
+
+            @keyframes antigravityFloatMap {
+                0% {
+                    transform: translateY(0px) rotate(0deg);
+                    filter: drop-shadow(0 12px 24px rgba(194, 65, 12, 0.18));
+                }
+                50% {
+                    transform: translateY(-20px) rotate(-1.5deg);
+                    filter: drop-shadow(0 32px 48px rgba(194, 65, 12, 0.4));
+                }
+                100% {
+                    transform: translateY(0px) rotate(0deg);
+                    filter: drop-shadow(0 12px 24px rgba(194, 65, 12, 0.18));
+                }
+            }
+
+            @keyframes antigravityFloatNode {
+                0% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-12px);
+                }
+                100% {
+                    transform: translateY(0px);
+                }
+            }
+
+            /* Applied to Main Book Cover */
+            .antigravity-floating,
+            .antigravity-active #main-book-cover,
+            .antigravity-active .main-book-cover-container,
+            .antigravity-active .main-book-cover-img {
+                animation: antigravityFloatBook 4.5s ease-in-out infinite !important;
+                will-change: transform, box-shadow;
+            }
+
+            /* Applied to Character Map elements */
+            .antigravity-floating-charmap,
+            .antigravity-active #section-charmap .map-container,
+            .antigravity-active .network-svg,
+            .antigravity-active #char-detail-card {
+                animation: antigravityFloatMap 5.2s ease-in-out infinite !important;
+                will-change: transform, filter;
+            }
+
+            .antigravity-active #section-charmap .node {
+                animation: antigravityFloatNode 3.8s ease-in-out infinite alternate !important;
+                transform-origin: center;
+            }
+            .antigravity-active #section-charmap .node:nth-child(2n) {
+                animation-duration: 4.4s !important;
+                animation-delay: -0.9s !important;
+            }
+            .antigravity-active #section-charmap .node:nth-child(3n) {
+                animation-duration: 4.8s !important;
+                animation-delay: -1.8s !important;
+            }
+
+            /* ANTIGRAVITY MODAL STYLES */
+            .antigravity-modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(15, 23, 42, 0.78);
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.5rem;
+                box-sizing: border-box;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.35s ease;
+            }
+            .antigravity-modal-overlay.show {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            .antigravity-modal-content {
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(254, 243, 199, 0.96));
+                border: 2px solid rgba(194, 65, 12, 0.4);
+                border-radius: 24px;
+                max-width: 580px;
+                width: 100%;
+                padding: 2.2rem 2.4rem;
+                box-shadow: 0 25px 60px -15px rgba(194, 65, 12, 0.45), 0 0 45px rgba(249, 115, 22, 0.3);
+                position: relative;
+                text-align: center;
+                transform: scale(0.9) translateY(25px);
+                transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                color: #0f172a;
+            }
+            body.dark-mode .antigravity-modal-content {
+                background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98));
+                border-color: rgba(249, 115, 22, 0.45);
+                color: #f8fafc;
+                box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 40px rgba(249, 115, 22, 0.28);
+            }
+            .antigravity-modal-overlay.show .antigravity-modal-content {
+                transform: scale(1) translateY(0);
+            }
+            .antigravity-modal-close {
+                position: absolute;
+                top: 16px;
+                right: 18px;
+                background: transparent;
+                border: none;
+                font-size: 1.8rem;
+                line-height: 1;
+                color: var(--text-muted);
+                cursor: pointer;
+                padding: 4px 8px;
+                border-radius: 8px;
+                transition: color 0.2s, transform 0.2s;
+            }
+            .antigravity-modal-close:hover {
+                color: var(--primary);
+                transform: scale(1.15);
+            }
+            .antigravity-modal-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: linear-gradient(135deg, #c2410c, #ea580c);
+                color: #ffffff;
+                font-size: 0.72rem;
+                font-weight: 800;
+                letter-spacing: 1.5px;
+                text-transform: uppercase;
+                padding: 6px 14px;
+                border-radius: 99px;
+                box-shadow: 0 4px 14px rgba(194, 65, 12, 0.35);
+                margin-bottom: 1.2rem;
+            }
+            .antigravity-quote-icon {
+                font-size: 2.8rem;
+                line-height: 1;
+                color: var(--primary);
+                opacity: 0.6;
+                font-family: serif;
+                margin-bottom: 0.2rem;
+            }
+            .antigravity-quote-kn {
+                font-family: var(--font-serif);
+                font-size: 1.35rem;
+                font-weight: 700;
+                color: var(--primary);
+                line-height: 1.5;
+                margin: 0 0 0.8rem 0;
+            }
+            .antigravity-quote-en {
+                font-size: 1.05rem;
+                font-style: italic;
+                color: var(--text);
+                line-height: 1.5;
+                margin: 0 0 1rem 0;
+            }
+            .antigravity-quote-divider {
+                height: 1px;
+                background: linear-gradient(90deg, transparent, rgba(194, 65, 12, 0.35), transparent);
+                margin: 1rem auto;
+                width: 75%;
+            }
+            .antigravity-secondary-quote {
+                font-size: 0.92rem;
+                color: var(--text-muted);
+                line-height: 1.55;
+                margin: 0 0 1.2rem 0;
+            }
+            .antigravity-author {
+                font-size: 0.95rem;
+                font-weight: 600;
+                color: var(--text);
+                margin-bottom: 1.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+            .antigravity-book-tag {
+                background: rgba(194, 65, 12, 0.12);
+                color: var(--primary);
+                font-size: 0.75rem;
+                font-weight: 700;
+                padding: 3px 8px;
+                border-radius: 6px;
+            }
+            .antigravity-modal-footer {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .antigravity-xkcd-btn {
+                background: linear-gradient(135deg, #1e293b, #0f172a);
+                color: #38bdf8;
+                border: 1px solid rgba(56, 189, 248, 0.35);
+                padding: 10px 18px;
+                border-radius: 12px;
+                font-size: 0.84rem;
+                font-weight: 700;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                transition: all 0.25s ease;
+            }
+            .antigravity-xkcd-btn:hover {
+                background: #0284c7;
+                color: #ffffff;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 18px rgba(2, 132, 199, 0.4);
+            }
+            .antigravity-dismiss-btn {
+                background: linear-gradient(135deg, #c2410c, #ea580c);
+                color: #ffffff;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 12px;
+                font-size: 0.84rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.25s ease;
+                font-family: inherit;
+            }
+            .antigravity-dismiss-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 18px rgba(194, 65, 12, 0.4);
+            }
         </style>
     </head>
     <body>
@@ -2909,6 +3220,9 @@ async def root():
 
         <!-- HERO SECTION -->
         <div class="hero">
+            <div class="main-book-cover-container" id="main-book-cover" title="ಹೇಳಿ ಹೋಗು ಕಾರಣ — ಕಾದಂಬರಿ">
+                <img src="/cover.png" alt="ಹೇಳಿ ಹೋಗು ಕಾರಣ — Novel Cover" class="main-book-cover-img" id="book-cover-img" />
+            </div>
             <h1 class="fade-in">ಹೇಳಿ ಹೋಗು ಕಾರಣ</h1>
             <p class="fade-in" style="animation-delay: 0.1s">Your AI-powered guide through the literary world of Heli Hogu Kaarana. Ask anything about characters, themes, or the story.</p>
         </div>
@@ -4687,17 +5001,86 @@ async def root():
                 if (btn) btn.innerHTML = isDark ? '☀️' : '🌓';
             }
 
-            // Restore theme preferences on initialization (Default to Light Mode)
-            (function() {
-                const savedTheme = localStorage.getItem('theme');
-                if (savedTheme === 'dark') {
-                    document.body.classList.add('dark-mode');
-                    window.addEventListener('DOMContentLoaded', () => {
-                        const btn = document.getElementById('theme-toggle-btn');
-                        if (btn) btn.innerHTML = '☀️';
-                    });
-                }
+            // ── ANTIGRAVITY EASTER EGG (xkcd #353) ──────────────────────────
+            (function initAntigravityEasterEgg() {
+                const targetSequence = 'antigravity';
+                let typedBuffer = '';
+
+                window.addEventListener('keydown', function(event) {
+                    // Close modal on Escape
+                    if (event.key === 'Escape') {
+                        closeAntigravityModal();
+                        return;
+                    }
+
+                    // Trim buffer on Backspace
+                    if (event.key === 'Backspace') {
+                        typedBuffer = typedBuffer.slice(0, -1);
+                        return;
+                    }
+
+                    // Track single character keypresses
+                    if (event.key && event.key.length === 1) {
+                        typedBuffer += event.key.toLowerCase();
+
+                        // Keep buffer trimmed to length of target
+                        if (typedBuffer.length > targetSequence.length) {
+                            typedBuffer = typedBuffer.slice(-targetSequence.length);
+                        }
+
+                        // Check if exact sequence matches
+                        if (typedBuffer === targetSequence) {
+                            typedBuffer = ''; // Reset buffer
+                            triggerAntigravityEasterEgg();
+                        }
+                    }
+                });
             })();
+
+            function triggerAntigravityEasterEgg() {
+                // 1. Apply smooth floating/levitating CSS animation to main book cover and character map elements
+                document.body.classList.add('antigravity-active');
+
+                const bookCover = document.getElementById('main-book-cover') || document.querySelector('.main-book-cover-container') || document.querySelector('.cover-img');
+                if (bookCover) {
+                    bookCover.classList.add('antigravity-floating');
+                }
+
+                const charMapElements = document.querySelectorAll('#section-charmap, .map-container, .network-svg, #char-detail-card, #section-charmap .node');
+                charMapElements.forEach(function(el) {
+                    el.classList.add('antigravity-floating-charmap');
+                });
+
+                // 2. Reveal hidden modal displaying famous Ravi Belagere quote
+                const modal = document.getElementById('antigravity-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    // Force reflow for CSS animation
+                    void modal.offsetWidth;
+                    modal.classList.add('show');
+                }
+
+                // 3. Open https://xkcd.com/353 in a new tab
+                try {
+                    window.open('https://xkcd.com/353', '_blank', 'noopener,noreferrer');
+                } catch (err) {
+                    console.warn('Popup blocked or error opening xkcd:', err);
+                }
+            }
+
+            function closeAntigravityModal() {
+                const modal = document.getElementById('antigravity-modal');
+                if (modal) {
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                    }, 350);
+                }
+            }
+
+            // Expose globally for programmatic testing and interaction
+            window.triggerAntigravityEasterEgg = triggerAntigravityEasterEgg;
+            window.closeAntigravityModal = closeAntigravityModal;
         </script>
         <!-- BOTTOM NAVIGATION BAR FOR MOBILE -->
         <div class="mobile-bottom-nav">
@@ -4722,6 +5105,41 @@ async def root():
                 <span>Feedback</span>
             </button>
         </div>
+
+    <!-- ===== ANTIGRAVITY EASTER EGG MODAL ===== -->
+    <div id="antigravity-modal" class="antigravity-modal-overlay" style="display:none;" onclick="if(event.target===this)closeAntigravityModal()">
+        <div class="antigravity-modal-content">
+            <button class="antigravity-modal-close" onclick="closeAntigravityModal()" aria-label="Close modal">&times;</button>
+            <div class="antigravity-modal-badge">
+                <span>🚀 ANTIGRAVITY ACTIVATED / ಗುರುತ್ವಾಕರ್ಷಣಾ ಮುಕ್ತ</span>
+            </div>
+            <div class="antigravity-quote-icon">❝</div>
+            <blockquote class="antigravity-quote-kn">
+                ಹೇಳಿ ಹೋಗು ಕಾರಣ... ಯಾಕೆಂದರೆ ನಿನಗಾಗಿ ಕಾಯುವ ಹೃದಯ ಇಲ್ಲಿದೆ.
+            </blockquote>
+            <p class="antigravity-quote-en">
+                "Tell me before you leave... because there is a heart here waiting for you."
+            </p>
+            <div class="antigravity-quote-divider"></div>
+            <p class="antigravity-secondary-quote">
+                "ಪ್ರೀತಿ ಎಂದರೆ ಕೇವಲ ಮುಖ ನೋಡುವುದಲ್ಲ, ಪರಸ್ಪರ ಮೌನವನ್ನು ಅರ್ಥ ಮಾಡಿಕೊಳ್ಳುವುದು."
+                <br>
+                <span style="font-size:0.85rem;opacity:0.85;">(Love is not merely looking at each other's faces; it is understanding each other's silence.)</span>
+            </p>
+            <div class="antigravity-author">
+                — <strong>ರವಿ ಬೆಳಗೆರೆ</strong> (Ravi Belagere)
+                <span class="antigravity-book-tag">ಹೇಳಿ ಹೋಗು ಕಾರಣ</span>
+            </div>
+            <div class="antigravity-modal-footer">
+                <a href="https://xkcd.com/353" target="_blank" rel="noopener noreferrer" class="antigravity-xkcd-btn">
+                    <span>🐍 Read xkcd #353 (Python Antigravity) ↗</span>
+                </a>
+                <button class="antigravity-dismiss-btn" onclick="closeAntigravityModal()">
+                    Close &amp; Keep Floating 🌌
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- ===== SITE FOOTER ===== -->
     <footer style="width:100%;background:linear-gradient(90deg,#b45309,#c2410c,#b45309);color:#fff;padding:1.2rem 1.5rem;box-sizing:border-box;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.78rem;margin-top:auto;">
