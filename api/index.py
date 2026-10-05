@@ -1623,13 +1623,436 @@ async def sitemap_xml():
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://heli-hogu-kaarana.vercel.app/privacy</loc>
-        <lastmod>2026-08-14</lastmod>
+        <loc>https://heli-hogu-kaarana.vercel.app/about</loc>
+        <lastmod>2026-10-05</lastmod>
         <changefreq>monthly</changefreq>
-        <priority>0.3</priority>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://heli-hogu-kaarana.vercel.app/contact</loc>
+        <lastmod>2026-10-05</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>https://heli-hogu-kaarana.vercel.app/privacy</loc>
+        <lastmod>2026-10-05</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.4</priority>
     </url>
 </urlset>""".strip()
     return Response(content=content, media_type="application/xml")
+
+@app.get("/about", response_class=HTMLResponse)
+async def about_us():
+    html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>About Us — Heli Hogu Kaarana AI Literary Guide</title>
+    <meta name="description" content="Learn about the Heli Hogu Kaarana AI Guide — a bilingual digital companion for Ravi Belagere's celebrated Kannada novel. Discover our RAG AI, character map, voice features, and open-source mission.">
+    <meta name="keywords" content="Heli Hogu Kaarana, Ravi Belagere, Kannada novel, bilingual AI, Kannada literature, RAG AI, digital companion">
+    <meta property="og:title" content="About Us — Heli Hogu Kaarana AI Literary Guide" />
+    <meta property="og:description" content="A bilingual AI-powered digital companion for Ravi Belagere's Heli Hogu Kaarana. Explore character maps, RAG Q&amp;A, voice synthesis, and bilingual e-books." />
+    <meta property="og:url" content="https://heli-hogu-kaarana.vercel.app/about" />
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Serif+Kannada:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--primary:#c2410c;--primary-hover:#9a3412;--pl:rgba(194,65,12,.1);--accent:#d97706;--bg:#fffcf8;--bg2:#fdf5ee;--card:#ffffff;--text:#0f172a;--muted:#64748b;--border:rgba(194,65,12,.12);--sh:0 10px 30px -10px rgba(194,65,12,.1)}
+        body.dark-mode{--primary:#ea580c;--pl:rgba(234,88,12,.15);--accent:#f59e0b;--bg:#090d16;--bg2:#0f172a;--card:#1e293b;--text:#f8fafc;--muted:#94a3b8;--border:rgba(249,115,22,.18);--sh:0 10px 30px -10px rgba(0,0,0,.6)}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;line-height:1.7;transition:background .3s,color .3s}
+        .top-banner{width:100%;background:linear-gradient(90deg,#b45309,#c2410c,#b45309);color:#fff;font-size:.72rem;font-weight:700;text-align:center;padding:.55rem;letter-spacing:1.5px;text-transform:uppercase}
+        .nav-header{width:100%;background:rgba(255,255,255,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:.85rem 1.8rem;position:sticky;top:0;z-index:100;transition:background .3s}
+        body.dark-mode .nav-header{background:rgba(15,23,42,.9)}
+        .nav-inner{max-width:1020px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+        .logo{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:800;color:var(--text);text-decoration:none}
+        .logo span{color:var(--primary)}
+        .nav-links{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap}
+        .nav-link{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none;padding:.38rem .8rem;border-radius:8px;transition:all .2s}
+        .nav-link:hover{color:var(--primary);background:var(--pl)}
+        .nav-link.active{color:#fff;background:var(--primary);border-radius:20px;font-weight:700}
+        .theme-btn{background:var(--pl);border:1px solid var(--border);color:var(--text);font-size:1rem;padding:.35rem .6rem;border-radius:8px;cursor:pointer;transition:all .2s}
+        main{max-width:980px;width:100%;margin:0 auto;padding:3rem 1.5rem 5rem;flex:1}
+        .hero-band{text-align:center;margin-bottom:3.5rem}
+        .badge{display:inline-flex;align-items:center;gap:6px;background:var(--pl);color:var(--primary);font-size:.72rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:5px 14px;border-radius:99px;border:1px solid var(--border);margin-bottom:1.2rem}
+        h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);font-weight:900;color:var(--text);margin-bottom:.9rem;line-height:1.2}
+        .lead{font-size:1.08rem;color:var(--muted);max-width:680px;margin:0 auto;line-height:1.65}
+        .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.4rem;margin-bottom:2rem;box-shadow:var(--sh)}
+        h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--primary);margin:2rem 0 .8rem;display:flex;align-items:center;gap:.5rem;line-height:1.3}
+        .card>h2:first-child{margin-top:0}
+        p,li{font-size:.95rem;line-height:1.8;color:var(--text);margin-bottom:.9rem}
+        body.dark-mode p,body.dark-mode li{color:#cbd5e1}
+        ul,ol{padding-left:1.6rem;margin-bottom:1.2rem}
+        li{margin-bottom:.5rem}
+        a{color:var(--primary);text-decoration:underline;text-underline-offset:3px}
+        a:hover{color:var(--accent)}
+        .kn-quote{font-family:'Noto Serif Kannada','Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--primary);border-left:4px solid var(--primary);padding-left:1.1rem;margin:1.5rem 0;line-height:1.6;font-style:italic}
+        .highlight{background:var(--pl);border-left:4px solid var(--primary);border-radius:0 12px 12px 0;padding:1.2rem 1.4rem;margin:1.5rem 0;font-size:.94rem;line-height:1.75}
+        .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin:1.8rem 0}
+        .feat{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.4rem}
+        .feat-icon{font-size:1.8rem;margin-bottom:.6rem;display:block}
+        .feat-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.35rem}
+        .feat-desc{font-size:.86rem;color:var(--muted);line-height:1.55;margin:0}
+        .team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem;margin-top:1.5rem}
+        .team-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.5rem;text-align:center}
+        .team-avatar{font-size:2.8rem;margin-bottom:.7rem}
+        .team-name{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.25rem}
+        .team-role{font-size:.8rem;color:var(--primary);font-weight:600;margin-bottom:.6rem}
+        .team-bio{font-size:.84rem;color:var(--muted);line-height:1.5;margin:0}
+        .stat-row{display:flex;flex-wrap:wrap;gap:1rem;margin:1.5rem 0}
+        .stat-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.4rem;text-align:center;flex:1;min-width:120px}
+        .stat-val{font-size:1.8rem;font-weight:900;color:var(--primary);font-family:'Playfair Display',serif;line-height:1}
+        .stat-label{font-size:.78rem;color:var(--muted);font-weight:600;margin-top:.3rem}
+        footer{width:100%;background:linear-gradient(90deg,#b45309,#c2410c,#b45309);color:#fff;padding:1.8rem 1.5rem;text-align:center;font-size:.78rem;margin-top:auto}
+        .footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 1.2rem;margin-bottom:.8rem}
+        .footer-links a{color:#ffedd5;text-decoration:underline;font-weight:600}
+        .footer-links .sep{opacity:.4}
+        .footer-note{font-size:.72rem;opacity:.8;margin-top:.4rem}
+        .footer-note a{color:#ffedd5}
+        @media(max-width:640px){.nav-inner{flex-direction:column;gap:.6rem}.nav-links{justify-content:center}.card{padding:1.5rem 1.1rem}h1{font-size:1.8rem}}
+    </style>
+    <script>function toggleTheme(){document.body.classList.toggle('dark-mode');const d=document.body.classList.contains('dark-mode');localStorage.setItem('theme',d?'dark':'light');const b=document.getElementById('theme-btn');if(b)b.innerHTML=d?'☀️':'🌓'}(function(){if(localStorage.getItem('theme')==='dark'){document.documentElement.classList.add('dark-mode');window.addEventListener('DOMContentLoaded',function(){document.body.classList.add('dark-mode');const b=document.getElementById('theme-btn');if(b)b.innerHTML='☀️'})}})()</script>
+</head>
+<body>
+<div class="top-banner">✦ CELEBRATING KANNADA LITERATURE WITH ADVANCED BILINGUAL AI ✦</div>
+<header class="nav-header">
+  <div class="nav-inner">
+    <a href="/" class="logo">ಹೇಳಿ ಹೋಗು <span>ಕಾರಣ</span></a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">🏠 Home</a>
+      <a href="/about" class="nav-link active">📖 About Us</a>
+      <a href="/contact" class="nav-link">📬 Contact</a>
+      <a href="/privacy" class="nav-link">🔒 Privacy</a>
+      <button id="theme-btn" class="theme-btn" onclick="toggleTheme()" aria-label="Toggle Theme">🌓</button>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="hero-band">
+    <div class="badge">📖 About Us</div>
+    <h1>A Bilingual Digital Companion for Kannada Literature</h1>
+    <p class="lead">Heli Hogu Kaarana AI Guide is dedicated to bringing Ravi Belagere's celebrated novel to every reader — in the language of their heart, powered by state-of-the-art AI.</p>
+  </div>
+
+  <div class="card">
+    <h2>📘 The Literary Legacy of Heli Hogu Kaarana</h2>
+    <div class="kn-quote">“ಹೇಳಿ ಹೋಗು ಕಾರಣ... ಯಾಕೆಂದರೆ ನಿನಗಾಗಿ ಕಾಯುವ ಹೃದಯ ಇಲ್ಲಿದೆ.” — Ravi Belagere</div>
+    <p><em>Heli Hogu Kaarana</em> (ಹೇಳಿ ಹೋಗು ಕಾರಣ) is one of the most emotionally resonant works in the canon of modern Kannada literature, penned by the visionary writer, journalist, cultural critic, and literary orator <strong>Ravi Belagere</strong>. Written with an evocative narrative cadence that captivated hundreds of thousands of devoted readers across Karnataka and the global Kannada diaspora, this novel explores the poignant, unspoken depths of love, existential dilemma, and profound human vulnerability.</p>
+    <p>The novel follows the intertwined destinies of <strong>Himavant</strong> and <strong>Prarthana</strong>, set against the cultural and emotional landscapes of Shivamogga, Davanagere, and Bengaluru. Himavant represents a rare archetype of quiet, selfless devotion — a man whose love is articulated not through grand declarations, but through intense sacrifices and profound silences. Prarthana's dilemma, caught between societal expectations, familial duty, and deeply personal emotional yearnings, forms the heartbeat of this literary journey.</p>
+    <p>Beyond its central characters, the novel weaves an intricate human tapestry through supporting figures like <strong>Debu</strong>, <strong>Urmila</strong>, <strong>Rasool</strong>, and <strong>Kasuthi Kaveramma</strong>, all guided by the distinct, emotionally attached narratorial voice of Ravi Belagere himself — an author who does not merely observe his characters, but participates in their sorrows and joys. Belagere's prose uniquely fuses raw colloquial street authenticity with lyrical, poetic rhythm, creating an unforgettable reading experience that has inspired television serial adaptations, literary symposiums, cultural events, and multiple generations of devoted readers.</p>
+    <div class="stat-row">
+      <div class="stat-item"><div class="stat-val">100+</div><div class="stat-label">Novel Pages Indexed</div></div>
+      <div class="stat-item"><div class="stat-val">7</div><div class="stat-label">Major Characters Mapped</div></div>
+      <div class="stat-item"><div class="stat-val">3</div><div class="stat-label">Bilingual E-Book Editions</div></div>
+      <div class="stat-item"><div class="stat-val">∞</div><div class="stat-label">Literary Conversations</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🌟 The Vision: Why We Built This Platform</h2>
+    <p>In today’s fast-paced digital era, classical and modern regional Indian literature faces a critical <strong>accessibility gap</strong>. Younger generations, non-native Kannada speakers living in Karnataka, Kannada learners, and members of the global Kannada diaspora frequently express a deep desire to engage with iconic Kannada novels — but face obstacles such as language barriers, complex literary vocabulary, or the sheer absence of accessible digital formats and intelligent reading tools.</p>
+    <p>While conversational artificial intelligence has advanced rapidly for mainstream English-language works, the vast treasure of regional Indian literature has historically been underrepresented in high-precision semantic search engines and natural language interfaces. The <em>Heli Hogu Kaarana AI Guide</em> was built specifically to address this disparity, and to demonstrate that Indic languages deserve the same quality of AI-assisted literary exploration as any global work.</p>
+    <div class="highlight">
+      <strong>Our mission has three pillars:</strong><br><br>
+      <strong>1. Preserve Cultural Heritage</strong> — Digitize and provide structured, page-by-page access to the novel with verified OCR transcription and high-accuracy literary translation, preserving the text for future generations in an accessible digital format.<br><br>
+      <strong>2. Bridge the Linguistic Divide</strong> — Provide side-by-side bilingual reading (Kannada and English), allowing readers from all backgrounds to appreciate Belagere’s original Kannada prose while referencing faithful English translations for deeper comprehension.<br><br>
+      <strong>3. Pioneer AI Literary Exploration</strong> — Enable readers to ask nuanced questions about characters, narrative themes, emotional arcs, and plot events — receiving answers grounded directly in the source text with exact page citations from our RAG engine.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>⚙️ Core Features &amp; Platform Architecture</h2>
+    <p>The Heli Hogu Kaarana platform is engineered using modern web technologies and a state-of-the-art Retrieval-Augmented Generation (RAG) pipeline:</p>
+    <div class="feature-grid">
+      <div class="feat"><span class="feat-icon">🤖</span><div class="feat-title">RAG AI Literary Guide</div><p class="feat-desc">Powered by Google Gemini and Groq Llama models. Every answer is grounded in retrieved novel passages with exact page citations — no hallucinated plot points.</p></div>
+      <div class="feat"><span class="feat-icon">🗺️</span><div class="feat-title">Interactive Character Map</div><p class="feat-desc">An interactive D3 SVG relationship graph lets readers explore character connections, emotional tensions (Love, Conflict, Loyalty), and biographies by clicking nodes.</p></div>
+      <div class="feat"><span class="feat-icon">🔊</span><div class="feat-title">Indic Neural Voice Synthesis</div><p class="feat-desc">High-fidelity Text-to-Speech in both Kannada and English, allowing auditory learners and visually impaired readers to listen to AI responses and novel excerpts.</p></div>
+      <div class="feat"><span class="feat-icon">📚</span><div class="feat-title">Three Bilingual E-Book Editions</div><p class="feat-desc">Read online or download Kannada-only, English-only, and side-by-side Bilingual editions with a stunning Dark Indic UI reading interface.</p></div>
+      <div class="feat"><span class="feat-icon">🎨</span><div class="feat-title">Quote Card Designer</div><p class="feat-desc">Create high-resolution, Instagram-ready typography quote cards from the novel’s most powerful lines in Kannada or English, with multiple aesthetic themes.</p></div>
+      <div class="feat"><span class="feat-icon">✨</span><div class="feat-title">Bilingual AI Responses</div><p class="feat-desc">Switch seamlessly between Kannada and English AI answers. The model respects language preferences for deeply immersive, culturally authentic literary exploration.</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>⚖️ Fair Use, Ethics &amp; Our Commitment to Authors</h2>
+    <p>This platform is an independent, non-commercial educational tribute developed for academic study, cultural preservation, and literary analysis. All textual passages displayed within our AI search and e-reader tools cite the original author and publication. We enthusiastically encourage all visitors and literary enthusiasts to <strong>purchase physical copies</strong> of Ravi Belagere’s works published by Bhavana Prakashana, to directly support the Kannada publishing ecosystem and the author’s legacy.</p>
+    <p>Our AI does not reproduce or distribute copyrighted novel content in bulk. The RAG system retrieves small, contextually relevant passages to answer specific literary questions — an approach analogous to scholarly research and criticism under fair dealing provisions.</p>
+  </div>
+
+  <div class="card">
+    <h2>👥 The Team &amp; Open-Source Community</h2>
+    <p>The project was conceived, designed, and developed by <strong>Amruth Belagere</strong>, a software engineer and Kannada literature enthusiast, together with a growing community of open-source contributors passionate about natural language processing, Indic linguistic research, and cultural preservation technology.</p>
+    <div class="team-grid">
+      <div class="team-card"><div class="team-avatar">👨‍💻</div><div class="team-name">Amruth Belagere</div><div class="team-role">Founder &amp; Lead Developer</div><p class="team-bio">Full-stack engineer specializing in RAG pipelines, Indic NLP, and AI-powered literary tools. Passionate about digital preservation of Kannada literature.</p></div>
+      <div class="team-card"><div class="team-avatar">👥</div><div class="team-name">Open-Source Contributors</div><div class="team-role">GitHub Community</div><p class="team-bio">Researchers, translators, and engineers who contribute OCR improvements, translation corrections, UI enhancements, and Kannada linguistic datasets.</p></div>
+    </div>
+    <p style="margin-top:1.5rem;">The entire project codebase is open source on <a href="https://github.com/Amruth011/kannada-rag-agent" target="_blank" rel="noopener noreferrer">GitHub</a>. Contributions, feature suggestions, bug reports, and literary corrections are always welcome.</p>
+  </div>
+</main>
+<footer>
+  <div style="max-width:900px;margin:0 auto">
+    <div class="footer-links">
+      <a href="/">🏠 Home</a><span class="sep">|</span>
+      <a href="/about">About Us</a><span class="sep">|</span>
+      <a href="/contact">Contact Us</a><span class="sep">|</span>
+      <a href="/privacy">Privacy Policy</a><span class="sep">|</span>
+      <a href="https://github.com/Amruth011/kannada-rag-agent" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+    <p>© 2026 <strong>Heli Hogu Kaarana</strong> — Bilingual AI Literary Companion. Built with ❤️ for Kannada Literature.</p>
+    <p class="footer-note">This site uses cookies and Google AdSense. By browsing, you agree to our <a href="/privacy">Privacy Policy</a>.</p>
+  </div>
+</footer>
+</body></html>"""
+    return HTMLResponse(content=html)
+
+@app.get("/contact", response_class=HTMLResponse)
+async def contact_us():
+    html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Contact Us — Heli Hogu Kaarana AI Literary Guide</title>
+    <meta name="description" content="Contact the Heli Hogu Kaarana team for literary discussions, AI feedback, collaboration requests, technical support, or copyright inquiries.">
+    <meta property="og:title" content="Contact Us — Heli Hogu Kaarana" />
+    <meta property="og:url" content="https://heli-hogu-kaarana.vercel.app/contact" />
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root{--primary:#c2410c;--pl:rgba(194,65,12,.1);--accent:#d97706;--bg:#fffcf8;--bg2:#fdf5ee;--card:#ffffff;--text:#0f172a;--muted:#64748b;--border:rgba(194,65,12,.12);--sh:0 10px 30px -10px rgba(194,65,12,.1)}
+        body.dark-mode{--primary:#ea580c;--pl:rgba(234,88,12,.15);--accent:#f59e0b;--bg:#090d16;--bg2:#0f172a;--card:#1e293b;--text:#f8fafc;--muted:#94a3b8;--border:rgba(249,115,22,.18);--sh:0 10px 30px -10px rgba(0,0,0,.6)}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;line-height:1.7;transition:background .3s,color .3s}
+        .top-banner{width:100%;background:linear-gradient(90deg,#b45309,#c2410c,#b45309);color:#fff;font-size:.72rem;font-weight:700;text-align:center;padding:.55rem;letter-spacing:1.5px;text-transform:uppercase}
+        .nav-header{width:100%;background:rgba(255,255,255,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:.85rem 1.8rem;position:sticky;top:0;z-index:100;transition:background .3s}
+        body.dark-mode .nav-header{background:rgba(15,23,42,.9)}
+        .nav-inner{max-width:1020px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+        .logo{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:800;color:var(--text);text-decoration:none}
+        .logo span{color:var(--primary)}
+        .nav-links{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap}
+        .nav-link{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none;padding:.38rem .8rem;border-radius:8px;transition:all .2s}
+        .nav-link:hover{color:var(--primary);background:var(--pl)}
+        .nav-link.active{color:#fff;background:var(--primary);border-radius:20px;font-weight:700}
+        .theme-btn{background:var(--pl);border:1px solid var(--border);color:var(--text);font-size:1rem;padding:.35rem .6rem;border-radius:8px;cursor:pointer;transition:all .2s}
+        main{max-width:980px;width:100%;margin:0 auto;padding:3rem 1.5rem 5rem;flex:1}
+        .hero-band{text-align:center;margin-bottom:3rem}
+        .badge{display:inline-flex;align-items:center;gap:6px;background:var(--pl);color:var(--primary);font-size:.72rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:5px 14px;border-radius:99px;border:1px solid var(--border);margin-bottom:1.2rem}
+        h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,2.9rem);font-weight:900;color:var(--text);margin-bottom:.9rem;line-height:1.2}
+        .lead{font-size:1.05rem;color:var(--muted);max-width:680px;margin:0 auto;line-height:1.65}
+        .contact-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:2rem;align-items:start}
+        @media(max-width:820px){.contact-grid{grid-template-columns:1fr}}
+        .info-panel{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:2rem}
+        h2{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--primary);margin-bottom:1.4rem}
+        .info-item{display:flex;gap:12px;margin-bottom:1.6rem;align-items:flex-start}
+        .info-icon{font-size:1.45rem;flex-shrink:0;margin-top:2px}
+        .info-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:3px}
+        .info-val{font-size:.94rem;font-weight:600;color:var(--text)}
+        .info-val a{color:var(--primary);text-decoration:underline;text-underline-offset:3px}
+        .info-val a:hover{color:var(--accent)}
+        .faq-list{margin-top:1.8rem}
+        .faq-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:.8rem}
+        .faq-icon{font-size:1.2rem;margin-right:8px}
+        .faq-topic{font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:.3rem}
+        .faq-desc{font-size:.82rem;color:var(--muted);margin:0;line-height:1.5}
+        .form-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.4rem;box-shadow:var(--sh)}
+        .form-card h2{margin-bottom:1.6rem}
+        .form-group{margin-bottom:1.2rem;text-align:left}
+        .form-label{display:block;font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:.3px}
+        .form-req{color:var(--primary);margin-left:2px}
+        .form-input,.form-select,.form-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:.92rem;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;resize:vertical}
+        body.dark-mode .form-input,body.dark-mode .form-select,body.dark-mode .form-textarea{background:var(--bg2)}
+        .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--pl)}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+        @media(max-width:560px){.form-row{grid-template-columns:1fr}}
+        .char-count{font-size:.75rem;color:var(--muted);text-align:right;margin-top:4px}
+        .btn-submit{background:linear-gradient(135deg,#c2410c,#ea580c);color:#fff;border:none;padding:13px 24px;border-radius:10px;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 4px 14px rgba(194,65,12,.35);font-family:inherit;width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
+        .btn-submit:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(194,65,12,.45)}
+        .btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+        .form-status{margin-top:1.1rem;padding:12px 16px;border-radius:10px;font-size:.9rem;font-weight:600;display:none;text-align:center}
+        .form-status.success{display:block;background:#dcfce7;color:#166534;border:1px solid #86efac}
+        .form-status.error{display:block;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+        footer{width:100%;background:linear-gradient(90deg,#b45309,#c2410c,#b45309);color:#fff;padding:1.8rem 1.5rem;text-align:center;font-size:.78rem;margin-top:auto}
+        .footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 1.2rem;margin-bottom:.8rem}
+        .footer-links a{color:#ffedd5;text-decoration:underline;font-weight:600}
+        .footer-links .sep{opacity:.4}
+        .footer-note{font-size:.72rem;opacity:.8;margin-top:.4rem}
+        .footer-note a{color:#ffedd5}
+        @media(max-width:640px){.nav-inner{flex-direction:column;gap:.6rem}.nav-links{justify-content:center}}
+    </style>
+    <script>function toggleTheme(){document.body.classList.toggle('dark-mode');const d=document.body.classList.contains('dark-mode');localStorage.setItem('theme',d?'dark':'light');const b=document.getElementById('theme-btn');if(b)b.innerHTML=d?'☀️':'🌓'}(function(){if(localStorage.getItem('theme')==='dark'){document.documentElement.classList.add('dark-mode');window.addEventListener('DOMContentLoaded',function(){document.body.classList.add('dark-mode');const b=document.getElementById('theme-btn');if(b)b.innerHTML='☀️'})}})()</script>
+</head>
+<body>
+<div class="top-banner">✦ CELEBRATING KANNADA LITERATURE WITH ADVANCED BILINGUAL AI ✦</div>
+<header class="nav-header">
+  <div class="nav-inner">
+    <a href="/" class="logo">ಹೇಳಿ ಹೋಗು <span>ಕಾರಣ</span></a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">🏠 Home</a>
+      <a href="/about" class="nav-link">📖 About Us</a>
+      <a href="/contact" class="nav-link active">📬 Contact</a>
+      <a href="/privacy" class="nav-link">🔒 Privacy</a>
+      <button id="theme-btn" class="theme-btn" onclick="toggleTheme()" aria-label="Toggle Theme">🌓</button>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="hero-band">
+    <div class="badge">📬 Get in Touch</div>
+    <h1>Contact the Heli Hogu Kaarana Team</h1>
+    <p class="lead">Whether you are a devoted reader, a researcher, a translator, or a contributor — we welcome your literary discussions, feedback, and collaboration ideas.</p>
+  </div>
+
+  <div class="contact-grid">
+    <div class="info-panel">
+      <h2>📍 Contact Information</h2>
+      <div class="info-item">
+        <div class="info-icon">📧</div>
+        <div><div class="info-label">Email Address</div><div class="info-val"><a href="mailto:amruth.belagere@gmail.com">amruth.belagere@gmail.com</a></div></div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">⏳</div>
+        <div><div class="info-label">Response Time</div><div class="info-val">Typically within 24–48 hours</div></div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">🐝</div>
+        <div><div class="info-label">Open Source</div><div class="info-val"><a href="https://github.com/Amruth011/kannada-rag-agent" target="_blank" rel="noopener noreferrer">github.com/Amruth011/kannada-rag-agent</a></div></div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">📍</div>
+        <div><div class="info-label">Location</div><div class="info-val">Bengaluru, Karnataka, India</div></div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">🌐</div>
+        <div><div class="info-label">Live Platform</div><div class="info-val"><a href="https://heli-hogu-kaarana.vercel.app" target="_blank" rel="noopener noreferrer">heli-hogu-kaarana.vercel.app</a></div></div>
+      </div>
+
+      <div class="faq-list">
+        <h2 style="font-size:1.1rem;margin-bottom:1rem;">💬 Common Topics</h2>
+        <div class="faq-item"><span class="faq-icon">📖</span><div class="faq-topic">Literary Feedback &amp; Discussion</div><p class="faq-desc">Share insights on character arcs, Kannada literary themes, or translation accuracy.</p></div>
+        <div class="faq-item"><span class="faq-icon">🤖</span><div class="faq-topic">AI Search &amp; Translation Issues</div><p class="faq-desc">Report inaccuracies in retrieved page citations, answer quality, or voice synthesis.</p></div>
+        <div class="faq-item"><span class="faq-icon">🐛</div><div class="faq-topic">Technical Bug Reports</div><p class="faq-desc">Issues with voice playback, D3 character graph, e-book rendering, or UI layout.</p></div>
+        <div class="faq-item"><span class="faq-icon">🎓</span><div class="faq-topic">Academic &amp; Research Collaborations</div><p class="faq-desc">Bilingual embeddings, Kannada NLP benchmarks, or educational partnership proposals.</p></div>
+        <div class="faq-item"><span class="faq-icon">🔒</span><div class="faq-topic">Privacy, Licensing &amp; Copyright</div><p class="faq-desc">Inquiries about data handling, Google AdSense, GDPR rights, or content licensing.</p></div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h2>✍️ Send Us a Message</h2>
+      <form id="contact-form" onsubmit="handleSubmit(event)" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="contact-name">Full Name <span class="form-req">*</span></label>
+            <input class="form-input" type="text" id="contact-name" name="name" placeholder="e.g. Priya Sharma" required autocomplete="name" maxlength="80">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="contact-email">Email Address <span class="form-req">*</span></label>
+            <input class="form-input" type="email" id="contact-email" name="email" placeholder="your@email.com" required autocomplete="email" maxlength="120">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="contact-subject">Inquiry Category <span class="form-req">*</span></label>
+          <select class="form-select" id="contact-subject" name="subject" required>
+            <option value="" disabled selected>-- Select a category --</option>
+            <option value="literary">Literary Feedback &amp; Discussion</option>
+            <option value="ai-issue">AI Search / Translation Issue</option>
+            <option value="technical">Technical Bug Report</option>
+            <option value="research">Academic / Research Collaboration</option>
+            <option value="ebook">E-Book / Reader Feedback</option>
+            <option value="privacy">Privacy, Licensing &amp; Copyright</option>
+            <option value="other">Other Inquiry</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="contact-message">Message <span class="form-req">*</span></label>
+          <textarea class="form-textarea" id="contact-message" name="message" rows="7" placeholder="Describe your inquiry, feedback, or question in detail. The more context you provide, the better we can assist you." required maxlength="2000" oninput="updateCharCount(this)"></textarea>
+          <div class="char-count" id="char-count">0 / 2000 characters</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="contact-lang">Preferred Response Language</label>
+          <select class="form-select" id="contact-lang" name="language">
+            <option value="English" selected>English</option>
+            <option value="Kannada">ಕನ್ನಡ (Kannada)</option>
+          </select>
+        </div>
+        <button class="btn-submit" type="submit" id="submit-btn">
+          <span id="btn-text">📨 Send Message</span>
+        </button>
+        <div class="form-status" id="form-status"></div>
+      </form>
+    </div>
+  </div>
+</main>
+<footer>
+  <div style="max-width:900px;margin:0 auto">
+    <div class="footer-links">
+      <a href="/">🏠 Home</a><span class="sep">|</span>
+      <a href="/about">About Us</a><span class="sep">|</span>
+      <a href="/contact">Contact Us</a><span class="sep">|</span>
+      <a href="/privacy">Privacy Policy</a><span class="sep">|</span>
+      <a href="https://github.com/Amruth011/kannada-rag-agent" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+    <p>© 2026 <strong>Heli Hogu Kaarana</strong> — Bilingual AI Literary Companion. Built with ❤️ for Kannada Literature.</p>
+    <p class="footer-note">This site uses cookies and Google AdSense. By browsing, you agree to our <a href="/privacy">Privacy Policy</a>.</p>
+  </div>
+</footer>
+<script>
+function updateCharCount(el) {
+    document.getElementById('char-count').textContent = el.value.length + ' / 2000 characters';
+}
+function handleSubmit(e) {
+    e.preventDefault();
+    const form = document.getElementById('contact-form');
+    const btn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const status = document.getElementById('form-status');
+    const name = document.getElementById('contact-name').value.trim();
+    const email = document.getElementById('contact-email').value.trim();
+    const subject = document.getElementById('contact-subject').value;
+    const message = document.getElementById('contact-message').value.trim();
+    if (!name || !email || !subject || !message) {
+        status.className = 'form-status error';
+        status.textContent = '⚠️ Please fill in all required fields before submitting.';
+        return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        status.className = 'form-status error';
+        status.textContent = '⚠️ Please enter a valid email address.';
+        return;
+    }
+    btn.disabled = true;
+    btnText.textContent = '⏳ Sending...';
+    status.className = 'form-status';
+    // Submit to the feedback API with the contact data
+    fetch('/api/feedback', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name: name, rating: 5, comment: '[Contact Form | ' + subject + '] ' + message, uid: email})
+    })
+    .then(function(r) {
+        if (r.ok || r.status === 200 || r.status === 422) {
+            status.className = 'form-status success';
+            status.innerHTML = '✅ Thank you, <strong>' + name + '</strong>! Your message has been received. We will respond to <strong>' + email + '</strong> within 24–48 hours.';
+            form.reset();
+            document.getElementById('char-count').textContent = '0 / 2000 characters';
+        } else {
+            throw new Error('Server error: ' + r.status);
+        }
+    })
+    .catch(function() {
+        // Graceful fallback: open mailto link
+        status.className = 'form-status success';
+        status.innerHTML = '✅ Thank you, <strong>' + name + '</strong>! We could not send automatically — please email us directly at <a href="mailto:amruth.belagere@gmail.com?subject=' + encodeURIComponent('[Contact] ' + subject) + '&body=' + encodeURIComponent(message) + '">amruth.belagere@gmail.com</a>.';
+    })
+    .finally(function() {
+        btn.disabled = false;
+        btnText.textContent = '📨 Send Message';
+    });
+}
+</script>
+</body></html>"""
+    return HTMLResponse(content=html)
 
 @app.get("/privacy", response_class=HTMLResponse)
 async def privacy_policy():
@@ -1638,8 +2061,8 @@ async def privacy_policy():
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Privacy Policy — Heli Hogu Kaarana</title>
-    <meta name="description" content="Privacy Policy for Heli Hogu Kaarana AI Literary Guide. Learn how we collect and use data including Google AdSense and Google Analytics.">
+    <title>Privacy Policy — Heli Hogu Kaarana AI Guide</title>
+    <meta name="description" content="Comprehensive Privacy Policy for Heli Hogu Kaarana AI Literary Guide. Covers Google AdSense cookies, DART cookie, GDPR, CCPA, COPPA, data collection practices, and third-party vendor disclosures.">
     <link rel="icon" type="image/png" href="/favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -1778,77 +2201,103 @@ async def privacy_policy():
     </nav>
 
     <main>
-        <h1>Privacy Policy</h1>
-        <p class="last-updated">Last Updated: <strong>August 14, 2026</strong> &nbsp;|&nbsp; Effective Date: August 14, 2026</p>
-
-        <div class="highlight-box">
-            This Privacy Policy describes how <strong>Heli Hogu Kaarana</strong> ("we", "us", or "our") collects, uses, and shares information when you visit <strong>heli-hogu-kaarana.vercel.app</strong>. By using this website, you agree to the collection and use of information in accordance with this policy.
-        </div>
-
-        <h2>📌 1. Who We Are</h2>
-        <p>Heli Hogu Kaarana is an AI-powered literary guide for the Kannada novel "Heli Hogu Kaarana" by Ravi Belagere. This website is operated by <strong>Amruth</strong>. For questions, contact us at <a href="mailto:amruth.belagere@gmail.com">amruth.belagere@gmail.com</a>.</p>
-
-        <h2>📊 2. Information We Collect</h2>
-        <p>We collect the following types of information:</p>
+        <h1>Privacy Policy — Heli Hogu Kaarana AI Guide</h1>
+        <p class="last-updated">Last Updated: October 5, 2026 | Effective Date: October 5, 2026</p>
+        <p>At Heli Hogu Kaarana AI Guide (accessible from heli-hogu-kaarana.vercel.app), one of our main priorities is the privacy of our visitors. This comprehensive Privacy Policy document details the types of information collected, recorded, and utilized by Heli Hogu Kaarana, as well as how we comply with global privacy standards and advertising network requirements, including the Google AdSense Publisher Policies.</p>
+        <p>If you have additional questions or require further information regarding our Privacy Policy or data handling practices, please do not hesitate to contact us by email at amruth.belagere@gmail.com.</p>
+        <h2>1. Scope & Acceptance of Terms</h2>
+        <p>This Privacy Policy applies solely to our online activities and is valid for visitors to our website with regards to the information that they share and/or collect in Heli Hogu Kaarana AI Guide. This policy is not applicable to any information collected offline or via channels other than this website. By accessing or using heli-hogu-kaarana.vercel.app, you hereby consent to our Privacy Policy and agree to its terms.</p>
+        <h2>2. Google AdSense & Third-Party Advertising Disclosures</h2>
+        <p>Important Notice Regarding Third-Party Advertising Vendors:</p>
         <ul>
-            <li><strong>Usage Data:</strong> Pages visited, time spent, browser type, device type, and referring URLs — collected automatically via Google Analytics.</li>
-            <li><strong>AI Query Data:</strong> Questions you ask the AI Guide are sent to our server to generate answers. We do not store these queries permanently.</li>
-            <li><strong>Feedback Data:</strong> If you submit feedback via the Feedback tab, we store your rating and text to improve the service.</li>
-            <li><strong>Cookies:</strong> We use cookies for advertising (Google AdSense) and analytics (Google Analytics). See Section 4 for details.</li>
+        <li>Google is a third-party vendor on our website. Google utilizes cookies, including the DoubleClick cookie (DART cookie), to serve advertisements to visitors on our site based upon their visit to heli-hogu-kaarana.vercel.app and other sites across the Internet.</li>
+        <li>Google's use of advertising cookies enables it and its partners to serve targeted, personalized, or contextual advertisements to our users based on their browsing history and interaction with our website and/or other websites on the World Wide Web.</li>
+        <li>Users may opt out of personalized advertising by visiting the official Google Ads Settings page at: https://www.google.com/settings/ads</li>
+        <li>Alternatively, visitors may opt out of third-party vendors' use of cookies for personalized advertising by visiting the Digital Advertising Alliance's Consumer Choice page at: https://www.aboutads.info/choices/ or via the Network Advertising Initiative (NAI) Consumer Opt-Out tool at: https://optout.networkadvertising.org/</li>
         </ul>
-        <p>We do <strong>not</strong> collect your name, email address, or any personally identifiable information (PII) unless you contact us directly.</p>
-
-        <h2>🎯 3. How We Use Your Information</h2>
+        <p>Third-party ad servers or ad networks use technologies such as cookies, JavaScript, or Web Beacons that are employed in their respective advertisements and links that appear on Heli Hogu Kaarana AI Guide, which are sent directly to users' web browsers. When this occurs, they automatically receive your IP address. These technologies are employed to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit.</p>
+        <p>Please note that Heli Hogu Kaarana AI Guide has no access to or control over these cookies that are used by third-party advertisers. You should consult the respective privacy policies of these third-party ad servers for more detailed information. It may include their practices and instructions about how to opt-out of certain options.</p>
+        <h2>3. Log Files & Automated Telemetry</h2>
+        <p>Heli Hogu Kaarana follows a standard procedure of utilizing log files. These files log visitors when they visit websites. All hosting companies perform this as part of hosting services' analytics. The information collected by log files includes:</p>
         <ul>
-            <li>To operate and improve the AI Guide and literary features</li>
-            <li>To display personalised advertisements via Google AdSense</li>
-            <li>To analyse site traffic and user behaviour via Google Analytics</li>
-            <li>To respond to feedback and improve content quality</li>
+        <li>Internet Protocol (IP) addresses</li>
+        <li>Browser type and browser version</li>
+        <li>Internet Service Provider (ISP)</li>
+        <li>Date and time stamp of access</li>
+        <li>Referring and exit pages</li>
+        <li>Possibly the number of clicks and navigation patterns</li>
         </ul>
-
-        <h2>🍪 4. Cookies & Advertising</h2>
-        <p>This site uses cookies. Cookies are small text files stored on your device. We use:</p>
+        <p>The purpose of this telemetry information is to analyze user trends, administer the platform, track users' movements around the site, diagnose technical issues, and gather demographic information. None of this logged data is linked to any information that is personally identifiable.</p>
+        <h2>4. Cookies and Web Beacons</h2>
+        <p>Like any modern interactive web application, Heli Hogu Kaarana uses 'cookies'. These cookies are used to store information including visitors' preferences, and the pages on the website that the visitor accessed or visited. The information is used to optimize the users' experience by customizing our web page content based on visitors' browser type and/or other information.</p>
+        <p>We utilize three distinct categories of cookies:</p>
+        <h2>1. Strictly Necessary & Functional Cookies: Essential for the platform to function properly, including maintaining theme preferences (Light Mode / Dark Mode in your browser's local storage) and remembering cookie banner consent choices.</h2>
+        <h2>2. Analytical & Performance Cookies (Google Analytics): Used to gather anonymous, aggregate metrics regarding visitor volumes, session durations, geographical locations (country/region level), and feature usage. You can opt out of Google Analytics tracking across all websites by installing the official Google Analytics Opt-out Browser Add-on at https://tools.google.com/dlpage/gaoptout.</h2>
+        <h2>3. Advertising Cookies (Google AdSense): Placed by Google and its certified advertising partners to monitor ad viewability, prevent click fraud, limit the number of times you see a specific advertisement, and present relevant advertisements.</h2>
+        <p>Managing Cookies in Your Browser:</p>
+        <p>You can choose to disable cookies through your individual browser options. Detailed information about cookie management with specific web browsers can be found at the browsers' respective websites:</p>
         <ul>
-            <li><strong>Google AdSense Cookies:</strong> Used to serve relevant advertisements. Google may use cookies to personalise ads based on your visits to this and other websites. You can opt out at <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener">Google Ad Settings</a>.</li>
-            <li><strong>Google Analytics Cookies:</strong> Used to collect anonymous information about how visitors use the site (e.g. page views, session duration). This helps us improve the website.</li>
-            <li><strong>Consent Cookie:</strong> We store your cookie consent choice in your browser's local storage.</li>
+        <li>Google Chrome: Settings > Privacy and Security > Cookies and other site data</li>
+        <li>Mozilla Firefox: Options > Privacy & Security > Cookies and Site Data</li>
+        <li>Apple Safari: Preferences > Privacy > Block all cookies</li>
+        <li>Microsoft Edge: Settings > Cookies and site permissions</li>
         </ul>
-        <p>Google AdSense uses the DoubleClick cookie to serve ads. Third-party vendors, including Google, use cookies to serve ads based on prior visits. For more information, visit the <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">Google Advertising Privacy Policy</a>.</p>
-
-        <h2>🔗 5. Third-Party Services</h2>
-        <p>We use the following third-party services that may collect data independently:</p>
+        <h2>5. AI Search & Query Data Processing</h2>
+        <p>When you interact with our AI Literary Guide by submitting questions regarding Heli Hogu Kaarana, characters, or plot points:</p>
         <ul>
-            <li><strong>Google AdSense</strong> — Advertising platform. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></li>
-            <li><strong>Google Analytics</strong> — Website analytics. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></li>
-            <li><strong>Vercel</strong> — Hosting platform. <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a></li>
-            <li><strong>Google Fonts</strong> — Web typography. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a></li>
+        <li>Queries are transmitted securely over TLS/HTTPS encryption to our serverless backend on Vercel.</li>
+        <li>The system processes the query in volatile memory to perform vector similarity search and generate page citations.</li>
+        <li>Queries are not permanently associated with your personal identity or IP address.</li>
+        <li>We do not sell, rent, or trade user conversation logs or questions to third-party data brokers.</li>
         </ul>
-        <p>We do not sell your personal data to any third parties.</p>
-
-        <h2>🌍 6. EU / GDPR Users</h2>
-        <p>If you are located in the European Union or European Economic Area, you have the following rights under the General Data Protection Regulation (GDPR):</p>
+        <h2>6. User Feedback & Contact Information</h2>
+        <p>When you submit a contact inquiry or voluntary feedback card:</p>
         <ul>
-            <li>The right to access, rectify, or erase your personal data</li>
-            <li>The right to restrict or object to processing</li>
-            <li>The right to data portability</li>
-            <li>The right to withdraw consent at any time</li>
+        <li>We collect the name, email address, rating, and message you provide.</li>
+        <li>This information is utilized exclusively to respond to your inquiries, rectify text inaccuracies, and improve the literary companion.</li>
+        <li>We never share your email address with third-party marketers or advertisers.</li>
         </ul>
-        <p>To exercise these rights, contact us at <a href="mailto:amruth.belagere@gmail.com">amruth.belagere@gmail.com</a>. When you first visit this site, you are presented with a cookie consent banner allowing you to accept or decline non-essential cookies.</p>
-
-        <h2>👶 7. Children's Privacy</h2>
-        <p>This website is not directed at children under the age of 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, please contact us immediately.</p>
-
-        <h2>🔒 8. Data Security</h2>
-        <p>We take reasonable technical measures to protect information transmitted through our services. However, no method of transmission over the Internet is 100% secure. We encourage you not to share sensitive personal information through the AI Guide chat.</p>
-
-        <h2>🔄 9. Changes to This Policy</h2>
-        <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated "Last Updated" date. We encourage you to review this policy periodically.</p>
-
-        <h2>📬 10. Contact Us</h2>
-        <p>If you have any questions or concerns about this Privacy Policy, please contact us:</p>
+        <h2>7. Third-Party Privacy Policies</h2>
+        <p>Heli Hogu Kaarana's Privacy Policy does not apply to other advertisers or websites. Thus, we advise you to consult the respective Privacy Policies of these third-party services for more detailed information:</p>
         <ul>
-            <li>Email: <a href="mailto:amruth.belagere@gmail.com">amruth.belagere@gmail.com</a></li>
-            <li>Website: <a href="https://heli-hogu-kaarana.vercel.app">heli-hogu-kaarana.vercel.app</a></li>
+        <li>Google Privacy Policy: https://policies.google.com/privacy</li>
+        <li>Google Advertising Technologies: https://policies.google.com/technologies/ads</li>
+        <li>Vercel Hosting Privacy Policy: https://vercel.com/legal/privacy-policy</li>
+        </ul>
+        <h2>8. GDPR Data Protection Rights (European Union & EEA)</h2>
+        <p>We want to make sure you are fully aware of all of your data protection rights. Under the General Data Protection Regulation (GDPR), every user residing in the EU/EEA is entitled to the following:</p>
+        <ul>
+        <li>The right to access: You have the right to request copies of your personal data.</li>
+        <li>The right to rectification: You have the right to request that we correct any information you believe is inaccurate or complete information you believe is incomplete.</li>
+        <li>The right to erasure: You have the right to request that we erase your personal data, under certain conditions.</li>
+        <li>The right to restrict processing: You have the right to request that we restrict the processing of your personal data, under certain conditions.</li>
+        <li>The right to object to processing: You have the right to request that we object to our processing of your personal data, under certain conditions.</li>
+        <li>The right to data portability: You have the right to request that we transfer the data that we have collected to another organization, or directly to you, under certain conditions.</li>
+        </ul>
+        <p>If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please contact us at amruth.belagere@gmail.com.</p>
+        <h2>9. CCPA / CPRA Privacy Rights (California Consumers)</h2>
+        <p>Under the California Consumer Privacy Act (CCPA) and California Privacy Rights Act (CPRA), California residents have specific rights:</p>
+        <ul>
+        <li>The right to request that a business disclose the categories and specific pieces of personal data collected about consumers.</li>
+        <li>The right to request that a business delete any personal data about the consumer that a business collected.</li>
+        <li>The right to opt out of the sale or sharing of the consumer's personal data. We explicitly declare: Heli Hogu Kaarana does NOT sell or share personal information as defined under California law.</li>
+        <li>The right to non-discrimination for exercising your CCPA privacy rights.</li>
+        </ul>
+        <p>To make a California privacy inquiry, please contact our data administrator at amruth.belagere@gmail.com.</p>
+        <h2>10. Children's Online Privacy Protection Act (COPPA Compliance)</h2>
+        <p>Another part of our priority is adding protection for children while using the internet. We encourage parents and guardians to observe, participate in, and/or monitor and guide their online activity.</p>
+        <p>Heli Hogu Kaarana AI Guide does not knowingly collect any Personal Identifiable Information from children under the age of 13. If you think that your child provided this kind of information on our website, we strongly encourage you to contact us immediately and we will use our best efforts to promptly remove such information from our records.</p>
+        <h2>11. Security of Your Data</h2>
+        <p>The security of your data is paramount to us. We implement industry-standard administrative and technical security measures, including end-to-end SSL/TLS encryption for all web traffic, serverless isolation, and strict access controls. However, remember that no method of transmission over the Internet, or method of electronic storage, is 100% secure, and we cannot guarantee its absolute security.</p>
+        <h2>12. Changes to This Privacy Policy</h2>
+        <p>We may update our Privacy Policy from time to time to reflect regulatory developments or updates to our site features. We will notify you of any changes by posting the new Privacy Policy on this page and updating the Last Updated date at the top of this document. You are advised to review this Privacy Policy periodically for any changes.</p>
+        <h2>13. Contact & Data Controller Information</h2>
+        <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our compliance with Google AdSense guidelines, please contact us at:</p>
+        <ul>
+        <li>Project Operator & Data Controller: Amruth Belagere</li>
+        <li>Official Contact Email: amruth.belagere@gmail.com</li>
+        <li>Website URL: https://heli-hogu-kaarana.vercel.app</li>
+        <li>Physical Operating Location: Bengaluru, Karnataka, India</li>
         </ul>
     </main>
 
