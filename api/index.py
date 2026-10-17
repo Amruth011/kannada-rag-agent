@@ -1909,7 +1909,7 @@ async def contact_us():
       <h2>📍 Contact Information</h2>
       <div class="info-item">
         <div class="info-icon">📧</div>
-        <div><div class="info-label">Email Address</div><div class="info-val"><a href="mailto:amruth.belagere@gmail.com">amruth.belagere@gmail.com</a></div></div>
+        <div><div class="info-label">Email Address</div><div class="info-val"><a href="mailto:amruth.kumar.portfolio@gmail.com">amruth.kumar.portfolio@gmail.com</a></div></div>
       </div>
       <div class="info-item">
         <div class="info-icon">⏳</div>
@@ -2043,7 +2043,7 @@ function handleSubmit(e) {
     .catch(function() {
         // Graceful fallback: open mailto link
         status.className = 'form-status success';
-        status.innerHTML = '✅ Thank you, <strong>' + name + '</strong>! We could not send automatically — please email us directly at <a href="mailto:amruth.belagere@gmail.com?subject=' + encodeURIComponent('[Contact] ' + subject) + '&body=' + encodeURIComponent(message) + '">amruth.belagere@gmail.com</a>.';
+        status.innerHTML = '✅ Thank you, <strong>' + name + '</strong>! We could not send automatically — please email us directly at <a href="mailto:amruth.kumar.portfolio@gmail.com?subject=' + encodeURIComponent('[Contact] ' + subject) + '&body=' + encodeURIComponent(message) + '">amruth.kumar.portfolio@gmail.com</a>.';
     })
     .finally(function() {
         btn.disabled = false;
@@ -2204,7 +2204,7 @@ async def privacy_policy():
         <h1>Privacy Policy — Heli Hogu Kaarana AI Guide</h1>
         <p class="last-updated">Last Updated: October 5, 2026 | Effective Date: October 5, 2026</p>
         <p>At Heli Hogu Kaarana AI Guide (accessible from heli-hogu-kaarana.vercel.app), one of our main priorities is the privacy of our visitors. This comprehensive Privacy Policy document details the types of information collected, recorded, and utilized by Heli Hogu Kaarana, as well as how we comply with global privacy standards and advertising network requirements, including the Google AdSense Publisher Policies.</p>
-        <p>If you have additional questions or require further information regarding our Privacy Policy or data handling practices, please do not hesitate to contact us by email at amruth.belagere@gmail.com.</p>
+        <p>If you have additional questions or require further information regarding our Privacy Policy or data handling practices, please do not hesitate to contact us by email at amruth.kumar.portfolio@gmail.com.</p>
         <h2>1. Scope & Acceptance of Terms</h2>
         <p>This Privacy Policy applies solely to our online activities and is valid for visitors to our website with regards to the information that they share and/or collect in Heli Hogu Kaarana AI Guide. This policy is not applicable to any information collected offline or via channels other than this website. By accessing or using heli-hogu-kaarana.vercel.app, you hereby consent to our Privacy Policy and agree to its terms.</p>
         <h2>2. Google AdSense & Third-Party Advertising Disclosures</h2>
@@ -2274,7 +2274,7 @@ async def privacy_policy():
         <li>The right to object to processing: You have the right to request that we object to our processing of your personal data, under certain conditions.</li>
         <li>The right to data portability: You have the right to request that we transfer the data that we have collected to another organization, or directly to you, under certain conditions.</li>
         </ul>
-        <p>If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please contact us at amruth.belagere@gmail.com.</p>
+        <p>If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please contact us at amruth.kumar.portfolio@gmail.com.</p>
         <h2>9. CCPA / CPRA Privacy Rights (California Consumers)</h2>
         <p>Under the California Consumer Privacy Act (CCPA) and California Privacy Rights Act (CPRA), California residents have specific rights:</p>
         <ul>
@@ -2283,7 +2283,7 @@ async def privacy_policy():
         <li>The right to opt out of the sale or sharing of the consumer's personal data. We explicitly declare: Heli Hogu Kaarana does NOT sell or share personal information as defined under California law.</li>
         <li>The right to non-discrimination for exercising your CCPA privacy rights.</li>
         </ul>
-        <p>To make a California privacy inquiry, please contact our data administrator at amruth.belagere@gmail.com.</p>
+        <p>To make a California privacy inquiry, please contact our data administrator at amruth.kumar.portfolio@gmail.com.</p>
         <h2>10. Children's Online Privacy Protection Act (COPPA Compliance)</h2>
         <p>Another part of our priority is adding protection for children while using the internet. We encourage parents and guardians to observe, participate in, and/or monitor and guide their online activity.</p>
         <p>Heli Hogu Kaarana AI Guide does not knowingly collect any Personal Identifiable Information from children under the age of 13. If you think that your child provided this kind of information on our website, we strongly encourage you to contact us immediately and we will use our best efforts to promptly remove such information from our records.</p>
@@ -2295,7 +2295,7 @@ async def privacy_policy():
         <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our compliance with Google AdSense guidelines, please contact us at:</p>
         <ul>
         <li>Project Operator & Data Controller: Amruth Belagere</li>
-        <li>Official Contact Email: amruth.belagere@gmail.com</li>
+        <li>Official Contact Email: amruth.kumar.portfolio@gmail.com</li>
         <li>Website URL: https://heli-hogu-kaarana.vercel.app</li>
         <li>Physical Operating Location: Bengaluru, Karnataka, India</li>
         </ul>
@@ -2307,7 +2307,7 @@ async def privacy_policy():
             <span style="opacity:0.4;">|</span>
             <a href="/privacy">Privacy Policy</a>
             <span style="opacity:0.4;">|</span>
-            <a href="mailto:amruth.belagere@gmail.com">Contact Us</a>
+            <a href="mailto:amruth.kumar.portfolio@gmail.com">Contact Us</a>
         </div>
     </footer>
 </body>
@@ -5599,7 +5599,7 @@ async def root():
             <span style="opacity:0.4;">|</span>
             <span>Built with ❤️ for Kannada Literature</span>
             <span style="opacity:0.4;">|</span>
-            <a href="mailto:amruth.belagere@gmail.com" style="color:#ffedd5;text-decoration:underline;">Contact Us</a>
+            <a href="mailto:amruth.kumar.portfolio@gmail.com" style="color:#ffedd5;text-decoration:underline;">Contact Us</a>
         </div>
         <div style="margin-top:0.5rem;opacity:0.75;font-size:0.7rem;">
             This site uses cookies and Google AdSense to serve personalised ads. By continuing, you agree to our <a href="/privacy" style="color:#ffedd5;text-decoration:underline;">Privacy Policy</a>.

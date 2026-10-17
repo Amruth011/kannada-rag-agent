@@ -47,3 +47,8 @@ audio/
 *.mp3
 *.wav
 
+
+# Generated report PDFs
+*.pdf
+docs/*.pdf
+
